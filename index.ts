@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import { getAllUsers } from "./Firebase/collections";
+import { getAllBeers } from "./DBclient/beerclient";
 
 dotenv.config();
 
@@ -22,4 +23,10 @@ app.listen(port, () => {
 app.get("/api/users", async (req: Request, res: Response) => {
   const users = await getAllUsers();
   res.send(users);
+});
+
+// Get all beers
+app.get("/api/beers", async (req: Request, res: Response) => {
+  const beers = await getAllBeers();
+  res.send(beers);
 });

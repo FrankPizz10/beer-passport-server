@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model beers {
+  id         Int      @id @default(autoincrement())
+  brewery_id Int      @default(0)
+  name       String   @default("") @db.VarChar(255)
+  cat_id     Int      @default(0)
+  style_id   Int      @default(0)
+  abv        Float    @default(0) @db.Float
+  ibu        Float    @default(0) @db.Float
+  srm        Float    @default(0) @db.Float
+  upc        Int      @default(0)
+  filepath   String   @default("") @db.VarChar(255)
+  descript   String   @db.Text
+  add_user   Int      @default(0)
+  last_mod   DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+}

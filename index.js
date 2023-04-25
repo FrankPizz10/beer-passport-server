@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const collections_1 = require("./Firebase/collections");
+const beerclient_1 = require("./DBclient/beerclient");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT;
@@ -30,4 +31,9 @@ app.listen(port, () => {
 app.get("/api/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield (0, collections_1.getAllUsers)();
     res.send(users);
+}));
+// Get all beers
+app.get("/api/beers", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const beers = yield (0, beerclient_1.getAllBeers)();
+    res.send(beers);
 }));
