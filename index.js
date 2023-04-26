@@ -53,3 +53,8 @@ app.get("/api/categories", (req, res) => __awaiter(void 0, void 0, void 0, funct
     const categories = yield (0, gettableinfo_1.getCategories)();
     res.send(categories);
 }));
+// Get beer by id
+app.get("/api/beers/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const beer = yield (0, beerclient_1.getBeerById)(parseInt(req.params.id));
+    res.send(beer);
+}));

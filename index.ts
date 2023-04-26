@@ -1,7 +1,11 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import { getAllUsers } from "./Firebase/collections";
-import { getAllBeers, getBeerByCategory } from "./DBclient/beerclient";
+import {
+  getAllBeers,
+  getBeerByCategory,
+  getBeerById,
+} from "./DBclient/beerclient";
 import { getCategories } from "./DBclient/gettableinfo";
 
 dotenv.config();
@@ -51,4 +55,10 @@ app.post("/api/beers/cat", async (req: Request, res: Response) => {
 app.get("/api/categories", async (req: Request, res: Response) => {
   const categories = await getCategories();
   res.send(categories);
+});
+
+// Get beer by id
+app.get("/api/beers/:id", async (req: Request, res: Response) => {
+  const beer = await getBeerById(parseInt(req.params.id));
+  res.send(beer);
 });
