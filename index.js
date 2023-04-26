@@ -16,10 +16,16 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const collections_1 = require("./Firebase/collections");
 const beerclient_1 = require("./DBclient/beerclient");
+const gettableinfo_1 = require("./DBclient/gettableinfo");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT;
 var cors = require("cors");
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({
+    extended: false,
+}));
+app.use(bodyParser.json());
 app.use(cors());
 app.get("/", (req, res) => {
     res.send("Express + TypeScript Server");
@@ -36,4 +42,14 @@ app.get("/api/users", (req, res) => __awaiter(void 0, void 0, void 0, function* 
 app.get("/api/beers", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const beers = yield (0, beerclient_1.getAllBeers)();
     res.send(beers);
+}));
+// Get beer by category
+app.post("/api/beers/cat", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const beers = yield (0, beerclient_1.getBeerByCategory)(req.body.cat);
+    res.send(beers);
+}));
+// Get categories
+app.get("/api/categories", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const categories = yield (0, gettableinfo_1.getCategories)();
+    res.send(categories);
 }));

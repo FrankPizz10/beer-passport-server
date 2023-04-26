@@ -1,7 +1,8 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import { getAllUsers } from "./Firebase/collections";
-import { getAllBeers } from "./DBclient/beerclient";
+import { getAllBeers, getBeerByCategory } from "./DBclient/beerclient";
+import { getCategories } from "./DBclient/gettableinfo";
 
 dotenv.config();
 
@@ -9,6 +10,15 @@ const app: Express = express();
 const port = process.env.PORT;
 
 var cors = require("cors");
+const bodyParser = require("body-parser");
+
+app.use(
+  bodyParser.urlencoded({
+    extended: false,
+  })
+);
+
+app.use(bodyParser.json());
 app.use(cors());
 
 app.get("/", (req: Request, res: Response) => {
@@ -29,4 +39,16 @@ app.get("/api/users", async (req: Request, res: Response) => {
 app.get("/api/beers", async (req: Request, res: Response) => {
   const beers = await getAllBeers();
   res.send(beers);
+});
+
+// Get beer by category
+app.post("/api/beers/cat", async (req: Request, res: Response) => {
+  const beers = await getBeerByCategory(req.body.cat);
+  res.send(beers);
+});
+
+// Get categories
+app.get("/api/categories", async (req: Request, res: Response) => {
+  const categories = await getCategories();
+  res.send(categories);
 });
