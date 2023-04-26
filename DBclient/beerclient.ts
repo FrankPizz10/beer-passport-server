@@ -26,3 +26,17 @@ export const getBeerByCategory = async (cat: string) => {
   });
   return beers.splice(0, 20);
 };
+
+export const getBeerById = async (id: number) => {
+  const beer = await prisma.beers.findUnique({
+    where: {
+      id: id,
+    },
+    include: {
+      category: true,
+      style: true,
+      brewery: true,
+    },
+  });
+  return beer;
+};
