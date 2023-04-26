@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllBeers = void 0;
+exports.getBeerByCategory = exports.getAllBeers = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getAllBeers = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -18,3 +18,23 @@ const getAllBeers = () => __awaiter(void 0, void 0, void 0, function* () {
     return beers.splice(0, 10);
 });
 exports.getAllBeers = getAllBeers;
+const getBeerByCategory = (cat) => __awaiter(void 0, void 0, void 0, function* () {
+    // Get category that contains cat
+    const category = yield prisma.categories.findFirst({
+        where: {
+            cat_name: {
+                contains: cat,
+            },
+        },
+    });
+    const id = category === null || category === void 0 ? void 0 : category.id;
+    const beers = yield prisma.beers.findMany({
+        where: {
+            cat_id: {
+                equals: id,
+            },
+        },
+    });
+    return beers.splice(0, 20);
+});
+exports.getBeerByCategory = getBeerByCategory;

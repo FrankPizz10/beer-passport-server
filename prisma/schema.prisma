@@ -8,17 +8,61 @@ datasource db {
 }
 
 model beers {
+  id         Int         @id @default(autoincrement())
+  brewery    breweries?  @relation(fields: [brewery_id], references: [id])
+  brewery_id Int         @default(0)
+  name       String      @default("") @db.VarChar(255)
+  category   categories? @relation(fields: [cat_id], references: [id])
+  cat_id     Int         @default(0)
+  style      styles?     @relation(fields: [style_id], references: [id])
+  style_id   Int         @default(0)
+  abv        Float       @default(0) @db.Float
+  ibu        Float       @default(0) @db.Float
+  srm        Float       @default(0) @db.Float
+  upc        Int         @default(0)
+  filepath   String      @default("") @db.VarChar(255)
+  descript   String      @db.Text
+  add_user   Int         @default(0)
+  last_mod   DateTime    @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+}
+
+model breweries {
+  id       Int      @id @default(autoincrement())
+  name     String   @default("") @db.VarChar(255)
+  address1 String   @default("") @db.VarChar(255)
+  address2 String   @default("") @db.VarChar(255)
+  city     String   @default("") @db.VarChar(255)
+  state    String   @default("") @db.VarChar(255)
+  code     String   @default("") @db.VarChar(25)
+  country  String   @default("") @db.VarChar(255)
+  phone    String   @default("") @db.VarChar(50)
+  website  String   @default("") @db.VarChar(255)
+  filepath String   @default("") @db.VarChar(255)
+  descript String   @db.Text
+  add_user Int      @default(0)
+  last_mod DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  beers    beers[]
+}
+
+model breweries_geocode {
+  id         Int    @id @default(autoincrement())
+  brewery_id Int    @default(0)
+  latitude   Float  @default(0) @db.Float
+  longitude  Float  @default(0) @db.Float
+  accuracy   String @default("") @db.VarChar(255)
+}
+
+model categories {
+  id       Int      @id @default(autoincrement())
+  cat_name String   @default("") @db.VarChar(255)
+  last_mod DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  beers    beers[]
+}
+
+model styles {
   id         Int      @id @default(autoincrement())
-  brewery_id Int      @default(0)
-  name       String   @default("") @db.VarChar(255)
   cat_id     Int      @default(0)
-  style_id   Int      @default(0)
-  abv        Float    @default(0) @db.Float
-  ibu        Float    @default(0) @db.Float
-  srm        Float    @default(0) @db.Float
-  upc        Int      @default(0)
-  filepath   String   @default("") @db.VarChar(255)
-  descript   String   @db.Text
-  add_user   Int      @default(0)
+  style_name String   @default("") @db.VarChar(255)
   last_mod   DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  beers      beers[]
 }
