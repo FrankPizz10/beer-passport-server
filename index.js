@@ -58,3 +58,18 @@ app.get("/api/beers/:id", (req, res) => __awaiter(void 0, void 0, void 0, functi
     const beer = yield (0, beerclient_1.getBeerById)(parseInt(req.params.id));
     res.send(beer);
 }));
+// Add user
+app.post("/api/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield (0, collections_1.addUser)(req.body);
+    res.send(user);
+}));
+// Get User by id
+app.get("/api/users/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield (0, collections_1.getUser)(req.params.id);
+    res.send(user);
+}));
+// Add tried beer
+app.post("/api/users/tried", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const beer = yield (0, collections_1.addTriedBeer)(req.body.user, req.body.beer);
+    res.send(beer);
+}));
