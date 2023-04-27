@@ -14,8 +14,8 @@ export interface User {
   username: string;
   age: number;
   email: string;
-  tried: Beer[];
-  liked: Beer[];
+  tried?: Beer[];
+  liked?: Beer[];
 }
 
 export interface Beer {
@@ -35,14 +35,20 @@ export const getAllUsers = async () => {
 
 // Get user by id
 export const getUser = async (id: string) => {
-  const usersCollection = collection(db, "users");
-  const q = query(usersCollection, where("id", "==", id));
-  const doc = await getDocs(q);
+  const doc = await getUserHelper(id);
   if (doc.docs[0].exists()) {
     return doc.docs[0].data() as User;
   } else {
     console.log("No such document!");
   }
+};
+
+// Get user helper
+export const getUserHelper = async (id: string) => {
+  const usersCollection = collection(db, "users");
+  const q = query(usersCollection, where("id", "==", id));
+  const doc = await getDocs(q);
+  return doc;
 };
 
 // Add user
@@ -58,8 +64,22 @@ export const addUser = async (user: User) => {
 
 // Add tried beer
 export const addTriedBeer = async (user: User, beer: Beer) => {
-  const usersCollection = collection(db, "users");
-  const userDoc = doc(usersCollection, user.id);
-  const triedBeer = await addDoc(collection(userDoc, "tried"), beer);
-  return triedBeer.id;
+  const querySnap = await getUserHelper(user.id);
+  const docRef = querySnap.docs[0].ref;
+  const triedCollectionRef = collection(docRef, "tried");
+  const newTriedDocRef = await addDoc(triedCollectionRef, beer);
+  return newTriedDocRef.id;
+};
+
+// Get tried beers by user
+export const getTriedBeers = async (user: User) => {
+  const querySnap = await getUserHelper(user.id);
+  const docRef = querySnap.docs[0].ref;
+  const triedCollectionRef = collection(docRef, "tried");
+  const triedSnapshot = await getDocs(triedCollectionRef);
+  const triedList = triedSnapshot.docs.map((doc) => ({
+    id: parseInt(doc.id),
+    ...doc.data(),
+  })) as Beer[];
+  return triedList;
 };

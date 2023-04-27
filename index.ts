@@ -4,6 +4,7 @@ import {
   addTriedBeer,
   addUser,
   getAllUsers,
+  getTriedBeers,
   getUser,
 } from "./Firebase/collections";
 import {
@@ -84,4 +85,15 @@ app.get("/api/users/:id", async (req: Request, res: Response) => {
 app.post("/api/users/tried", async (req: Request, res: Response) => {
   const beer = await addTriedBeer(req.body.user, req.body.beer);
   res.send(beer);
+});
+
+// Get tried beers by user
+app.get("/api/users/tried/:id", async (req: Request, res: Response) => {
+  const user = await getUser(req.params.id);
+  if (user) {
+    const beers = await getTriedBeers(user);
+    res.send(beers);
+  } else {
+    res.send([]);
+  }
 });

@@ -73,3 +73,14 @@ app.post("/api/users/tried", (req, res) => __awaiter(void 0, void 0, void 0, fun
     const beer = yield (0, collections_1.addTriedBeer)(req.body.user, req.body.beer);
     res.send(beer);
 }));
+// Get tried beers by user
+app.get("/api/users/tried/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield (0, collections_1.getUser)(req.params.id);
+    if (user) {
+        const beers = yield (0, collections_1.getTriedBeers)(user);
+        res.send(beers);
+    }
+    else {
+        res.send([]);
+    }
+}));
