@@ -78,7 +78,12 @@ app.post("/api/users", async (req: Request, res: Response) => {
 // Get User by id
 app.get("/api/users/:id", async (req: Request, res: Response) => {
   const user = await getUser(req.params.id);
-  res.send(user);
+  if (user) {
+    res.send(user);
+  } else {
+    res.statusCode = 404;
+    res.send("User not found");
+  }
 });
 
 // Add tried beer

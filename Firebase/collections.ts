@@ -36,10 +36,11 @@ export const getAllUsers = async () => {
 // Get user by id
 export const getUser = async (id: string) => {
   const doc = await getUserHelper(id);
-  if (doc.docs[0].exists()) {
+  if (doc && doc.docs[0] && doc.docs[0].exists()) {
     return doc.docs[0].data() as User;
   } else {
     console.log("No such document!");
+    return null;
   }
 };
 

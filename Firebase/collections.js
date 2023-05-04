@@ -23,11 +23,12 @@ exports.getAllUsers = getAllUsers;
 // Get user by id
 const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const doc = yield (0, exports.getUserHelper)(id);
-    if (doc.docs[0].exists()) {
+    if (doc && doc.docs[0] && doc.docs[0].exists()) {
         return doc.docs[0].data();
     }
     else {
         console.log("No such document!");
+        return null;
     }
 });
 exports.getUser = getUser;

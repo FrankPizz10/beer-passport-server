@@ -66,7 +66,13 @@ app.post("/api/users", (req, res) => __awaiter(void 0, void 0, void 0, function*
 // Get User by id
 app.get("/api/users/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield (0, collections_1.getUser)(req.params.id);
-    res.send(user);
+    if (user) {
+        res.send(user);
+    }
+    else {
+        res.statusCode = 404;
+        res.send("User not found");
+    }
 }));
 // Add tried beer
 app.post("/api/users/tried", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
