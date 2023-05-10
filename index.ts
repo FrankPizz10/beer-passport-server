@@ -1,18 +1,26 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import {
-  addTriedBeer,
-  addUser,
-  getAllUsers,
-  getTriedBeers,
-  getUser,
-} from "./Firebase/collections";
+// import {
+//   addTriedBeer,
+//   addUser,
+//   getAllUsers,
+//   getTriedBeers,
+//   getUser,
+// } from "./Firebase/collections";
 import {
   getAllBeers,
   getBeerByCategory,
   getBeerById,
 } from "./DBclient/beerclient";
+import {
+  getAllUsers,
+  addUser,
+  getUser,
+  updateOrCreateUserBeers,
+  getUserBeersByUserId,
+} from "./DBclient/userclient";
 import { getCategories } from "./DBclient/gettableinfo";
+import { get } from "http";
 
 dotenv.config();
 
@@ -45,6 +53,12 @@ app.get("/api/users", async (req: Request, res: Response) => {
   res.send(users);
 });
 
+// Add user
+app.post("/api/users", async (req: Request, res: Response) => {
+  const user = await addUser(req.body);
+  res.send(user);
+});
+
 // Get all beers
 app.get("/api/beers", async (req: Request, res: Response) => {
   const beers = await getAllBeers();
@@ -69,12 +83,6 @@ app.get("/api/beers/:id", async (req: Request, res: Response) => {
   res.send(beer);
 });
 
-// Add user
-app.post("/api/users", async (req: Request, res: Response) => {
-  const user = await addUser(req.body);
-  res.send(user);
-});
-
 // Get User by id
 app.get("/api/users/:id", async (req: Request, res: Response) => {
   const user = await getUser(req.params.id);
@@ -87,18 +95,28 @@ app.get("/api/users/:id", async (req: Request, res: Response) => {
 });
 
 // Add tried beer
-app.post("/api/users/tried", async (req: Request, res: Response) => {
-  const beer = await addTriedBeer(req.body.user, req.body.beer);
+app.post("/api/userbeers", async (req: Request, res: Response) => {
+  const user_id = await getUser(req.body.user_uid);
+  if (!user_id) {
+    res.statusCode = 404;
+    res.send("User not found");
+  }
+  const beer = await updateOrCreateUserBeers(
+    user_id!.id,
+    req.body.beer_id,
+    req.body.tried,
+    req.body.liked
+  );
   res.send(beer);
 });
 
-// Get tried beers by user
-app.get("/api/users/tried/:id", async (req: Request, res: Response) => {
-  const user = await getUser(req.params.id);
-  if (user) {
-    const beers = await getTriedBeers(user);
-    res.send(beers);
-  } else {
-    res.send([]);
+// Get user beers by user
+app.get("/api/userbeers/:id", async (req: Request, res: Response) => {
+  const user_id = await getUser(req.params.id);
+  if (!user_id) {
+    res.statusCode = 404;
+    res.send("User not found");
   }
+  const beers = await getUserBeersByUserId(user_id!.id);
+  res.send(beers);
 });

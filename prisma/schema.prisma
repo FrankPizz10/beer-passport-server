@@ -3,27 +3,33 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "foreignKeys"
 }
 
 model beers {
-  id         Int         @id @default(autoincrement())
-  brewery    breweries?  @relation(fields: [brewery_id], references: [id])
-  brewery_id Int         @default(0)
-  name       String      @default("") @db.VarChar(255)
-  category   categories? @relation(fields: [cat_id], references: [id])
-  cat_id     Int         @default(0)
-  style      styles?     @relation(fields: [style_id], references: [id])
-  style_id   Int         @default(0)
-  abv        Float       @default(0) @db.Float
-  ibu        Float       @default(0) @db.Float
-  srm        Float       @default(0) @db.Float
-  upc        Int         @default(0)
-  filepath   String      @default("") @db.VarChar(255)
-  descript   String      @db.Text
-  add_user   Int         @default(0)
-  last_mod   DateTime    @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  id         Int          @id @default(autoincrement())
+  brewery_id Int          @default(0)
+  breweries  breweries?   @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_brewery_id")
+  name       String       @default("") @db.VarChar(255)
+  cat_id     Int          @default(0)
+  categories categories?  @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_cat_id")
+  style_id   Int          @default(0)
+  styles     styles?      @relation(fields: [style_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_style_id")
+  abv        Float        @default(0) @db.Float
+  ibu        Float        @default(0) @db.Float
+  srm        Float        @default(0) @db.Float
+  upc        Int          @default(0)
+  filepath   String       @default("") @db.VarChar(255)
+  descript   String       @db.Text
+  add_user   Int          @default(0)
+  last_mod   DateTime     @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  user_beers user_beers[]
+
+  @@index([brewery_id], map: "fk_beers_brewery_id")
+  @@index([cat_id], map: "fk_beers_cat_id")
+  @@index([style_id], map: "fk_beers_style_id")
 }
 
 model breweries {
@@ -65,4 +71,26 @@ model styles {
   style_name String   @default("") @db.VarChar(255)
   last_mod   DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   beers      beers[]
+}
+
+model user_beers {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  beer_id    Int
+  tried      Boolean?  @default(false)
+  liked      Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  updated_at DateTime? @default(now()) @db.Timestamp(0)
+  beers      beers     @relation(fields: [beer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_beers_beer_id")
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_beers_user_id")
+
+  @@unique([user_id, beer_id])
+  @@index([beer_id], map: "fk_user_beers_beer_id")
+  @@index([user_id], map: "fk_user_beers_user_id")
+}
+
+model users {
+  id         Int          @id @unique(map: "id") @default(autoincrement())
+  uid        String       @unique(map: "uid") @db.VarChar(255)
+  user_beers user_beers[]
 }

@@ -33,9 +33,9 @@ export const getBeerById = async (id: number) => {
       id: id,
     },
     include: {
-      category: true,
-      style: true,
-      brewery: true,
+      categories: true,
+      breweries: true,
+      styles: true,
     },
   });
   return beer;
