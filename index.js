@@ -14,13 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
-// import {
-//   addTriedBeer,
-//   addUser,
-//   getAllUsers,
-//   getTriedBeers,
-//   getUser,
-// } from "./Firebase/collections";
 const beerclient_1 = require("./DBclient/beerclient");
 const userclient_1 = require("./DBclient/userclient");
 const gettableinfo_1 = require("./DBclient/gettableinfo");
@@ -70,7 +63,7 @@ app.get("/api/beers/:id", (req, res) => __awaiter(void 0, void 0, void 0, functi
     const beer = yield (0, beerclient_1.getBeerById)(parseInt(req.params.id));
     res.send(beer);
 }));
-// Add tried beer
+// Update or create user beer
 app.post("/api/userbeers", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const beer = yield (0, userclient_1.updateOrCreateUserBeers)(req.body.user_id, req.body.beer_id, req.body.tried, req.body.liked);
     res.send(beer);
@@ -88,4 +81,14 @@ app.get("/api/userbyuid/:uid", (req, res) => __awaiter(void 0, void 0, void 0, f
         res.send("User not found");
     }
     res.send(user);
+}));
+// Get tried beers by user id
+app.get("/api/triedbeers/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const triedBeers = yield (0, userclient_1.getTriedBeersByUserId)(parseInt(req.params.id));
+    res.send(triedBeers);
+}));
+// Get liked beers by user id
+app.get("/api/likedbeers/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const likedBeers = yield (0, userclient_1.getLikedBeersByUserId)(parseInt(req.params.id));
+    res.send(likedBeers);
 }));

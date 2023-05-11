@@ -1,12 +1,5 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-// import {
-//   addTriedBeer,
-//   addUser,
-//   getAllUsers,
-//   getTriedBeers,
-//   getUser,
-// } from "./Firebase/collections";
 import {
   getAllBeers,
   getBeerByCategory,
@@ -18,9 +11,10 @@ import {
   getUser,
   updateOrCreateUserBeers,
   getUserBeersByUserId,
+  getTriedBeersByUserId,
+  getLikedBeersByUserId,
 } from "./DBclient/userclient";
 import { getCategories } from "./DBclient/gettableinfo";
-import { get } from "http";
 
 dotenv.config();
 
@@ -83,7 +77,7 @@ app.get("/api/beers/:id", async (req: Request, res: Response) => {
   res.send(beer);
 });
 
-// Add tried beer
+// Update or create user beer
 app.post("/api/userbeers", async (req: Request, res: Response) => {
   const beer = await updateOrCreateUserBeers(
     req.body.user_id,
@@ -108,4 +102,16 @@ app.get("/api/userbyuid/:uid", async (req: Request, res: Response) => {
     res.send("User not found");
   }
   res.send(user);
+});
+
+// Get tried beers by user id
+app.get("/api/triedbeers/:id", async (req: Request, res: Response) => {
+  const triedBeers = await getTriedBeersByUserId(parseInt(req.params.id));
+  res.send(triedBeers);
+});
+
+// Get liked beers by user id
+app.get("/api/likedbeers/:id", async (req: Request, res: Response) => {
+  const likedBeers = await getLikedBeersByUserId(parseInt(req.params.id));
+  res.send(likedBeers);
 });
