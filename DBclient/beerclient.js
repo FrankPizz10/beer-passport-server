@@ -44,9 +44,9 @@ const getBeerById = (id) => __awaiter(void 0, void 0, void 0, function* () {
             id: id,
         },
         include: {
-            categories: true,
-            breweries: true,
-            styles: true,
+            category: true,
+            brewery: true,
+            style: true,
         },
     });
     return beer;

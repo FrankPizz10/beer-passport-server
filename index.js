@@ -70,34 +70,22 @@ app.get("/api/beers/:id", (req, res) => __awaiter(void 0, void 0, void 0, functi
     const beer = yield (0, beerclient_1.getBeerById)(parseInt(req.params.id));
     res.send(beer);
 }));
-// Get User by id
-app.get("/api/users/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield (0, userclient_1.getUser)(req.params.id);
-    if (user) {
-        res.send(user);
-    }
-    else {
-        res.statusCode = 404;
-        res.send("User not found");
-    }
-}));
 // Add tried beer
 app.post("/api/userbeers", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user_id = yield (0, userclient_1.getUser)(req.body.user_uid);
-    if (!user_id) {
-        res.statusCode = 404;
-        res.send("User not found");
-    }
-    const beer = yield (0, userclient_1.updateOrCreateUserBeers)(user_id.id, req.body.beer_id, req.body.tried, req.body.liked);
+    const beer = yield (0, userclient_1.updateOrCreateUserBeers)(req.body.user_id, req.body.beer_id, req.body.tried, req.body.liked);
     res.send(beer);
 }));
 // Get user beers by user
 app.get("/api/userbeers/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user_id = yield (0, userclient_1.getUser)(req.params.id);
-    if (!user_id) {
+    const beers = yield (0, userclient_1.getUserBeersByUserId)(parseInt(req.params.id));
+    res.send(beers);
+}));
+// Get user by uid
+app.get("/api/userbyuid/:uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield (0, userclient_1.getUser)(req.params.uid);
+    if (!user) {
         res.statusCode = 404;
         res.send("User not found");
     }
-    const beers = yield (0, userclient_1.getUserBeersByUserId)(user_id.id);
-    res.send(beers);
+    res.send(user);
 }));

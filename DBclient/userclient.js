@@ -21,6 +21,9 @@ const addUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const newUser = yield prisma.users.create({
         data: {
             uid: user.uid,
+            email: user.email,
+            age: user.age,
+            user_name: user.user_name,
         },
     });
     return newUser;
