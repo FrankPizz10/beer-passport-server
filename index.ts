@@ -13,6 +13,7 @@ import {
   getUserBeersByUserId,
   getTriedBeersByUserId,
   getLikedBeersByUserId,
+  getUserBeerByUserIdAndBeerId,
 } from "./DBclient/userclient";
 import { getCategories } from "./DBclient/gettableinfo";
 
@@ -93,6 +94,18 @@ app.get("/api/userbeers/:id", async (req: Request, res: Response) => {
   const beers = await getUserBeersByUserId(parseInt(req.params.id));
   res.send(beers);
 });
+
+// Get user beer by user and beer
+app.get(
+  "/api/userbeer/:user_id/:beer_id",
+  async (req: Request, res: Response) => {
+    const beer = await getUserBeerByUserIdAndBeerId(
+      parseInt(req.params.user_id),
+      parseInt(req.params.beer_id)
+    );
+    res.send(beer);
+  }
+);
 
 // Get user by uid
 app.get("/api/userbyuid/:uid", async (req: Request, res: Response) => {

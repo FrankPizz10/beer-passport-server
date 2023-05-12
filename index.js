@@ -73,6 +73,11 @@ app.get("/api/userbeers/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
     const beers = yield (0, userclient_1.getUserBeersByUserId)(parseInt(req.params.id));
     res.send(beers);
 }));
+// Get user beer by user and beer
+app.get("/api/userbeer/:user_id/:beer_id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const beer = yield (0, userclient_1.getUserBeerByUserIdAndBeerId)(parseInt(req.params.user_id), parseInt(req.params.beer_id));
+    res.send(beer);
+}));
 // Get user by uid
 app.get("/api/userbyuid/:uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield (0, userclient_1.getUser)(req.params.uid);

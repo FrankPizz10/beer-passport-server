@@ -74,6 +74,21 @@ export const getUserBeersByUserId = async (id: number) => {
   return userBeers;
 };
 
+export const getUserBeerByUserIdAndBeerId = async (
+  user_id: number,
+  beer_id: number
+) => {
+  const userBeer = await prisma.user_beers.findUnique({
+    where: {
+      user_id_beer_id: {
+        user_id: user_id,
+        beer_id: beer_id,
+      },
+    },
+  });
+  return userBeer;
+};
+
 export const getTriedBeersByUserId = async (id: number) => {
   const triedBeers = await prisma.user_beers.findMany({
     where: {

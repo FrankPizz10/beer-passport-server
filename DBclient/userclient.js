@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLikedBeersByUserId = exports.getTriedBeersByUserId = exports.getUserBeersByUserId = exports.updateOrCreateUserBeers = exports.getUser = exports.addUser = exports.getAllUsers = void 0;
+exports.getLikedBeersByUserId = exports.getTriedBeersByUserId = exports.getUserBeerByUserIdAndBeerId = exports.getUserBeersByUserId = exports.updateOrCreateUserBeers = exports.getUser = exports.addUser = exports.getAllUsers = void 0;
 const client_1 = require("@prisma/client");
 const beerclient_1 = require("./beerclient");
 const prisma = new client_1.PrismaClient();
@@ -77,6 +77,18 @@ const getUserBeersByUserId = (id) => __awaiter(void 0, void 0, void 0, function*
     return userBeers;
 });
 exports.getUserBeersByUserId = getUserBeersByUserId;
+const getUserBeerByUserIdAndBeerId = (user_id, beer_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const userBeer = yield prisma.user_beers.findUnique({
+        where: {
+            user_id_beer_id: {
+                user_id: user_id,
+                beer_id: beer_id,
+            },
+        },
+    });
+    return userBeer;
+});
+exports.getUserBeerByUserIdAndBeerId = getUserBeerByUserIdAndBeerId;
 const getTriedBeersByUserId = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const triedBeers = yield prisma.user_beers.findMany({
         where: {
