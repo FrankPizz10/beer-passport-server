@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const collections_1 = require("./Firebase/collections");
 const beerclient_1 = require("./DBclient/beerclient");
+const userclient_1 = require("./DBclient/userclient");
 const gettableinfo_1 = require("./DBclient/gettableinfo");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -35,8 +35,13 @@ app.listen(port, () => {
 });
 // Get all users
 app.get("/api/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield (0, collections_1.getAllUsers)();
+    const users = yield (0, userclient_1.getAllUsers)();
     res.send(users);
+}));
+// Add user
+app.post("/api/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield (0, userclient_1.addUser)(req.body);
+    res.send(user);
 }));
 // Get all beers
 app.get("/api/beers", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -57,4 +62,38 @@ app.get("/api/categories", (req, res) => __awaiter(void 0, void 0, void 0, funct
 app.get("/api/beers/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const beer = yield (0, beerclient_1.getBeerById)(parseInt(req.params.id));
     res.send(beer);
+}));
+// Update or create user beer
+app.post("/api/userbeers", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const beer = yield (0, userclient_1.updateOrCreateUserBeers)(req.body.user_id, req.body.beer_id, req.body.tried, req.body.liked);
+    res.send(beer);
+}));
+// Get user beers by user
+app.get("/api/userbeers/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const beers = yield (0, userclient_1.getUserBeersByUserId)(parseInt(req.params.id));
+    res.send(beers);
+}));
+// Get user beer by user and beer
+app.get("/api/userbeer/:user_id/:beer_id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const beer = yield (0, userclient_1.getUserBeerByUserIdAndBeerId)(parseInt(req.params.user_id), parseInt(req.params.beer_id));
+    res.send(beer);
+}));
+// Get user by uid
+app.get("/api/userbyuid/:uid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield (0, userclient_1.getUser)(req.params.uid);
+    if (!user) {
+        res.statusCode = 404;
+        res.send("User not found");
+    }
+    res.send(user);
+}));
+// Get tried beers by user id
+app.get("/api/triedbeers/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const triedBeers = yield (0, userclient_1.getTriedBeersByUserId)(parseInt(req.params.id));
+    res.send(triedBeers);
+}));
+// Get liked beers by user id
+app.get("/api/likedbeers/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const likedBeers = yield (0, userclient_1.getLikedBeersByUserId)(parseInt(req.params.id));
+    res.send(likedBeers);
 }));

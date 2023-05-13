@@ -14,8 +14,7 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getAllBeers = () => __awaiter(void 0, void 0, void 0, function* () {
     const beers = yield prisma.beers.findMany();
-    // const beers = await prisma.$queryRaw(Prisma.sql`SELECT * FROM beers`);
-    return beers.splice(0, 10);
+    return beers;
 });
 exports.getAllBeers = getAllBeers;
 const getBeerByCategory = (cat) => __awaiter(void 0, void 0, void 0, function* () {
@@ -45,8 +44,8 @@ const getBeerById = (id) => __awaiter(void 0, void 0, void 0, function* () {
         },
         include: {
             category: true,
-            style: true,
             brewery: true,
+            style: true,
         },
     });
     return beer;

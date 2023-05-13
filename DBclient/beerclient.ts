@@ -3,8 +3,7 @@ const prisma = new PrismaClient();
 
 export const getAllBeers = async () => {
   const beers = await prisma.beers.findMany();
-  // const beers = await prisma.$queryRaw(Prisma.sql`SELECT * FROM beers`);
-  return beers.splice(0, 10);
+  return beers;
 };
 
 export const getBeerByCategory = async (cat: string) => {
@@ -34,8 +33,8 @@ export const getBeerById = async (id: number) => {
     },
     include: {
       category: true,
-      style: true,
       brewery: true,
+      style: true,
     },
   });
   return beer;
