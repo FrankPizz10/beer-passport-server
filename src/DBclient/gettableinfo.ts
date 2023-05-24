@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma, categories } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const getCategories = async () => {
