@@ -1,8 +1,8 @@
 import { getCategories } from "../../src/DBclient/gettableinfo";
-import { categories } from "@prisma/client";
+// import { categories } from "@prisma/client";
 
 describe("DBClient.gettableinfo", () => {
-  let categories: categories[];
+  let categories: any[];
   beforeAll(async () => {
     categories = await getCategories();
   });

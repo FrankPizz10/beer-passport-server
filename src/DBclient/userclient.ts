@@ -21,7 +21,7 @@ export const addUser = async (user: any) => {
 };
 
 const addAllNewUserBeers = async (user_id: number) => {
-  const beers = await getAllBeers();
+  const beers: any[] = await getAllBeers();
   await Promise.all(
     beers.map(async (beer) => {
       return updateOrCreateUserBeers(user_id, beer.id, false, false);
