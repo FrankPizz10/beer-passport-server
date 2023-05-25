@@ -1,0 +1,11 @@
+Light Lager — 4-10
+Blond Ale — 14-25
+Saison — 20-38
+Pilsner — 25-45
+Dry Stout — 30-35
+Pale Ale — 30-50
+Hazy IPA — 30-50
+Hazy Double IPA — 45-80
+West Coast IPA — 50-70
+Imperial Stout — 50-80
+Double IPA — 65-100

@@ -9,14 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllUsers = void 0;
-const firestore_1 = require("@firebase/firestore");
-const firebase_1 = require("./firebase");
-// Get all users
-const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    const usersCollection = (0, firestore_1.collection)(firebase_1.db, "users");
-    const usersSnapshot = yield (0, firestore_1.getDocs)(usersCollection);
-    const usersList = usersSnapshot.docs.map((doc) => (Object.assign({ id: doc.id }, doc.data())));
-    return usersList;
+exports.getCategories = void 0;
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
+const getCategories = () => __awaiter(void 0, void 0, void 0, function* () {
+    const categories = yield prisma.categories.findMany();
+    return categories;
 });
-exports.getAllUsers = getAllUsers;
+exports.getCategories = getCategories;
