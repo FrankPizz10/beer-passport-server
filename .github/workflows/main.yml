@@ -28,7 +28,7 @@ jobs:
 #           TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
 #           TWILIO_API_KEY_SID: ${{ secrets.TWILIO_API_KEY_SID }}
 #         run: npm install && npm run build && npm test
-        run: npm install && npm run build
+        run: npm install && npm run build && npm test
 
 #   deploy:
 #     if: github.ref == 'refs/heads/main'
