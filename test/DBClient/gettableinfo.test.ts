@@ -1,8 +1,8 @@
 import { getCategories } from "../../src/DBclient/gettableinfo";
-// import { categories } from "@prisma/client";
+import { categories } from "@prisma/client";
 
 describe("DBClient.gettableinfo", () => {
-  let categories: any[];
+  let categories: categories[];
   beforeAll(async () => {
     categories = await getCategories();
   });
@@ -13,4 +13,7 @@ describe("DBClient.gettableinfo", () => {
       expect(categories[0].cat_name).toBe("British Ale");
     });
   });
+  // test("should pass", () => {
+  //   expect(1).toBe(1);
+  // });
 });
