@@ -7,7 +7,7 @@ export const getAllUsers = async () => {
   return users;
 };
 
-export const addUser = async (user: any, ctx: Context) => {
+export const addUser = async (user: AddUser, ctx: Context) => {
   const newUser = await ctx.prisma.users.create({
     data: {
       uid: user.uid,
@@ -21,7 +21,7 @@ export const addUser = async (user: any, ctx: Context) => {
 };
 
 const addAllNewUserBeers = async (user_id: number, ctx: Context) => {
-  const beers: any[] = await getAllBeers();
+  const beers: Beer[] = await getAllBeers();
   await Promise.all(
     beers.map(async (beer) => {
       return updateOrCreateUserBeers(user_id, beer.id, false, false, ctx);
