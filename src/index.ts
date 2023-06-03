@@ -16,6 +16,7 @@ import {
   getUserBeerByUserIdAndBeerId,
 } from "./DBclient/userclient";
 import { getCategories } from "./DBclient/gettableinfo";
+import { createContext } from "../context";
 
 dotenv.config();
 
@@ -34,11 +35,13 @@ app.use(
 app.use(bodyParser.json());
 app.use(cors());
 
+export const prismaCtx = createContext();
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
-app.listen(port, () => {
+export const server = app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });
 
@@ -50,7 +53,7 @@ app.get("/api/users", async (req: Request, res: Response) => {
 
 // Add user
 app.post("/api/users", async (req: Request, res: Response) => {
-  const user = await addUser(req.body);
+  const user = await addUser(req.body, prismaCtx);
   res.send(user);
 });
 
@@ -84,7 +87,8 @@ app.post("/api/userbeers", async (req: Request, res: Response) => {
     req.body.user_id,
     req.body.beer_id,
     req.body.tried,
-    req.body.liked
+    req.body.liked,
+    prismaCtx
   );
   res.send(beer);
 });

@@ -1,14 +1,14 @@
-import { PrismaClient, Prisma } from "@prisma/client";
 import { getAllBeers } from "./beerclient";
-const prisma = new PrismaClient();
+import { Context } from "../../context";
+import { prismaCtx } from "..";
 
 export const getAllUsers = async () => {
-  const users = await prisma.users.findMany();
+  const users = await prismaCtx.prisma.users.findMany();
   return users;
 };
 
-export const addUser = async (user: any) => {
-  const newUser = await prisma.users.create({
+export const addUser = async (user: any, ctx: Context) => {
+  const newUser = await ctx.prisma.users.create({
     data: {
       uid: user.uid,
       email: user.email,
@@ -16,21 +16,21 @@ export const addUser = async (user: any) => {
       user_name: user.user_name,
     },
   });
-  await addAllNewUserBeers(newUser.id);
+  await addAllNewUserBeers(newUser.id, ctx);
   return newUser;
 };
 
-const addAllNewUserBeers = async (user_id: number) => {
+const addAllNewUserBeers = async (user_id: number, ctx: Context) => {
   const beers: any[] = await getAllBeers();
   await Promise.all(
     beers.map(async (beer) => {
-      return updateOrCreateUserBeers(user_id, beer.id, false, false);
+      return updateOrCreateUserBeers(user_id, beer.id, false, false, ctx);
     })
   );
 };
 
 export const getUser = async (id: string) => {
-  const user = await prisma.users.findUnique({
+  const user = await prismaCtx.prisma.users.findUnique({
     where: {
       uid: id,
     },
@@ -42,9 +42,10 @@ export const updateOrCreateUserBeers = async (
   user_id: number,
   beer_id: number,
   tried: boolean,
-  liked: boolean
+  liked: boolean,
+  ctx: Context
 ) => {
-  const triedBeer = await prisma.user_beers.upsert({
+  const triedBeer = await ctx.prisma.user_beers.upsert({
     where: {
       user_id_beer_id: {
         user_id: user_id,
@@ -66,7 +67,7 @@ export const updateOrCreateUserBeers = async (
 };
 
 export const getUserBeersByUserId = async (id: number) => {
-  const userBeers = await prisma.user_beers.findMany({
+  const userBeers = await prismaCtx.prisma.user_beers.findMany({
     where: {
       user_id: id,
     },
@@ -78,7 +79,7 @@ export const getUserBeerByUserIdAndBeerId = async (
   user_id: number,
   beer_id: number
 ) => {
-  const userBeer = await prisma.user_beers.findUnique({
+  const userBeer = await prismaCtx.prisma.user_beers.findUnique({
     where: {
       user_id_beer_id: {
         user_id: user_id,
@@ -90,7 +91,7 @@ export const getUserBeerByUserIdAndBeerId = async (
 };
 
 export const getTriedBeersByUserId = async (id: number) => {
-  const triedBeers = await prisma.user_beers.findMany({
+  const triedBeers = await prismaCtx.prisma.user_beers.findMany({
     where: {
       user_id: id,
       tried: true,
@@ -100,7 +101,7 @@ export const getTriedBeersByUserId = async (id: number) => {
 };
 
 export const getLikedBeersByUserId = async (id: number) => {
-  const likedBeers = await prisma.user_beers.findMany({
+  const likedBeers = await prismaCtx.prisma.user_beers.findMany({
     where: {
       user_id: id,
       liked: true,
