@@ -115,20 +115,15 @@ describe('DBClient', () => {
     });
     describe('getUserBeerByUserIdAndBeerId', () => {
       it('should get all beers for a user', async () => {
-        const user = await getUser('I8PXIyg7RwYE0HQmVBejgf7sHtd2');
-        if (user) {
-          const userBeer = await getUserBeerByUserIdAndBeerId(user.id, 1);
-          if (userBeer) {
-            expect(userBeer.id).toBe(3);
-            expect(userBeer.beer_id).toBe(1);
-            expect(userBeer.user_id).toBe(2);
-            expect(userBeer.liked).toBe(false);
-            expect(userBeer.tried).toBe(false);
-          } else {
-            throw new Error('userBeer is null');
-          }
+        const userBeer = await getUserBeerByUserIdAndBeerId(3, 1);
+        if (userBeer) {
+          expect(userBeer.id).toBe(16);
+          expect(userBeer.beer_id).toBe(1);
+          expect(userBeer.user_id).toBe(3);
+          expect(userBeer.liked).toBe(false);
+          expect(userBeer.tried).toBe(false);
         } else {
-          throw new Error('user is null');
+          throw new Error('userBeer is null');
         }
       });
     });
