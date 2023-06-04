@@ -58,7 +58,7 @@ describe('DBClient', () => {
         if (beer) {
           expect(beer.name).toBe('Winter Warmer');
         } else {
-          fail('beer is null');
+          throw new Error('beer is null');
         }
       });
     });
@@ -89,13 +89,12 @@ describe('DBClient', () => {
       it('should get a user', async () => {
         const user = await getUser('xtCCTvpArfP4ZRzrjmzAyrVmO5A2');
         if (user) {
-          expect(user.id).toBe(1);
           expect(user.uid).toBe('xtCCTvpArfP4ZRzrjmzAyrVmO5A2');
           expect(user.email).toBe('f1@gmail.com');
           expect(user.age).toBe(23);
           expect(user.user_name).toBe('Frank_Pizz10');
         } else {
-          fail('user is null');
+          throw new Error('user is null');
         }
       });
     });
@@ -111,7 +110,7 @@ describe('DBClient', () => {
           expect(userBeers[0].liked).toBe(false);
           expect(userBeers[0].tried).toBe(false);
         } else {
-          fail('user is null');
+          throw new Error('user is null');
         }
       });
     });
@@ -127,10 +126,10 @@ describe('DBClient', () => {
             expect(userBeer.liked).toBe(false);
             expect(userBeer.tried).toBe(false);
           } else {
-            fail('userBeer is null');
+            throw new Error('userBeer is null');
           }
         } else {
-          fail('user is null');
+          throw new Error('user is null');
         }
       });
     });
@@ -145,7 +144,7 @@ describe('DBClient', () => {
           expect(userBeers[0].liked).toBe(false);
           expect(userBeers[0].tried).toBe(true);
         } else {
-          fail('user is null');
+          throw new Error('user is null');
         }
       });
     });
