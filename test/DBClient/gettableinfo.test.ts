@@ -100,17 +100,16 @@ describe('DBClient', () => {
     });
     describe('getUserBeersByUserId', () => {
       it('should get all beers for a user', async () => {
-        const user = await getUser('I8PXIyg7RwYE0HQmVBejgf7sHtd2');
-        if (user) {
-          const userBeers = await getUserBeersByUserId(user.id);
-          expect(userBeers.length).toBeGreaterThan(7);
-          expect(userBeers[0].id).toBe(3);
-          expect(userBeers[0].beer_id).toBe(1);
-          expect(userBeers[0].user_id).toBe(2);
-          expect(userBeers[0].liked).toBe(false);
-          expect(userBeers[0].tried).toBe(false);
+        const userBeers = await getUserBeersByUserId(3);
+        expect(userBeers.length).toBeGreaterThan(7);
+        const targetBeer = userBeers.find(b => b.id === 16);
+        if (targetBeer) {
+          expect(targetBeer.beer_id).toBe(1);
+          expect(targetBeer.user_id).toBe(3);
+          expect(targetBeer.liked).toBe(false);
+          expect(targetBeer.tried).toBe(false);
         } else {
-          throw new Error('user is null');
+          throw new Error('targetBeer is null');
         }
       });
     });
@@ -135,33 +134,29 @@ describe('DBClient', () => {
     });
     describe('getTriedBeersByUserId', () => {
       it('should get all tried beers for a user', async () => {
-        const user = await getUser('xtCCTvpArfP4ZRzrjmzAyrVmO5A2');
-        if (user) {
-          const userBeers = await getTriedBeersByUserId(user.id);
-          expect(userBeers[0].id).toBe(2);
-          expect(userBeers[0].beer_id).toBe(1);
-          expect(userBeers[0].user_id).toBe(1);
-          expect(userBeers[0].liked).toBe(false);
-          expect(userBeers[0].tried).toBe(true);
+        const userBeers = await getTriedBeersByUserId(3);
+        const targetBeer = userBeers.find(b => b.id === 19);
+        if (targetBeer) {
+          expect(targetBeer.beer_id).toBe(4);
+          expect(targetBeer.user_id).toBe(3);
+          expect(targetBeer.liked).toBe(false);
+          expect(targetBeer.tried).toBe(true);
         } else {
-          throw new Error('user is null');
+          throw new Error('targetBeer is null');
         }
       });
     });
     describe('getLikedBeersByUserId', () => {
       it('should get all liked beers for a user', async () => {
-        const user = await getUser('xtCCTvpArfP4ZRzrjmzAyrVmO5A2');
-        if (user) {
-          const userBeers = await getLikedBeersByUserId(user.id);
-          const targetBeer = userBeers.find(b => b.beer_id === 25);
-          if (targetBeer) {
-            expect(targetBeer.beer_id).toBe(6);
-            expect(targetBeer.user_id).toBe(3);
-            expect(targetBeer.liked).toBe(true);
-            expect(targetBeer.tried).toBe(true);
-          }
+        const userBeers = await getLikedBeersByUserId(3);
+        const targetBeer = userBeers.find(b => b.id === 25);
+        if (targetBeer) {
+          expect(targetBeer.beer_id).toBe(6);
+          expect(targetBeer.user_id).toBe(3);
+          expect(targetBeer.liked).toBe(true);
+          expect(targetBeer.tried).toBe(true);
         } else {
-          throw new Error('user is null');
+          throw new Error('targetBeer is null');
         }
       });
     });
