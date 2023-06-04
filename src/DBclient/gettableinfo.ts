@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prismaCtx } from '..';
 
 export const getCategories = async () => {
-  const categories = await prisma.categories.findMany();
+  const categories = await prismaCtx.prisma.categories.findMany();
   return categories;
 };

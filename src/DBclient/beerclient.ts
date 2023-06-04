@@ -1,14 +1,13 @@
-import { PrismaClient, Prisma } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prismaCtx } from '../index';
 
 export const getAllBeers = async () => {
-  const beers = await prisma.beers.findMany();
+  const beers = await prismaCtx.prisma.beers.findMany();
   return beers;
 };
 
 export const getBeerByCategory = async (cat: string) => {
   // Get category that contains cat
-  const category = await prisma.categories.findFirst({
+  const category = await prismaCtx.prisma.categories.findFirst({
     where: {
       cat_name: {
         contains: cat,
@@ -16,7 +15,7 @@ export const getBeerByCategory = async (cat: string) => {
     },
   });
   const id = category?.id;
-  const beers = await prisma.beers.findMany({
+  const beers = await prismaCtx.prisma.beers.findMany({
     where: {
       cat_id: {
         equals: id,
@@ -27,7 +26,7 @@ export const getBeerByCategory = async (cat: string) => {
 };
 
 export const getBeerById = async (id: number) => {
-  const beer = await prisma.beers.findUnique({
+  const beer = await prismaCtx.prisma.beers.findUnique({
     where: {
       id: id,
     },
