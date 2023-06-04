@@ -1,4 +1,4 @@
-import { prismaCtx } from "../index";
+import { prismaCtx } from '../index';
 
 export const getAllBeers = async () => {
   const beers = await prismaCtx.prisma.beers.findMany();

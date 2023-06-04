@@ -1,6 +1,6 @@
-import { getAllBeers } from "./beerclient";
-import { Context } from "../../context";
-import { prismaCtx } from "..";
+import { getAllBeers } from './beerclient';
+import { Context } from '../../context';
+import { prismaCtx } from '..';
 
 export const getAllUsers = async () => {
   const users = await prismaCtx.prisma.users.findMany();
@@ -23,9 +23,9 @@ export const addUser = async (user: AddUser, ctx: Context) => {
 const addAllNewUserBeers = async (user_id: number, ctx: Context) => {
   const beers: Beer[] = await getAllBeers();
   await Promise.all(
-    beers.map(async (beer) => {
+    beers.map(async beer => {
       return updateOrCreateUserBeers(user_id, beer.id, false, false, ctx);
-    })
+    }),
   );
 };
 
@@ -43,7 +43,7 @@ export const updateOrCreateUserBeers = async (
   beer_id: number,
   tried: boolean,
   liked: boolean,
-  ctx: Context
+  ctx: Context,
 ) => {
   const triedBeer = await ctx.prisma.user_beers.upsert({
     where: {
@@ -75,10 +75,7 @@ export const getUserBeersByUserId = async (id: number) => {
   return userBeers;
 };
 
-export const getUserBeerByUserIdAndBeerId = async (
-  user_id: number,
-  beer_id: number
-) => {
+export const getUserBeerByUserIdAndBeerId = async (user_id: number, beer_id: number) => {
   const userBeer = await prismaCtx.prisma.user_beers.findUnique({
     where: {
       user_id_beer_id: {
