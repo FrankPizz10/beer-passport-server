@@ -19,4 +19,19 @@ interface Beer {
   descript: string;
   add_user: number;
   last_mod: Date;
+  collection_id: number;
+}
+
+interface UserBeer {
+  user_id: number;
+  beer_id: number;
+  liked: boolean;
+  collection_id: number;
+}
+
+interface UserBadge {
+  user_id: number;
+  collection_id: number;
+  earned: boolean;
+  progress: number;
 }

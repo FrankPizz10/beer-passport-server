@@ -2,7 +2,13 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import { getAllBeers, getBeerByCategory, getBeerById } from './DBclient/beerclient';
+import {
+  getAllBeers,
+  getBeerByCategory,
+  getBeerById,
+  getBeersInCollection,
+  getCollectionsById,
+} from './DBclient/beerclient';
 import {
   getAllUsers,
   addUser,
@@ -13,7 +19,7 @@ import {
   getLikedBeersByUserId,
   getUserBeerByUserIdAndBeerId,
 } from './DBclient/userclient';
-import { getCategories } from './DBclient/gettableinfo';
+import { getCategories, getCollections } from './DBclient/gettableinfo';
 import { createContext } from '../context';
 
 dotenv.config();
@@ -37,7 +43,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 export const server = app.listen(PORT, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);
+  console.log(`⚡️[server]: Beer Passport Server is running at http://localhost:${PORT}`);
 });
 
 // Get all users
@@ -78,14 +84,20 @@ app.get('/api/beers/:id', async (req: Request, res: Response) => {
 
 // Update or create user beer
 app.post('/api/userbeers', async (req: Request, res: Response) => {
-  const beer = await updateOrCreateUserBeers(
-    req.body.user_id,
-    req.body.beer_id,
-    req.body.tried,
-    req.body.liked,
-    prismaCtx,
-  );
-  res.send(beer);
+  const beer = await getBeerById(req.body.beer_id);
+  if (!beer || beer.collection_id !== req.body.collection_id) {
+    res.statusCode = 400;
+    res.send('Beer not found or not in collection');
+  }
+  const userBeerParams: UserBeer = {
+    user_id: req.body.user_id,
+    beer_id: req.body.beer_id,
+    liked: req.body.liked,
+    collection_id: req.body.collection_id,
+  };
+  const userBeer = await updateOrCreateUserBeers(userBeerParams, prismaCtx);
+  // await calcUserBadgesProgress();
+  res.send(userBeer);
 });
 
 // Get user beers by user
@@ -123,4 +135,22 @@ app.get('/api/triedbeers/:id', async (req: Request, res: Response) => {
 app.get('/api/likedbeers/:id', async (req: Request, res: Response) => {
   const likedBeers = await getLikedBeersByUserId(parseInt(req.params.id));
   res.send(likedBeers);
+});
+
+// Get all collections
+app.get('/api/collections', async (req: Request, res: Response) => {
+  const collections = await getCollections();
+  res.send(collections);
+});
+
+// Get collection by id
+app.get('/api/collections/:id', async (req: Request, res: Response) => {
+  const collection = await getCollectionsById(parseInt(req.params.id));
+  res.send(collection);
+});
+
+// Get all beers in a collection
+app.get('/api/collections/:id/beers', async (req: Request, res: Response) => {
+  const beers = await getBeersInCollection(parseInt(req.params.id));
+  res.send(beers);
 });

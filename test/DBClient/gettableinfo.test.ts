@@ -107,7 +107,6 @@ describe('DBClient', () => {
           expect(targetBeer.beer_id).toBe(1);
           expect(targetBeer.user_id).toBe(3);
           expect(targetBeer.liked).toBe(false);
-          expect(targetBeer.tried).toBe(false);
         } else {
           throw new Error('targetBeer is null');
         }
@@ -121,7 +120,6 @@ describe('DBClient', () => {
           expect(userBeer.beer_id).toBe(1);
           expect(userBeer.user_id).toBe(3);
           expect(userBeer.liked).toBe(false);
-          expect(userBeer.tried).toBe(false);
         } else {
           throw new Error('userBeer is null');
         }
@@ -135,7 +133,6 @@ describe('DBClient', () => {
           expect(targetBeer.beer_id).toBe(4);
           expect(targetBeer.user_id).toBe(3);
           expect(targetBeer.liked).toBe(false);
-          expect(targetBeer.tried).toBe(true);
         } else {
           throw new Error('targetBeer is null');
         }
@@ -149,7 +146,6 @@ describe('DBClient', () => {
           expect(targetBeer.beer_id).toBe(6);
           expect(targetBeer.user_id).toBe(3);
           expect(targetBeer.liked).toBe(true);
-          expect(targetBeer.tried).toBe(true);
         } else {
           throw new Error('targetBeer is null');
         }

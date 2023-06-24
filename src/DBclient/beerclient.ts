@@ -2,7 +2,7 @@ import { prismaCtx } from '../index';
 
 export const getAllBeers = async () => {
   const beers = await prismaCtx.prisma.beers.findMany();
-  return beers;
+  return beers as Beer[];
 };
 
 export const getBeerByCategory = async (cat: string) => {
@@ -34,7 +34,26 @@ export const getBeerById = async (id: number) => {
       category: true,
       brewery: true,
       style: true,
+      collections: true,
     },
   });
   return beer;
+};
+
+export const getCollectionsById = async (collectionId: number) => {
+  const collections = await prismaCtx.prisma.collections.findUnique({
+    where: {
+      id: collectionId,
+    },
+  });
+  return collections;
+};
+
+export const getBeersInCollection = async (collectionId: number) => {
+  const beers = await prismaCtx.prisma.beers.findMany({
+    where: {
+      collection_id: collectionId,
+    },
+  });
+  return beers;
 };
