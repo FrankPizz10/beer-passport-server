@@ -11,9 +11,9 @@ export const getCollections = async () => {
 };
 
 export const getCollectionSize = async (collection_id: number) => {
-  const collectionSize = await prismaCtx.prisma.collections.count({
+  const collectionSize = await prismaCtx.prisma.beers.count({
     where: {
-      id: collection_id,
+      collection_id: collection_id,
     },
   });
   return collectionSize;

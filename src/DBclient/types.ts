@@ -26,7 +26,7 @@ interface UserBeer {
   user_id: number;
   beer_id: number;
   liked: boolean;
-  collection_id: number;
+  collection_id?: number;
 }
 
 interface UserBadge {

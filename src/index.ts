@@ -18,6 +18,7 @@ import {
   getTriedBeersByUserId,
   getLikedBeersByUserId,
   getUserBeerByUserIdAndBeerId,
+  getUserBadgesByUserId,
 } from './DBclient/userclient';
 import { getCategories, getCollections } from './DBclient/gettableinfo';
 import { createContext } from '../context';
@@ -89,14 +90,14 @@ app.post('/api/userbeers', async (req: Request, res: Response) => {
     res.statusCode = 400;
     res.send('Beer not found or not in collection');
   }
+  const collectionId = req.body.collection_id ? req.body.collection_id : null;
   const userBeerParams: UserBeer = {
     user_id: req.body.user_id,
     beer_id: req.body.beer_id,
     liked: req.body.liked,
-    collection_id: req.body.collection_id,
+    collection_id: collectionId,
   };
   const userBeer = await updateOrCreateUserBeers(userBeerParams, prismaCtx);
-  // await calcUserBadgesProgress();
   res.send(userBeer);
 });
 
@@ -153,4 +154,10 @@ app.get('/api/collections/:id', async (req: Request, res: Response) => {
 app.get('/api/collections/:id/beers', async (req: Request, res: Response) => {
   const beers = await getBeersInCollection(parseInt(req.params.id));
   res.send(beers);
+});
+
+// Get user badges by user id
+app.get('/api/userbadges/:id', async (req: Request, res: Response) => {
+  const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
+  res.send(userBadges);
 });
