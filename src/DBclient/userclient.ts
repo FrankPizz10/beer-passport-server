@@ -151,6 +151,9 @@ export const getUserBadgesByUserId = async (user_id: number) => {
     where: {
       user_id: user_id,
     },
+    include: {
+      collections: true,
+    },
   });
   return userBadges;
 };
