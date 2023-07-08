@@ -20,7 +20,7 @@ model beers {
   filepath      String       @default("") @db.VarChar(255)
   descript      String       @db.Text
   add_user      Int          @default(0)
-  last_mod      DateTime     @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  last_mod      DateTime     @default(now()) @db.Timestamp(0)
   collection_id Int?
   brewery       breweries    @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_brewery_id")
   category      categories   @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_cat_id")
@@ -48,7 +48,7 @@ model breweries {
   filepath String   @default("") @db.VarChar(255)
   descript String   @db.Text
   add_user Int      @default(0)
-  last_mod DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  last_mod DateTime @default(now()) @db.Timestamp(0)
   beers    beers[]
 }
 
@@ -63,7 +63,7 @@ model breweries_geocode {
 model categories {
   id       Int      @id @default(autoincrement())
   cat_name String   @default("") @db.VarChar(255)
-  last_mod DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  last_mod DateTime @default(now()) @db.Timestamp(0)
   beers    beers[]
 }
 
@@ -71,7 +71,7 @@ model styles {
   id         Int      @id @default(autoincrement())
   cat_id     Int      @default(0)
   style_name String   @default("") @db.VarChar(255)
-  last_mod   DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  last_mod   DateTime @default(now()) @db.Timestamp(0)
   beers      beers[]
 }
 

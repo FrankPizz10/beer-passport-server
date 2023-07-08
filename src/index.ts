@@ -55,6 +55,10 @@ app.get('/api/users', async (req: Request, res: Response) => {
 
 // Add user
 app.post('/api/users', async (req: Request, res: Response) => {
+  if (!req.body.uid || !req.body.email || !req.body.age || !req.body.user_name) {
+    res.statusCode = 400;
+    return res.send('Missing uid, email, age, or user_name');
+  }
   const user = await addUser(req.body, prismaCtx);
   res.send(user);
 });
@@ -67,6 +71,10 @@ app.get('/api/beers', async (req: Request, res: Response) => {
 
 // Get beer by category
 app.post('/api/beers/cat', async (req: Request, res: Response) => {
+  if (!req.body.cat) {
+    res.statusCode = 400;
+    return res.send('No category provided');
+  }
   const beers = await getBeerByCategory(req.body.cat);
   res.send(beers);
 });
@@ -85,10 +93,14 @@ app.get('/api/beers/:id', async (req: Request, res: Response) => {
 
 // Update or create user beer
 app.post('/api/userbeers', async (req: Request, res: Response) => {
+  if (!req.body.user_id || !req.body.beer_id || !req.body.liked) {
+    res.statusCode = 400;
+    return res.send('Missing user_id, beer_id, or liked');
+  }
   const beer = await getBeerById(req.body.beer_id);
   if (!beer || beer.collection_id !== req.body.collection_id) {
     res.statusCode = 400;
-    res.send('Beer not found or not in collection');
+    return res.send('Beer not found or not in collection');
   }
   const collectionId = req.body.collection_id ? req.body.collection_id : null;
   const userBeerParams: UserBeer = {
