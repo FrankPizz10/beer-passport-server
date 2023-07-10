@@ -93,22 +93,36 @@ app.get('/api/beers/:id', async (req: Request, res: Response) => {
 
 // Update or create user beer
 app.post('/api/userbeers', async (req: Request, res: Response) => {
-  if (!req.body.user_id || !req.body.beer_id || !req.body.liked) {
+  const userBeerParams: UserBeer = {
+    user_id: req.body.userBeer.user_id,
+    beer_id: req.body.userBeer.beer_id,
+    liked: req.body.userBeer.liked,
+    collection_id: req.body.userBeer.collection_id,
+  };
+  if (!userBeerParams.user_id || !userBeerParams.beer_id || userBeerParams.liked === undefined) {
     res.statusCode = 400;
     return res.send('Missing user_id, beer_id, or liked');
   }
-  const beer = await getBeerById(req.body.beer_id);
-  if (!beer || beer.collection_id !== req.body.collection_id) {
+  const beer = await getBeerById(userBeerParams.beer_id);
+  if (!beer) {
     res.statusCode = 400;
-    return res.send('Beer not found or not in collection');
+    return res.send('Beer not found');
   }
-  const collectionId = req.body.collection_id ? req.body.collection_id : null;
-  const userBeerParams: UserBeer = {
-    user_id: req.body.user_id,
-    beer_id: req.body.beer_id,
-    liked: req.body.liked,
-    collection_id: collectionId,
-  };
+  if (beer.collection_id && !userBeerParams.collection_id) {
+    res.statusCode = 400;
+    return res.send('Beer is in a collection, but no collection_id provided');
+  }
+  if (userBeerParams.collection_id && !beer.collection_id) {
+    res.statusCode = 400;
+    return res.send('Beer is not in a collection, but collection_id provided');
+  }
+  if (beer.collection_id && userBeerParams.collection_id) {
+    if (beer.collection_id !== userBeerParams.collection_id) {
+      res.statusCode = 400;
+      return res.send('Beer is in a different collection than the one provided');
+    }
+  }
+  const collectionId = userBeerParams.collection_id ? userBeerParams.collection_id : null;
   const userBeer = await updateOrCreateUserBeers(userBeerParams, prismaCtx);
   res.send(userBeer);
 });
