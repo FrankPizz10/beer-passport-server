@@ -3,6 +3,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import {
+  addBeer,
   getAllBeers,
   getBeerByCategory,
   getBeerById,
@@ -22,6 +23,7 @@ import {
 } from './DBclient/userclient';
 import { getCategories, getCollections } from './DBclient/gettableinfo';
 import { createContext } from '../context';
+import { decodeToken } from './middleware';
 
 dotenv.config();
 
@@ -36,6 +38,8 @@ app.use(
 
 app.use(bodyParser.json());
 app.use(cors());
+
+// app.use(decodeToken);
 
 export const prismaCtx = createContext();
 
@@ -122,7 +126,6 @@ app.post('/api/userbeers', async (req: Request, res: Response) => {
       return res.send('Beer is in a different collection than the one provided');
     }
   }
-  const collectionId = userBeerParams.collection_id ? userBeerParams.collection_id : null;
   const userBeer = await updateOrCreateUserBeers(userBeerParams, prismaCtx);
   res.send(userBeer);
 });
@@ -186,4 +189,34 @@ app.get('/api/collections/:id/beers', async (req: Request, res: Response) => {
 app.get('/api/userbadges/:id', async (req: Request, res: Response) => {
   const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
   res.send(userBadges);
+});
+
+// Add a beer to the database
+app.post('/api/beers', async (req: Request, res: Response) => {
+  const beerParams: CreateBeer = {
+    brewery_id: parseInt(req.body.beer.brewery_id),
+    name: req.body.beer.name,
+    cat_id: parseInt(req.body.beer.cat_id),
+    style_id: parseInt(req.body.beer.style_id),
+    abv: req.body.beer.abv,
+    ibu: req.body.beer.ibu,
+    srm: req.body.beer.srm,
+    upc: req.body.beer.upc,
+    filepath: req.body.beer.filepath,
+    descript: req.body.beer.descript,
+    collection_id: req.body.beer.collection_id,
+  };
+  console.log(beerParams);
+  if (
+    !beerParams.brewery_id ||
+    !beerParams.name ||
+    !beerParams.cat_id ||
+    !beerParams.style_id ||
+    !beerParams.descript
+  ) {
+    res.statusCode = 400;
+    return res.send('Missing required fields');
+  }
+  const beer = await addBeer(beerParams, prismaCtx);
+  res.send(beer);
 });
