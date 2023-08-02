@@ -1,3 +1,4 @@
+import { Context } from '../../context';
 import { prismaCtx } from '../index';
 
 export const getAllBeers = async () => {
@@ -56,4 +57,23 @@ export const getBeersInCollection = async (collectionId: number) => {
     },
   });
   return beers;
+};
+
+export const addBeer = async (beer: CreateBeer, ctx: Context) => {
+  const newBeer = await ctx.prisma.beers.create({
+    data: {
+      brewery_id: beer.brewery_id,
+      name: beer.name,
+      cat_id: beer.cat_id,
+      style_id: beer.style_id,
+      abv: beer.abv,
+      ibu: beer.ibu,
+      srm: beer.srm,
+      upc: beer.upc,
+      filepath: beer.filepath,
+      descript: beer.descript,
+      collection_id: beer.collection_id,
+    },
+  });
+  return newBeer;
 };

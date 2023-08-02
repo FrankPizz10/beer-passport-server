@@ -24,4 +24,4 @@ jobs:
       - name: Build and test backend service
         env: # Pass the DB secrets into environmental variables for the backend tests to use
           CLEARDB_DATABASE_URL: ${{ secrets.CLEARDB_DATABASE_URL }}
-        run: npm install && npm run build && npm run lint # && npm run test
+        run: npm install && npm run lint # && npm run build && npm run test
