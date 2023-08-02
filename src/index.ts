@@ -23,7 +23,8 @@ import {
 } from './DBclient/userclient';
 import { getCategories, getCollections } from './DBclient/gettableinfo';
 import { createContext } from '../context';
-import { decodeToken } from './middleware';
+import { decodeUserToken } from './Middleware/authUsers';
+import { decodeAdminToken } from './Middleware/authAdmin';
 
 dotenv.config();
 
@@ -39,7 +40,8 @@ app.use(
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use(decodeToken);
+app.use(decodeUserToken);
+app.use('/api/beers', decodeAdminToken);
 
 export const prismaCtx = createContext();
 

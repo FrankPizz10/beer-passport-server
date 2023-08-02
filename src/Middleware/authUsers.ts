@@ -1,13 +1,13 @@
-import { auth } from './Firebase/firebase';
+import { admin } from '../Firebase/firebase';
 import { Request, Response, NextFunction } from 'express';
 
-export const decodeToken = async (req: Request, res: Response, next: NextFunction) => {
+export const decodeUserToken = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.headers.authorization) {
     return res.json({ message: 'Unauthorized' });
   }
   const token = req.headers.authorization.split(' ')[1];
   try {
-    const decodeValue = await auth.verifyIdToken(token);
+    const decodeValue = await admin.auth().verifyIdToken(token);
     console.log('decodeValue: ', decodeValue);
     if (decodeValue) {
       // req.user = decodeValue;

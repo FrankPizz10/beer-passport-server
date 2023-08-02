@@ -2,7 +2,6 @@ import { getAllBeers, getBeerById } from './beerclient';
 import { Context } from '../../context';
 import { prismaCtx } from '..';
 import { getCollectionSize } from './gettableinfo';
-import { collection } from 'firebase/firestore';
 
 export const getAllUsers = async () => {
   const users = await prismaCtx.prisma.users.findMany();
