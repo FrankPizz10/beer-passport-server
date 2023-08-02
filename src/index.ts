@@ -39,7 +39,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(cors());
 
-// app.use(decodeToken);
+app.use(decodeToken);
 
 export const prismaCtx = createContext();
 
@@ -206,17 +206,18 @@ app.post('/api/beers', async (req: Request, res: Response) => {
     descript: req.body.beer.descript,
     collection_id: req.body.beer.collection_id,
   };
-  console.log(beerParams);
-  if (
-    !beerParams.brewery_id ||
-    !beerParams.name ||
-    !beerParams.cat_id ||
-    !beerParams.style_id ||
-    !beerParams.descript
-  ) {
-    res.statusCode = 400;
-    return res.send('Missing required fields');
-  }
-  const beer = await addBeer(beerParams, prismaCtx);
-  res.send(beer);
+  // console.log(beerParams);
+  // if (
+  //   !beerParams.brewery_id ||
+  //   !beerParams.name ||
+  //   !beerParams.cat_id ||
+  //   !beerParams.style_id ||
+  //   !beerParams.descript
+  // ) {
+  //   res.statusCode = 400;
+  //   return res.send('Missing required fields');
+  // }
+  // const beer = await addBeer(beerParams, prismaCtx);
+  // res.send(beer);
+  res.send('Looks good!');
 });
