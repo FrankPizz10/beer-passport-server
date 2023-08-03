@@ -49,3 +49,14 @@ interface UserBadge {
   earned: boolean;
   progress: number;
 }
+
+interface CreateCollection {
+  name: string;
+  difficulty: number;
+  description: string;
+}
+
+interface AddBeerToCollection {
+  beer_id: number;
+  collection_id: number;
+}

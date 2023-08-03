@@ -4,6 +4,8 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import {
   addBeer,
+  addBeerToCollection,
+  addCollection,
   getAllBeers,
   getBeerByCategory,
   getBeerById,
@@ -25,6 +27,7 @@ import { getCategories, getCollections } from './DBclient/gettableinfo';
 import { createContext } from '../context';
 import { decodeUserToken } from './Middleware/authUsers';
 import { decodeAdminToken } from './Middleware/authAdmin';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 dotenv.config();
 
@@ -42,6 +45,8 @@ app.use(cors());
 
 app.use(decodeUserToken);
 app.use('/api/beers', decodeAdminToken);
+app.use('/api/collections/addBeer', decodeAdminToken);
+app.use('/api/collections', decodeAdminToken);
 
 export const prismaCtx = createContext();
 
@@ -208,18 +213,65 @@ app.post('/api/beers', async (req: Request, res: Response) => {
     descript: req.body.beer.descript,
     collection_id: req.body.beer.collection_id,
   };
-  // console.log(beerParams);
-  // if (
-  //   !beerParams.brewery_id ||
-  //   !beerParams.name ||
-  //   !beerParams.cat_id ||
-  //   !beerParams.style_id ||
-  //   !beerParams.descript
-  // ) {
-  //   res.statusCode = 400;
-  //   return res.send('Missing required fields');
-  // }
-  // const beer = await addBeer(beerParams, prismaCtx);
-  // res.send(beer);
-  res.send('Looks good!');
+  console.log(beerParams);
+  if (
+    !beerParams.brewery_id ||
+    !beerParams.name ||
+    !beerParams.cat_id ||
+    !beerParams.style_id ||
+    !beerParams.descript
+  ) {
+    res.statusCode = 400;
+    return res.send('Missing required fields');
+  }
+  try {
+    const beer = await addBeer(beerParams, prismaCtx);
+    res.send(beer);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.send('Error adding beer');
+  }
+});
+
+// Add a new collection
+app.post('/api/collections', async (req: Request, res: Response) => {
+  console.log(req.body);
+  const collectionParams: CreateCollection = {
+    name: req.body.collection.name,
+    difficulty: parseInt(req.body.collection.difficulty),
+    description: req.body.collection.description,
+  };
+  if (!collectionParams.name || !collectionParams.description || !collectionParams.difficulty) {
+    res.statusCode = 400;
+    return res.send('Missing required fields');
+  }
+  try {
+    const collection = await addCollection(collectionParams, prismaCtx);
+    res.send(collection);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.send('Error adding collection');
+  }
+});
+
+// Add a beer to a collection
+app.post('/api/collections/addBeer', async (req: Request, res: Response) => {
+  const collectionBeerParams: AddBeerToCollection = {
+    collection_id: req.body.addBeerToColelction.collection_id,
+    beer_id: req.body.addBeerToColelction.beer_id,
+  };
+  if (!collectionBeerParams?.collection_id || !collectionBeerParams?.beer_id) {
+    res.statusCode = 400;
+    return res.send('Missing required fields');
+  }
+  try {
+    const collectionBeer = await addBeerToCollection(collectionBeerParams, prismaCtx);
+    res.send(collectionBeer);
+  } catch (e: any) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.send('Error adding beer to collection');
+  }
 });

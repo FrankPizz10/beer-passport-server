@@ -77,3 +77,29 @@ export const addBeer = async (beer: CreateBeer, ctx: Context) => {
   });
   return newBeer;
 };
+
+export const addCollection = async (collection: CreateCollection, ctx: Context) => {
+  const newCollection = await ctx.prisma.collections.create({
+    data: {
+      name: collection.name,
+      difficulty: collection.difficulty,
+      description: collection.description,
+    },
+  });
+  return newCollection;
+};
+
+export const addBeerToCollection = async (
+  addBeerToCollection: AddBeerToCollection,
+  ctx: Context,
+) => {
+  const beer = await prismaCtx.prisma.beers.update({
+    where: {
+      id: addBeerToCollection.beer_id,
+    },
+    data: {
+      collection_id: addBeerToCollection.collection_id,
+    },
+  });
+  return beer;
+};
