@@ -259,8 +259,8 @@ app.post('/api/collections', async (req: Request, res: Response) => {
 // Add a beer to a collection
 app.post('/api/collections/addBeer', async (req: Request, res: Response) => {
   const collectionBeerParams: AddBeerToCollection = {
-    collection_id: req.body.addBeerToColelction.collection_id,
-    beer_id: req.body.addBeerToColelction.beer_id,
+    collection_id: parseInt(req.body.addBeerToColelction.collection_id),
+    beer_id: parseInt(req.body.addBeerToColelction.beer_id),
   };
   if (!collectionBeerParams?.collection_id || !collectionBeerParams?.beer_id) {
     res.statusCode = 400;
