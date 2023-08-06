@@ -8,30 +8,28 @@ datasource db {
 }
 
 model beers {
-  id            Int          @id @default(autoincrement())
-  brewery_id    Int          @default(0)
-  name          String       @default("") @db.VarChar(255)
-  cat_id        Int          @default(0)
-  style_id      Int          @default(0)
-  abv           Float        @default(0) @db.Float
-  ibu           Float        @default(0) @db.Float
-  srm           Float        @default(0) @db.Float
-  upc           Int          @default(0)
-  filepath      String       @default("") @db.VarChar(255)
-  descript      String       @db.Text
-  add_user      Int          @default(0)
-  last_mod      DateTime     @default(now()) @db.Timestamp(0)
-  collection_id Int?
-  brewery       breweries    @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_brewery_id")
-  category      categories   @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_cat_id")
-  collections   collections? @relation(fields: [collection_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_collection_id")
-  style         styles       @relation(fields: [style_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_style_id")
-  user_beers    user_beers[]
+  id               Int                @id @default(autoincrement())
+  brewery_id       Int                @default(0)
+  name             String             @default("") @db.VarChar(255)
+  cat_id           Int                @default(0)
+  style_id         Int                @default(0)
+  abv              Float              @default(0) @db.Float
+  ibu              Float              @default(0) @db.Float
+  srm              Float              @default(0) @db.Float
+  upc              Int                @default(0)
+  filepath         String             @default("") @db.VarChar(255)
+  descript         String             @db.Text
+  add_user         Int                @default(0)
+  last_mod         DateTime           @default(now()) @db.Timestamp(0)
+  brewery          breweries          @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_brewery_id")
+  category         categories         @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_cat_id")
+  style            styles             @relation(fields: [style_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_style_id")
+  collection_beers collection_beers[]
+  user_beers       user_beers[]
 
   @@index([brewery_id], map: "fk_beers_brewery_id")
   @@index([cat_id], map: "fk_beers_cat_id")
   @@index([style_id], map: "fk_beers_style_id")
-  @@index([collection_id], map: "fk_beers_collection_id")
 }
 
 model breweries {
@@ -102,14 +100,14 @@ model users {
 }
 
 model collections {
-  id          Int           @id @default(autoincrement())
-  name        String        @db.VarChar(255)
-  difficulty  Int
-  description String        @db.VarChar(255)
-  created_at  DateTime?     @default(now()) @db.Timestamp(0)
-  updated_at  DateTime?     @default(now()) @db.Timestamp(0)
-  beers       beers[]
-  user_badges user_badges[]
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(255)
+  difficulty       Int
+  description      String             @db.VarChar(255)
+  created_at       DateTime?          @default(now()) @db.Timestamp(0)
+  updated_at       DateTime?          @default(now()) @db.Timestamp(0)
+  collection_beers collection_beers[]
+  user_badges      user_badges[]
 }
 
 model user_badges {
@@ -125,4 +123,17 @@ model user_badges {
 
   @@unique([user_id, collection_id], map: "user_id_collection_id")
   @@index([collection_id], map: "fk_user_badges_collection_id")
+}
+
+model collection_beers {
+  id            Int         @id @default(autoincrement())
+  collection_id Int
+  beer_id       Int
+  created_at    DateTime?   @default(now()) @db.Timestamp(0)
+  updated_at    DateTime?   @default(now()) @db.Timestamp(0)
+  beers         beers       @relation(fields: [beer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beer_id")
+  collections   collections @relation(fields: [collection_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_collection_id")
+
+  @@index([beer_id], map: "fk_beer_id")
+  @@index([collection_id], map: "fk_collection_id")
 }
