@@ -1,4 +1,4 @@
-import { getAllBeers, getBeerById } from './beerclient';
+import { getAllBeers, getBeerById, getCollectionBeerByCollectionIdAndBeerId } from './beerclient';
 import { Context } from '../../context';
 import { prismaCtx } from '..';
 import { getCollectionSize } from './gettableinfo';
@@ -46,29 +46,29 @@ export const getUser = async (id: string) => {
 };
 
 export const updateOrCreateUserBeers = async (userBeer: UserBeer, ctx: Context) => {
-  const triedBeer = await ctx.prisma.user_beers.upsert({
-    where: {
-      user_id_beer_id: {
-        user_id: userBeer.user_id,
-        beer_id: userBeer.beer_id,
-      },
-    },
-    update: {
-      liked: userBeer.liked,
-    },
-    create: {
-      user_id: userBeer.user_id,
-      beer_id: userBeer.beer_id,
-      liked: userBeer.liked,
-      collection_id: userBeer.collection_id,
-    },
-  });
-  if (userBeer.collection_id) {
-    const badgeProgress = await calcUserBadgeProgress(userBeer.user_id, userBeer.collection_id);
-    const earned = badgeProgress === 1 ? true : false;
-    await updateUserBadges(userBeer.user_id, userBeer.collection_id, earned, badgeProgress, ctx);
-  }
-  return triedBeer;
+  // const triedBeer = await ctx.prisma.user_beers.upsert({
+  //   where: {
+  //     user_id_beer_id: {
+  //       user_id: userBeer.user_id,
+  //       beer_id: userBeer.beer_id,
+  //     },
+  //   },
+  //   update: {
+  //     liked: userBeer.liked,
+  //   },
+  //   create: {
+  //     user_id: userBeer.user_id,
+  //     beer_id: userBeer.beer_id,
+  //     liked: userBeer.liked,
+  //     collection_id: userBeer.collection_id,
+  //   },
+  // });
+  // if (userBeer.collection_id) {
+  //   const badgeProgress = await calcUserBadgeProgress(userBeer.user_id, userBeer.collection_id);
+  //   const earned = badgeProgress === 1 ? true : false;
+  //   await updateUserBadges(userBeer.user_id, userBeer.collection_id, earned, badgeProgress, ctx);
+  // }
+  // return triedBeer;
 };
 
 export const getUserBeersByUserId = async (id: number) => {
@@ -113,9 +113,9 @@ export const getLikedBeersByUserId = async (id: number) => {
 
 // Returns the progress of a user's badge for a given collection
 const calcUserBadgeProgress = async (user_id: number, collection_id: number) => {
-  const collectionProgress = (await getUserBeersByCollectionId(user_id, collection_id)).length;
-  const collectionSize = await getCollectionSize(collection_id);
-  return parseFloat((collectionProgress / collectionSize).toFixed(2));
+  // const collectionProgress = (await getUserBeersByCollectionId(user_id, collection_id)).length;
+  // const collectionSize = await getCollectionSize(collection_id);
+  // return parseFloat((collectionProgress / collectionSize).toFixed(2));
 };
 
 const updateUserBadges = async (
@@ -157,10 +157,18 @@ export const getUserBadgesByUserId = async (user_id: number) => {
   return userBadges;
 };
 
-const getUserBeersByCollectionId = async (user_id: number, collection_id: number) => {
+const getUserBeersByCollectionId = async (
+  user_id: number,
+  beer_id: number,
+  collection_id: number,
+) => {
+  const beer = await getBeerById(beer_id);
+  const collectionBeer = await getCollectionBeerByCollectionIdAndBeerId(collection_id, beer_id);
+  if (!collectionBeer) throw new Error('Collection not found');
   const userBeers = await prismaCtx.prisma.user_beers.findMany({
     where: {
-      collection_id: collection_id,
+      user_id: user_id,
+      beer_id: collectionBeer.collection_id,
     },
   });
   return userBeers;

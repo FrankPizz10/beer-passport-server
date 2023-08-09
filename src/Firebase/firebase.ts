@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import * as serviceAccount from 'C:/Users/fpizz/OneDrive/Documents/Summer2023/CodingProjects/BeerPassportApp/Secrets/beerpassport-b31d8-firebase-adminsdk-6avyz-4f32856e2e.json';
+import * as serviceAccount from '../../Secrets/beerpassport-b31d8-firebase-adminsdk-6avyz-4f32856e2e.json';
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),

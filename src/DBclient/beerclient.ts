@@ -35,7 +35,6 @@ export const getBeerById = async (id: number) => {
       category: true,
       brewery: true,
       style: true,
-      collections: true,
     },
   });
   return beer;
@@ -51,12 +50,11 @@ export const getCollectionsById = async (collectionId: number) => {
 };
 
 export const getBeersInCollection = async (collectionId: number) => {
-  const beers = await prismaCtx.prisma.beers.findMany({
+  const beers = await prismaCtx.prisma.collection_beers.findMany({
     where: {
       collection_id: collectionId,
     },
   });
-  return beers;
 };
 
 export const addBeer = async (beer: CreateBeer, ctx: Context) => {
@@ -72,7 +70,6 @@ export const addBeer = async (beer: CreateBeer, ctx: Context) => {
       upc: beer.upc,
       filepath: beer.filepath,
       descript: beer.descript,
-      collection_id: beer.collection_id,
     },
   });
   return newBeer;
@@ -93,13 +90,26 @@ export const addBeerToCollection = async (
   addBeerToCollection: AddBeerToCollection,
   ctx: Context,
 ) => {
-  const beer = await prismaCtx.prisma.beers.update({
-    where: {
-      id: addBeerToCollection.beer_id,
-    },
+  const newCollectionBeer = await ctx.prisma.collection_beers.create({
     data: {
+      beer_id: addBeerToCollection.beer_id,
       collection_id: addBeerToCollection.collection_id,
     },
   });
-  return beer;
+  return newCollectionBeer;
+};
+
+export const getCollectionBeerByCollectionIdAndBeerId = async (
+  collection_id: number,
+  beer_id: number,
+) => {
+  const collectionBeer = await prismaCtx.prisma.collection_beers.findUnique({
+    where: {
+      collection_id_beer_id: {
+        collection_id: collection_id,
+        beer_id: beer_id,
+      },
+    },
+  });
+  return collectionBeer;
 };
