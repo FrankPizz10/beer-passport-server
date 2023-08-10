@@ -11,7 +11,7 @@ import {
   getBeerById,
   getBeersInCollection,
   getCollectionBeerByCollectionIdAndBeerId,
-  getCollectionsById,
+  getCollectionById,
 } from './DBclient/beerclient';
 import {
   getAllUsers,
@@ -100,6 +100,10 @@ app.get('/api/categories', async (req: Request, res: Response) => {
 // Get beer by id
 app.get('/api/beers/:id', async (req: Request, res: Response) => {
   const beer = await getBeerById(parseInt(req.params.id));
+  if (!beer) {
+    res.statusCode = 204;
+    return res.send('Beer not found');
+  }
   res.send(beer);
 });
 
@@ -141,23 +145,31 @@ app.post('/api/userbeers', async (req: Request, res: Response) => {
 // Get user beers by user
 app.get('/api/userbeers/:id', async (req: Request, res: Response) => {
   const beers = await getUserBeersByUserId(parseInt(req.params.id));
+  if (!beers) {
+    res.statusCode = 204;
+    return res.send('User beers not found');
+  }
   res.send(beers);
 });
 
 // Get user beer by user and beer
 app.get('/api/userbeer/:user_id/:beer_id', async (req: Request, res: Response) => {
-  const beer = await getUserBeerByUserIdAndBeerId(
+  const userBeer = await getUserBeerByUserIdAndBeerId(
     parseInt(req.params.user_id),
     parseInt(req.params.beer_id),
   );
-  res.send(beer);
+  if (!userBeer) {
+    res.statusCode = 204;
+    return res.send('User beer not found');
+  }
+  res.send(userBeer);
 });
 
 // Get user by uid
 app.get('/api/userbyuid/:uid', async (req: Request, res: Response) => {
   const user = await getUser(req.params.uid);
   if (!user) {
-    res.statusCode = 404;
+    res.statusCode = 204;
     res.send('User not found');
   }
   res.send(user);
@@ -166,12 +178,20 @@ app.get('/api/userbyuid/:uid', async (req: Request, res: Response) => {
 // Get tried beers by user id
 app.get('/api/triedbeers/:id', async (req: Request, res: Response) => {
   const triedBeers = await getTriedBeersByUserId(parseInt(req.params.id));
+  if (!triedBeers) {
+    res.statusCode = 204;
+    return res.send('User not found');
+  }
   res.send(triedBeers);
 });
 
 // Get liked beers by user id
 app.get('/api/likedbeers/:id', async (req: Request, res: Response) => {
   const likedBeers = await getLikedBeersByUserId(parseInt(req.params.id));
+  if (!likedBeers) {
+    res.statusCode = 204;
+    return res.send('User not found');
+  }
   res.send(likedBeers);
 });
 
@@ -183,19 +203,31 @@ app.get('/api/collections', async (req: Request, res: Response) => {
 
 // Get collection by id
 app.get('/api/collections/:id', async (req: Request, res: Response) => {
-  const collection = await getCollectionsById(parseInt(req.params.id));
+  const collection = await getCollectionById(parseInt(req.params.id));
+  if (!collection) {
+    res.statusCode = 204;
+    return res.send('Collection not found');
+  }
   res.send(collection);
 });
 
 // Get all beers in a collection
 app.get('/api/collections/:id/beers', async (req: Request, res: Response) => {
   const beers = await getBeersInCollection(parseInt(req.params.id));
+  if (!beers) {
+    res.statusCode = 204;
+    return res.send('Collection not found');
+  }
   res.send(beers);
 });
 
 // Get user badges by user id
 app.get('/api/userbadges/:id', async (req: Request, res: Response) => {
   const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
+  if (!userBadges) {
+    res.statusCode = 204;
+    return res.send('UserBadges not found');
+  }
   res.send(userBadges);
 });
 
@@ -205,6 +237,10 @@ app.get('/api/collectionbeer/:collection_id/:beer_id', async (req: Request, res:
     parseInt(req.params.collection_id),
     parseInt(req.params.beer_id),
   );
+  if (!collectionBeer) {
+    res.statusCode = 204;
+    return res.send('CollectionBeer not found');
+  }
   res.send(collectionBeer);
 });
 

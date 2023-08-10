@@ -40,7 +40,7 @@ export const getBeerById = async (id: number) => {
   return beer;
 };
 
-export const getCollectionsById = async (collectionId: number) => {
+export const getCollectionById = async (collectionId: number) => {
   const collections = await prismaCtx.prisma.collections.findUnique({
     where: {
       id: collectionId,
@@ -55,6 +55,7 @@ export const getBeersInCollection = async (collectionId: number) => {
       collection_id: collectionId,
     },
   });
+  return beers;
 };
 
 export const addBeer = async (beer: CreateBeer, ctx: Context) => {
