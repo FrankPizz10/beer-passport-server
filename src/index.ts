@@ -44,7 +44,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(cors());
 
-// app.use(decodeUserToken);
+app.use(decodeUserToken);
 // app.use('/api/beers', decodeAdminToken);
 // app.use('/api/collections/addBeer', decodeAdminToken);
 // app.use('/api/collections', decodeAdminToken);
@@ -71,8 +71,17 @@ app.post('/api/users', async (req: Request, res: Response) => {
     res.statusCode = 400;
     return res.send('Missing uid, email, age, or user_name');
   }
-  const user = await addUser(req.body, prismaCtx);
-  res.send(user);
+  try {
+    const user = await addUser(req.body, prismaCtx);
+    res.send(user);
+  } catch (err) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      res.statusCode = 400;
+      return res.send('User already exists');
+    }
+    res.statusCode = 500;
+    return res.send('Something went wrong');
+  }
 });
 
 // Get all beers
@@ -87,8 +96,13 @@ app.post('/api/beers/cat', async (req: Request, res: Response) => {
     res.statusCode = 400;
     return res.send('No category provided');
   }
-  const beers = await getBeerByCategory(req.body.cat);
-  res.send(beers);
+  try {
+    const beers = await getBeerByCategory(req.body.cat);
+    res.send(beers);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
+  }
 });
 
 // Get categories
@@ -99,12 +113,17 @@ app.get('/api/categories', async (req: Request, res: Response) => {
 
 // Get beer by id
 app.get('/api/beers/:id', async (req: Request, res: Response) => {
-  const beer = await getBeerById(parseInt(req.params.id));
-  if (!beer) {
-    res.statusCode = 204;
-    return res.send('Beer not found');
+  try {
+    const beer = await getBeerById(parseInt(req.params.id));
+    if (!beer) {
+      res.statusCode = 204;
+      return res.send('Beer not found');
+    }
+    res.send(beer);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
   }
-  res.send(beer);
 });
 
 // Update or create user beer
@@ -144,55 +163,80 @@ app.post('/api/userbeers', async (req: Request, res: Response) => {
 
 // Get user beers by user
 app.get('/api/userbeers/:id', async (req: Request, res: Response) => {
-  const beers = await getUserBeersByUserId(parseInt(req.params.id));
-  if (!beers) {
-    res.statusCode = 204;
-    return res.send('User beers not found');
+  try {
+    const beers = await getUserBeersByUserId(parseInt(req.params.id));
+    if (!beers) {
+      res.statusCode = 204;
+      return res.send('User beers not found');
+    }
+    res.send(beers);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
   }
-  res.send(beers);
 });
 
 // Get user beer by user and beer
 app.get('/api/userbeer/:user_id/:beer_id', async (req: Request, res: Response) => {
-  const userBeer = await getUserBeerByUserIdAndBeerId(
-    parseInt(req.params.user_id),
-    parseInt(req.params.beer_id),
-  );
-  if (!userBeer) {
-    res.statusCode = 204;
-    return res.send('User beer not found');
+  try {
+    const userBeer = await getUserBeerByUserIdAndBeerId(
+      parseInt(req.params.user_id),
+      parseInt(req.params.beer_id),
+    );
+    if (!userBeer) {
+      res.statusCode = 204;
+      return res.send('User beer not found');
+    }
+    res.send(userBeer);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
   }
-  res.send(userBeer);
 });
 
 // Get user by uid
 app.get('/api/userbyuid/:uid', async (req: Request, res: Response) => {
-  const user = await getUser(req.params.uid);
-  if (!user) {
-    res.statusCode = 204;
-    res.send('User not found');
+  try {
+    const user = await getUser(req.params.uid);
+    if (!user) {
+      res.statusCode = 204;
+      res.send('User not found');
+    }
+    res.send(user);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
   }
-  res.send(user);
 });
 
 // Get tried beers by user id
 app.get('/api/triedbeers/:id', async (req: Request, res: Response) => {
-  const triedBeers = await getTriedBeersByUserId(parseInt(req.params.id));
-  if (!triedBeers) {
-    res.statusCode = 204;
-    return res.send('User not found');
+  try {
+    const triedBeers = await getTriedBeersByUserId(parseInt(req.params.id));
+    if (!triedBeers) {
+      res.statusCode = 204;
+      return res.send('User not found');
+    }
+    res.send(triedBeers);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
   }
-  res.send(triedBeers);
 });
 
 // Get liked beers by user id
 app.get('/api/likedbeers/:id', async (req: Request, res: Response) => {
-  const likedBeers = await getLikedBeersByUserId(parseInt(req.params.id));
-  if (!likedBeers) {
-    res.statusCode = 204;
-    return res.send('User not found');
+  try {
+    const likedBeers = await getLikedBeersByUserId(parseInt(req.params.id));
+    if (!likedBeers) {
+      res.statusCode = 204;
+      return res.send('User not found');
+    }
+    res.send(likedBeers);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
   }
-  res.send(likedBeers);
 });
 
 // Get all collections
@@ -203,45 +247,65 @@ app.get('/api/collections', async (req: Request, res: Response) => {
 
 // Get collection by id
 app.get('/api/collections/:id', async (req: Request, res: Response) => {
-  const collection = await getCollectionById(parseInt(req.params.id));
-  if (!collection) {
-    res.statusCode = 204;
-    return res.send('Collection not found');
+  try {
+    const collection = await getCollectionById(parseInt(req.params.id));
+    if (!collection) {
+      res.statusCode = 204;
+      return res.send('Collection not found');
+    }
+    res.send(collection);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
   }
-  res.send(collection);
 });
 
 // Get all beers in a collection
 app.get('/api/collections/:id/beers', async (req: Request, res: Response) => {
-  const beers = await getBeersInCollection(parseInt(req.params.id));
-  if (!beers) {
-    res.statusCode = 204;
-    return res.send('Collection not found');
+  try {
+    const beers = await getBeersInCollection(parseInt(req.params.id));
+    if (!beers) {
+      res.statusCode = 204;
+      return res.send('Collection not found');
+    }
+    res.send(beers);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
   }
-  res.send(beers);
 });
 
 // Get user badges by user id
 app.get('/api/userbadges/:id', async (req: Request, res: Response) => {
-  const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
-  if (!userBadges) {
-    res.statusCode = 204;
-    return res.send('UserBadges not found');
+  try {
+    const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
+    if (!userBadges) {
+      res.statusCode = 204;
+      return res.send('UserBadges not found');
+    }
+    res.send(userBadges);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
   }
-  res.send(userBadges);
 });
 
 // Get collectionBeer by collection id and beer id
 app.get('/api/collectionbeer/:collection_id/:beer_id', async (req: Request, res: Response) => {
-  const collectionBeer = await getCollectionBeerByCollectionIdAndBeerId(
-    parseInt(req.params.collection_id),
-    parseInt(req.params.beer_id),
-  );
-  if (!collectionBeer) {
-    res.statusCode = 204;
-    return res.send('CollectionBeer not found');
+  try {
+    const collectionBeer = await getCollectionBeerByCollectionIdAndBeerId(
+      parseInt(req.params.collection_id),
+      parseInt(req.params.beer_id),
+    );
+    if (!collectionBeer) {
+      res.statusCode = 204;
+      return res.send('CollectionBeer not found');
+    }
+    res.send(collectionBeer);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
   }
-  res.send(collectionBeer);
 });
 
 // Add a beer to the database
