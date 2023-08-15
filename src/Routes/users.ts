@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
-import { addUser, getAllUsers, getUser } from '../DBclient/userclient';
+import { addUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 const userRoutes: Express = express();
@@ -14,7 +14,7 @@ userRoutes.get('/api/users', async (req: Request, res: Response) => {
 // Get user by uid
 userRoutes.get('/api/userbyuid/:uid', async (req: Request, res: Response) => {
   try {
-    const user = await getUser(req.params.uid);
+    const user = await getUserByUid(req.params.uid);
     if (!user) {
       res.statusCode = 204;
       res.send('User not found');

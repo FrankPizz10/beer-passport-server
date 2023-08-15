@@ -1,10 +1,14 @@
 import express, { Express, Request, Response } from 'express';
+import { prismaCtx } from '../index';
 import {
   getLikedBeersByUserId,
   getTriedBeersByUserId,
   getUserBeerByUserIdAndBeerId,
   getUserBeersByUserId,
+  getUserById,
+  updateOrCreateUserBeers,
 } from '../DBclient/userclient';
+import { getBeerById } from '../DBclient/beerclient';
 
 const userbeerRoutes: Express = express();
 
@@ -16,31 +20,22 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
     liked: req.body.userBeer.liked,
     collection_id: req.body.userBeer.collection_id,
   };
-  // if (!userBeerParams.user_id || !userBeerParams.beer_id || userBeerParams.liked === undefined) {
-  //   res.statusCode = 400;
-  //   return res.send('Missing user_id, beer_id, or liked');
-  // }
-  // const beer = await getBeerById(userBeerParams.beer_id);
-  // if (!beer) {
-  //   res.statusCode = 400;
-  //   return res.send('Beer not found');
-  // }
-  // if (beer.collection_id && !userBeerParams.collection_id) {
-  //   res.statusCode = 400;
-  //   return res.send('Beer is in a collection, but no collection_id provided');
-  // }
-  // if (userBeerParams.collection_id && !beer.collection_id) {
-  //   res.statusCode = 400;
-  //   return res.send('Beer is not in a collection, but collection_id provided');
-  // }
-  // if (beer.collection_id && userBeerParams.collection_id) {
-  //   if (beer.collection_id !== userBeerParams.collection_id) {
-  //     res.statusCode = 400;
-  //     return res.send('Beer is in a different collection than the one provided');
-  //   }
-  // }
-  // const userBeer = await updateOrCreateUserBeers(userBeerParams, prismaCtx);
-  // res.send(userBeer);
+  if (!userBeerParams.user_id || !userBeerParams.beer_id || userBeerParams.liked === undefined) {
+    res.statusCode = 400;
+    return res.send('Missing user_id, beer_id, or liked');
+  }
+  const beer = await getBeerById(userBeerParams.beer_id);
+  if (!beer) {
+    res.statusCode = 400;
+    return res.send('Beer not found');
+  }
+  const user = await getUserById(userBeerParams.user_id);
+  if (!user) {
+    res.statusCode = 400;
+    return res.send('User not found');
+  }
+  const userBeer = await updateOrCreateUserBeers(userBeerParams, prismaCtx);
+  res.send(userBeer);
 });
 
 // Get user beers by user
