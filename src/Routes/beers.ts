@@ -1,5 +1,10 @@
 import express, { Express, Request, Response } from 'express';
-import { getAllBeers, getBeerByCategory, getBeerById } from '../DBclient/beerclient';
+import {
+  getAllBeers,
+  getBeerByCategory,
+  getBeerById,
+  getCollectionsByBeerId,
+} from '../DBclient/beerclient';
 import { getCategories } from '../DBclient/gettableinfo';
 
 const beerRoutes: Express = express();
@@ -40,6 +45,21 @@ beerRoutes.get('/api/beers/:id', async (req: Request, res: Response) => {
       return res.send('Beer not found');
     }
     res.send(beer);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.send('Something went wrong');
+  }
+});
+
+// Get all collections beer belongs to
+beerRoutes.get('/api/beers/:id/collections', async (req: Request, res: Response) => {
+  try {
+    const collections = await getCollectionsByBeerId(parseInt(req.params.id));
+    if (!collections) {
+      res.statusCode = 204;
+      return res.send('Beer does notbelong to any collections');
+    }
+    res.send(collections);
   } catch (err) {
     res.statusCode = 500;
     return res.send('Something went wrong');

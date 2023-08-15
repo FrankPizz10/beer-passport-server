@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { getCollections } from '../DBclient/gettableinfo';
-import { getBeersInCollection, getCollectionById } from '../DBclient/beerclient';
+import { getBeersByCollectionId, getCollectionById } from '../DBclient/beerclient';
 
 const collectionRoutes: Express = express();
 
@@ -28,7 +28,7 @@ collectionRoutes.get('/api/collections/:id', async (req: Request, res: Response)
 // Get all beers in a collection
 collectionRoutes.get('/api/collections/:id/beers', async (req: Request, res: Response) => {
   try {
-    const beers = await getBeersInCollection(parseInt(req.params.id));
+    const beers = await getBeersByCollectionId(parseInt(req.params.id));
     if (!beers) {
       res.statusCode = 204;
       return res.send('Collection not found');
