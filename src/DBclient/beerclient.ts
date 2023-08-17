@@ -49,13 +49,22 @@ export const getCollectionById = async (collectionId: number) => {
   return collections;
 };
 
-export const getBeersInCollection = async (collectionId: number) => {
+export const getBeersByCollectionId = async (collectionId: number) => {
   const beers = await prismaCtx.prisma.collection_beers.findMany({
     where: {
       collection_id: collectionId,
     },
   });
   return beers;
+};
+
+export const getCollectionsByBeerId = async (beerId: number) => {
+  const collections = await prismaCtx.prisma.collection_beers.findMany({
+    where: {
+      beer_id: beerId,
+    },
+  });
+  return collections;
 };
 
 export const addBeer = async (beer: CreateBeer, ctx: Context) => {

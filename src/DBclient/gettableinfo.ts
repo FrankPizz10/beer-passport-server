@@ -11,10 +11,10 @@ export const getCollections = async () => {
 };
 
 export const getCollectionSize = async (collection_id: number) => {
-  // const collectionSize = await prismaCtx.prisma.beers.count({
-  //   where: {
-  //     collection_id: collection_id,
-  //   },
-  // });
-  // return collectionSize;
+  const collectionSize = await prismaCtx.prisma.collection_beers.count({
+    where: {
+      collection_id: collection_id,
+    },
+  });
+  return collectionSize;
 };
