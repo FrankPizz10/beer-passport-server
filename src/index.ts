@@ -11,6 +11,7 @@ import userbeerRoutes from './Routes/userbeers';
 import userbadgeRoutes from './Routes/userbadges';
 import collectionbeerRoutes from './Routes/collectionbeers';
 import collectionRoutes from './Routes/collections';
+import friendRoutes from './Routes/friends';
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(cors());
 
-// app.use(decodeUserToken);
+app.use(decodeUserToken);
 
 app.use(adminRoutes);
 app.use(userRoutes);
@@ -35,6 +36,7 @@ app.use(userbeerRoutes);
 app.use(userbadgeRoutes);
 app.use(collectionRoutes);
 app.use(collectionbeerRoutes);
+app.use(friendRoutes);
 
 export const prismaCtx = createContext();
 

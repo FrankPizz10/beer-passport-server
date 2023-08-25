@@ -172,3 +172,15 @@ const getCollectionProgress = async (user_id: number, collection_id: number) => 
   }
   return progress;
 };
+
+export const getFriendsByUserId = async (user_id: number) => {
+  const friends = await prismaCtx.prisma.friends.findMany({
+    where: {
+      user_1: user_id,
+    },
+    include: {
+      users_friends_user_1Tousers: true,
+    },
+  });
+  return friends;
+};

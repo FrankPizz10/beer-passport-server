@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
 import { addUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { Prisma } from '@prisma/client';
 
 const userRoutes: Express = express();
 
@@ -36,7 +36,7 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
     const user = await addUser(req.body, prismaCtx);
     res.send(user);
   } catch (err) {
-    if (err instanceof PrismaClientKnownRequestError) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
       res.statusCode = 400;
       return res.send('User already exists');
     }
