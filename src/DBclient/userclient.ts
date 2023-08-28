@@ -8,15 +8,19 @@ export const getAllUsers = async () => {
 };
 
 export const addUser = async (user: AddUser, ctx: Context) => {
-  const newUser = await ctx.prisma.users.create({
-    data: {
-      uid: user.uid,
-      email: user.email,
-      age: user.age,
-      user_name: user.user_name,
-    },
-  });
-  return newUser;
+  try {
+    const newUser = await ctx.prisma.users.create({
+      data: {
+        uid: user.uid,
+        email: user.email,
+        age: user.age,
+        user_name: user.user_name,
+      },
+    });
+    return newUser;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const getUserByUid = async (id: string) => {

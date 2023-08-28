@@ -33,8 +33,14 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
     res.statusCode = 400;
     return res.send('Missing uid, email, age, or user_name');
   }
+  const add_user = {
+    uid: req.body.uid,
+    email: req.body.email,
+    age: parseInt(req.body.age),
+    user_name: req.body.user_name,
+  };
   try {
-    const user = await addUser(req.body, prismaCtx);
+    const user = await addUser(add_user, prismaCtx);
     return res.send(user);
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
