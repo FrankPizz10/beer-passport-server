@@ -16,11 +16,12 @@ userRoutes.get('/api/userbyuid/:uid', async (req: Request, res: Response) => {
   try {
     const user = await getUserByUid(req.params.uid);
     if (!user) {
-      res.statusCode = 204;
-      res.send('User not found');
+      res.statusCode = 404;
+      return res.send('User not found');
     }
-    res.send(user);
+    return res.send(user);
   } catch (err) {
+    console.log('Errored');
     res.statusCode = 500;
     return res.send('Something went wrong');
   }
@@ -34,7 +35,7 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
   }
   try {
     const user = await addUser(req.body, prismaCtx);
-    res.send(user);
+    return res.send(user);
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
       res.statusCode = 400;

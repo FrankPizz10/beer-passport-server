@@ -27,7 +27,9 @@ app.use(
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use(decodeUserToken);
+if (process.env.NODE_ENV === 'production') {
+  app.use(decodeUserToken);
+}
 
 app.use(adminRoutes);
 app.use(userRoutes);
