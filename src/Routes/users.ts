@@ -8,7 +8,7 @@ const userRoutes: Express = express();
 // Get all users
 userRoutes.get('/api/users', async (req: Request, res: Response) => {
   const users = await getAllUsers();
-  res.send(users);
+  return res.send(users);
 });
 
 // Get user by uid

@@ -12,7 +12,7 @@ const beerRoutes: Express = express();
 // Get all beers
 beerRoutes.get('/api/beers', async (req: Request, res: Response) => {
   const beers = await getAllBeers();
-  res.send(beers);
+  return res.send(beers);
 });
 
 // Get beer by category
@@ -23,7 +23,7 @@ beerRoutes.post('/api/beers/cat', async (req: Request, res: Response) => {
   }
   try {
     const beers = await getBeerByCategory(req.body.cat);
-    res.send(beers);
+    return res.send(beers);
   } catch (err) {
     res.statusCode = 500;
     return res.send('Something went wrong');
@@ -33,7 +33,7 @@ beerRoutes.post('/api/beers/cat', async (req: Request, res: Response) => {
 // Get categories
 beerRoutes.get('/api/categories', async (req: Request, res: Response) => {
   const categories = await getCategories();
-  res.send(categories);
+  return res.send(categories);
 });
 
 // Get beer by id
@@ -44,7 +44,7 @@ beerRoutes.get('/api/beers/:id', async (req: Request, res: Response) => {
       res.statusCode = 204;
       return res.send('Beer not found');
     }
-    res.send(beer);
+    return res.send(beer);
   } catch (err) {
     res.statusCode = 500;
     return res.send('Something went wrong');
@@ -59,7 +59,7 @@ beerRoutes.get('/api/beers/:id/collections', async (req: Request, res: Response)
       res.statusCode = 204;
       return res.send('Beer does notbelong to any collections');
     }
-    res.send(collections);
+    return res.send(collections);
   } catch (err) {
     res.statusCode = 500;
     return res.send('Something went wrong');

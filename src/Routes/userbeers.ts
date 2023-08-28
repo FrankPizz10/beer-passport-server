@@ -35,7 +35,7 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
     return res.send('User not found');
   }
   const userBeer = await updateOrCreateUserBeers(userBeerParams, prismaCtx);
-  res.send(userBeer);
+  return res.send(userBeer);
 });
 
 // Get user beers by user
@@ -46,7 +46,7 @@ userbeerRoutes.get('/api/userbeers/:id', async (req: Request, res: Response) => 
       res.statusCode = 204;
       return res.send('User beers not found');
     }
-    res.send(beers);
+    return res.send(beers);
   } catch (err) {
     res.statusCode = 500;
     return res.send('Something went wrong');
@@ -64,7 +64,7 @@ userbeerRoutes.get('/api/userbeer/:user_id/:beer_id', async (req: Request, res: 
       res.statusCode = 204;
       return res.send('User beer not found');
     }
-    res.send(userBeer);
+    return res.send(userBeer);
   } catch (err) {
     res.statusCode = 500;
     return res.send('Something went wrong');
@@ -79,7 +79,7 @@ userbeerRoutes.get('/api/triedbeers/:id', async (req: Request, res: Response) =>
       res.statusCode = 204;
       return res.send('User not found');
     }
-    res.send(triedBeers);
+    return res.send(triedBeers);
   } catch (err) {
     res.statusCode = 500;
     return res.send('Something went wrong');
@@ -94,7 +94,7 @@ userbeerRoutes.get('/api/likedbeers/:id', async (req: Request, res: Response) =>
       res.statusCode = 204;
       return res.send('User not found');
     }
-    res.send(likedBeers);
+    return res.send(likedBeers);
   } catch (err) {
     res.statusCode = 500;
     return res.send('Something went wrong');

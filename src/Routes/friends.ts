@@ -9,7 +9,7 @@ firendRoutes.get('/api/friends/:user_id', async (req: Request, res: Response) =>
     return res.status(400).send('Invalid user_id');
   }
   const friends = await getFriendsByUserId(parseInt(req.params.user_id));
-  res.send(friends);
+  return res.send(friends);
 });
 
 export default firendRoutes;

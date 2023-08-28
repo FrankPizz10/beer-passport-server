@@ -7,7 +7,7 @@ const adminRoutes: Express = express();
 adminRoutes.use('/admin', decodeAdminToken);
 
 adminRoutes.get('/admin', (req: Request, res: Response) => {
-  res.send('Success!');
+  return res.send('Success!');
 });
 
 // Add a beer to the database
@@ -38,7 +38,7 @@ adminRoutes.post('/admin/beers', async (req: Request, res: Response) => {
   }
   try {
     const beer = await addBeer(beerParams, prismaCtx);
-    res.send(beer);
+    return res.send(beer);
   } catch (e) {
     console.log(e);
     res.statusCode = 503;
@@ -60,7 +60,7 @@ adminRoutes.post('/admin/collections', async (req: Request, res: Response) => {
   }
   try {
     const collection = await addCollection(collectionParams, prismaCtx);
-    res.send(collection);
+    return res.send(collection);
   } catch (e) {
     console.log(e);
     res.statusCode = 503;
@@ -80,7 +80,7 @@ adminRoutes.post('/admin/collections/addBeer', async (req: Request, res: Respons
   }
   try {
     const collectionBeer = await addBeerToCollection(collectionBeerParams, prismaCtx);
-    res.send(collectionBeer);
+    return res.send(collectionBeer);
   } catch (e: any) {
     console.log(e);
     res.statusCode = 503;

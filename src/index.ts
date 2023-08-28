@@ -43,7 +43,7 @@ app.use(friendRoutes);
 export const prismaCtx = createContext();
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript Server');
+  return res.send('Express + TypeScript Server');
 });
 
 export const server = app.listen(PORT, () => {

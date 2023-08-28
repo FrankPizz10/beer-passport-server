@@ -16,7 +16,7 @@ collectionbeerRoutes.get(
         res.statusCode = 204;
         return res.send('CollectionBeer not found');
       }
-      res.send(collectionBeer);
+      return res.send(collectionBeer);
     } catch (err) {
       res.statusCode = 500;
       return res.send('Something went wrong');
