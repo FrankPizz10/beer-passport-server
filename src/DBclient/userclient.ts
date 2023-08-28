@@ -183,7 +183,7 @@ export const getFriendsByUserId = async (user_id: number) => {
       user_1: user_id,
     },
     include: {
-      users_friends_user_1Tousers: true,
+      users_friends_user_2Tousers: true,
     },
   });
   return friends;
