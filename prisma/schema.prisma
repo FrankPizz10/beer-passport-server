@@ -80,8 +80,8 @@ model user_beers {
   liked      Boolean?  @default(false)
   created_at DateTime? @default(now()) @db.Timestamp(0)
   updated_at DateTime? @default(now()) @db.Timestamp(0)
-  beers      beers     @relation(fields: [beer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_beers_beer_id")
-  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_beers_user_id")
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_beers_user_id")
+  beers      beers     @relation(fields: [beer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_beers_beer_id")
 
   @@unique([user_id, beer_id])
   @@index([beer_id], map: "fk_user_beers_beer_id")
@@ -120,11 +120,11 @@ model user_badges {
   progress      Float       @default(0) @db.Float
   created_at    DateTime    @default(now()) @db.Timestamp(0)
   updated_at    DateTime    @default(now()) @db.Timestamp(0)
-  collections   collections @relation(fields: [collection_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_badges_collection_id")
-  users         users       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_badges_user_id")
+  users         users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_badges_user_id")
+  collections   collections @relation(fields: [collection_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_badges_collection_id")
 
   @@unique([user_id, collection_id], map: "user_id_collection_id")
-  @@index([collection_id], map: "fk_user_badges_collection_id")
+  @@index([collection_id], map: "collection_id")
 }
 
 model collection_beers {
@@ -146,8 +146,8 @@ model friends {
   user_2                      Int
   created_at                  DateTime @default(now()) @db.Timestamp(0)
   updated_at                  DateTime @default(now()) @db.Timestamp(0)
-  users_friends_user_1Tousers users    @relation("friends_user_1Tousers", fields: [user_1], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "friends_ibfk_1")
-  users_friends_user_2Tousers users    @relation("friends_user_2Tousers", fields: [user_2], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "friends_ibfk_2")
+  users_friends_user_1Tousers users    @relation("friends_user_1Tousers", fields: [user_1], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "friends_ibfk_1")
+  users_friends_user_2Tousers users    @relation("friends_user_2Tousers", fields: [user_2], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "friends_ibfk_2")
 
   @@unique([user_1, user_2], map: "unique_user_combination")
   @@index([user_2], map: "user_2")

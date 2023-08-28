@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
-import { addUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
+import { addUser, deleteUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
 import { Prisma } from '@prisma/client';
 
 const userRoutes: Express = express();
@@ -47,6 +47,17 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
       res.statusCode = 400;
       return res.send('User already exists');
     }
+    res.statusCode = 500;
+    return res.send('Something went wrong');
+  }
+});
+
+// Delete user
+userRoutes.delete('/api/users/:uid', async (req: Request, res: Response) => {
+  try {
+    const user = await deleteUser(req.params.uid, prismaCtx);
+    return res.send(user);
+  } catch (err) {
     res.statusCode = 500;
     return res.send('Something went wrong');
   }

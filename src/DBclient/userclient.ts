@@ -188,3 +188,12 @@ export const getFriendsByUserId = async (user_id: number) => {
   });
   return friends;
 };
+
+export const deleteUser = async (id: string, ctx: Context) => {
+  const deletedUser = await ctx.prisma.users.delete({
+    where: {
+      uid: id,
+    },
+  });
+  return deletedUser;
+};
