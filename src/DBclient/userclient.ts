@@ -197,3 +197,13 @@ export const deleteUser = async (id: string, ctx: Context) => {
   });
   return deletedUser;
 };
+
+export const addFriend = async (user1: number, user2: number) => {
+  const friend = await prismaCtx.prisma.friends.create({
+    data: {
+      user_1: user1,
+      user_2: user2,
+    },
+  });
+  return friend;
+};

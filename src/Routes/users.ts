@@ -27,6 +27,26 @@ userRoutes.get('/api/userbyuid/:uid', async (req: Request, res: Response) => {
   }
 });
 
+// Get user by id
+userRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
+  try {
+    const user = await prismaCtx.prisma.users.findUnique({
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    if (!user) {
+      res.statusCode = 404;
+      return res.send('User not found');
+    }
+    return res.send(user);
+  } catch (err) {
+    console.log('Errored');
+    res.statusCode = 500;
+    return res.send('Something went wrong');
+  }
+});
+
 // Add user
 userRoutes.post('/api/users', async (req: Request, res: Response) => {
   if (!req.body.uid || !req.body.email || !req.body.age || !req.body.user_name) {
