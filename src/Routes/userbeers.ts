@@ -22,17 +22,17 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
   };
   if (!userBeerParams.user_id || !userBeerParams.beer_id || userBeerParams.liked === undefined) {
     res.statusCode = 400;
-    return res.send('Missing user_id, beer_id, or liked');
+    return res.json({ Error: 'Missing user_id, beer_id, or liked' });
   }
   const beer = await getBeerById(userBeerParams.beer_id);
   if (!beer) {
     res.statusCode = 400;
-    return res.send('Beer not found');
+    return res.json({ Error: 'Beer not found' });
   }
   const user = await getUserById(userBeerParams.user_id);
   if (!user) {
     res.statusCode = 400;
-    return res.send('User not found');
+    return res.json({ Error: 'User not found' });
   }
   const userBeer = await updateOrCreateUserBeers(userBeerParams, prismaCtx);
   return res.send(userBeer);
@@ -44,12 +44,12 @@ userbeerRoutes.get('/api/userbeers/:id', async (req: Request, res: Response) => 
     const beers = await getUserBeersByUserId(parseInt(req.params.id));
     if (!beers) {
       res.statusCode = 204;
-      return res.send('User beers not found');
+      return res.json({ Error: 'User beers not found' });
     }
     return res.send(beers);
   } catch (err) {
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 
@@ -62,12 +62,12 @@ userbeerRoutes.get('/api/userbeer/:user_id/:beer_id', async (req: Request, res: 
     );
     if (!userBeer) {
       res.statusCode = 204;
-      return res.send('User beer not found');
+      return res.json({ Error: 'User beer not found' });
     }
     return res.send(userBeer);
   } catch (err) {
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 
@@ -77,12 +77,12 @@ userbeerRoutes.get('/api/triedbeers/:id', async (req: Request, res: Response) =>
     const triedBeers = await getTriedBeersByUserId(parseInt(req.params.id));
     if (!triedBeers) {
       res.statusCode = 204;
-      return res.send('User not found');
+      return res.json({ Error: 'User not found' });
     }
     return res.send(triedBeers);
   } catch (err) {
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 
@@ -92,12 +92,12 @@ userbeerRoutes.get('/api/likedbeers/:id', async (req: Request, res: Response) =>
     const likedBeers = await getLikedBeersByUserId(parseInt(req.params.id));
     if (!likedBeers) {
       res.statusCode = 204;
-      return res.send('User not found');
+      return res.json({ Error: 'User not found' });
     }
     return res.send(likedBeers);
   } catch (err) {
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 

@@ -9,21 +9,19 @@ datasource db {
 
 model beers {
   id               Int                @id @default(autoincrement())
-  brewery_id       Int                @default(0)
+  brewery_id       Int?
   name             String             @default("") @db.VarChar(255)
-  cat_id           Int                @default(0)
-  style_id         Int                @default(0)
-  abv              Float              @default(0) @db.Float
-  ibu              Float              @default(0) @db.Float
-  srm              Float              @default(0) @db.Float
-  upc              Int                @default(0)
-  filepath         String             @default("") @db.VarChar(255)
-  descript         String             @db.Text
-  add_user         Int                @default(0)
+  cat_id           Int?
+  style_id         Int?
+  abv              Float?             @db.Float
+  ibu              Float?             @db.Float
+  srm              Float?             @db.Float
+  upc              Int?
+  descript         String?            @db.Text
   last_mod         DateTime           @default(now()) @db.Timestamp(0)
-  brewery          breweries          @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_brewery_id")
-  category         categories         @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_cat_id")
-  style            styles             @relation(fields: [style_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_style_id")
+  brewery          breweries?         @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_brewery_id")
+  category         categories?        @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_cat_id")
+  style            styles?            @relation(fields: [style_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_style_id")
   collection_beers collection_beers[]
   user_beers       user_beers[]
 
@@ -43,7 +41,6 @@ model breweries {
   country  String   @default("") @db.VarChar(255)
   phone    String   @default("") @db.VarChar(50)
   website  String   @default("") @db.VarChar(255)
-  filepath String   @default("") @db.VarChar(255)
   descript String   @db.Text
   add_user Int      @default(0)
   last_mod DateTime @default(now()) @db.Timestamp(0)
@@ -89,16 +86,17 @@ model user_beers {
 }
 
 model users {
-  id                            Int           @id @unique(map: "id") @default(autoincrement())
-  uid                           String        @unique(map: "uid") @db.VarChar(255)
+  id                            Int             @id @unique(map: "id") @default(autoincrement())
+  uid                           String          @unique(map: "uid") @db.VarChar(255)
   age                           Int
-  email                         String        @unique(map: "email") @db.VarChar(255)
-  user_name                     String        @unique(map: "user_name") @db.VarChar(255)
-  private                       Boolean       @default(false)
-  friends_friends_user_1Tousers friends[]     @relation("friends_user_1Tousers")
-  friends_friends_user_2Tousers friends[]     @relation("friends_user_2Tousers")
+  email                         String          @unique(map: "email") @db.VarChar(255)
+  user_name                     String          @unique(map: "user_name") @db.VarChar(255)
+  private                       Boolean         @default(false)
+  friends_friends_user_1Tousers friends[]       @relation("friends_user_1Tousers")
+  friends_friends_user_2Tousers friends[]       @relation("friends_user_2Tousers")
   user_badges                   user_badges[]
   user_beers                    user_beers[]
+  notifications                 notifications[]
 }
 
 model collections {
@@ -151,4 +149,16 @@ model friends {
 
   @@unique([user_1, user_2], map: "unique_user_combination")
   @@index([user_2], map: "user_2")
+}
+
+model notifications {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  message    String   @db.VarChar(255)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+  viewed     Boolean  @default(false)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notifications_user_id")
+
+  @@index([user_id], map: "fk_notifications_user_id")
 }

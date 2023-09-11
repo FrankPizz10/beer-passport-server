@@ -78,7 +78,6 @@ export const addBeer = async (beer: CreateBeer, ctx: Context) => {
       ibu: beer.ibu,
       srm: beer.srm,
       upc: beer.upc,
-      filepath: beer.filepath,
       descript: beer.descript,
     },
   });

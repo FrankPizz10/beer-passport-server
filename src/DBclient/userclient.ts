@@ -169,7 +169,7 @@ const getCollectionProgress = async (user_id: number, collection_id: number) => 
   let progress = 0;
   for (let i = 0; i < collectionBeers.length; i++) {
     const collectionBeer = collectionBeers[i];
-    const userBeer = userBeers.find(userBeer => userBeer.beer_id === collectionBeer.beer_id);
+    const userBeer = userBeers.find(beer => beer.beer_id === collectionBeer.beer_id);
     if (userBeer) {
       progress++;
     }

@@ -16,6 +16,6 @@ export const decodeAdminToken = async (req: Request, res: Response, next: NextFu
     }
     return res.json({ message: 'Unauthorized Admin' });
   } catch (e) {
-    return res.json({ message: 'Internal Error' });
+    return res.json({ message: 'Auth Admin Internal Error' });
   }
 };

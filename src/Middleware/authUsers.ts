@@ -5,7 +5,9 @@ export const decodeUserToken = async (req: Request, res: Response, next: NextFun
   if (!req.headers.authorization) {
     return res.json({ message: 'Unauthorized' });
   }
+  console.log('Headers', req.headers.authorization);
   const token = req.headers.authorization.split(' ')[1];
+  console.log('Token', token);
   try {
     const decodeValue = await admin.auth().verifyIdToken(token);
     if (decodeValue) {
@@ -13,6 +15,6 @@ export const decodeUserToken = async (req: Request, res: Response, next: NextFun
     }
     return res.json({ message: 'Unauthorized' });
   } catch (e) {
-    return res.json({ message: 'Internal Error' });
+    return res.json({ message: 'Auth Internal Error' });
   }
 };

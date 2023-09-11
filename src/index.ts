@@ -12,6 +12,7 @@ import userbadgeRoutes from './Routes/userbadges';
 import collectionbeerRoutes from './Routes/collectionbeers';
 import collectionRoutes from './Routes/collections';
 import friendRoutes from './Routes/friends';
+import { seedDatabase } from './DBclient/seedDatabase';
 
 dotenv.config();
 
@@ -27,10 +28,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(cors());
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(decodeUserToken);
-}
-
+app.use(decodeUserToken);
 app.use(adminRoutes);
 app.use(userRoutes);
 app.use(beerRoutes);
@@ -41,6 +39,8 @@ app.use(collectionbeerRoutes);
 app.use(friendRoutes);
 
 export const prismaCtx = createContext();
+
+seedDatabase();
 
 app.get('/', (req: Request, res: Response) => {
   return res.send('Express + TypeScript Server');

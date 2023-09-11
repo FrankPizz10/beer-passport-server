@@ -12,37 +12,29 @@ adminRoutes.get('/admin', (req: Request, res: Response) => {
 
 // Add a beer to the database
 adminRoutes.post('/admin/beers', async (req: Request, res: Response) => {
-  const beerParams: CreateBeer = {
-    brewery_id: parseInt(req.body.beer.brewery_id),
-    name: req.body.beer.name,
-    cat_id: parseInt(req.body.beer.cat_id),
-    style_id: parseInt(req.body.beer.style_id),
-    abv: req.body.beer.abv,
-    ibu: req.body.beer.ibu,
-    srm: req.body.beer.srm,
-    upc: req.body.beer.upc,
-    filepath: req.body.beer.filepath,
-    descript: req.body.beer.descript,
-    collection_id: req.body.beer.collection_id,
-  };
-  console.log(beerParams);
-  if (
-    !beerParams.brewery_id ||
-    !beerParams.name ||
-    !beerParams.cat_id ||
-    !beerParams.style_id ||
-    !beerParams.descript
-  ) {
+  if (!req.body.name) {
     res.statusCode = 400;
-    return res.send('Missing required fields');
+    return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const beer = await addBeer(beerParams, prismaCtx);
+    const beer = await prismaCtx.prisma.beers.create({
+      data: {
+        brewery_id: req.body.brewery_id != null ? parseInt(req.body.brewery_id) : null,
+        name: req.body.name,
+        cat_id: req.body.cat_id != null ? parseInt(req.body.cat_id) : null,
+        style_id: req.body.style_id != null ? parseInt(req.body.style_id) : null,
+        abv: req.body.abv,
+        ibu: req.body.ibu,
+        srm: req.body.srm,
+        upc: req.body.upc,
+        descript: req.body.descript,
+      },
+    });
     return res.send(beer);
   } catch (e) {
     console.log(e);
     res.statusCode = 503;
-    return res.send('Error adding beer');
+    return res.json({ Error: 'Error adding beer' });
   }
 });
 
@@ -56,7 +48,7 @@ adminRoutes.post('/admin/collections', async (req: Request, res: Response) => {
   };
   if (!collectionParams.name || !collectionParams.description || !collectionParams.difficulty) {
     res.statusCode = 400;
-    return res.send('Missing required fields');
+    return res.json({ Error: 'Missing required fields' });
   }
   try {
     const collection = await addCollection(collectionParams, prismaCtx);
@@ -64,7 +56,7 @@ adminRoutes.post('/admin/collections', async (req: Request, res: Response) => {
   } catch (e) {
     console.log(e);
     res.statusCode = 503;
-    return res.send('Error adding collection');
+    return res.json({ Error: 'Error adding collection' });
   }
 });
 
@@ -76,7 +68,7 @@ adminRoutes.post('/admin/collections/addBeer', async (req: Request, res: Respons
   };
   if (!collectionBeerParams?.collection_id || !collectionBeerParams?.beer_id) {
     res.statusCode = 400;
-    return res.send('Missing required fields');
+    return res.json({ Error: 'Missing required fields' });
   }
   try {
     const collectionBeer = await addBeerToCollection(collectionBeerParams, prismaCtx);
@@ -84,7 +76,7 @@ adminRoutes.post('/admin/collections/addBeer', async (req: Request, res: Respons
   } catch (e: any) {
     console.log(e);
     res.statusCode = 503;
-    return res.send('Error adding beer to collection');
+    return res.json({ Error: 'Error adding beer to collection' });
   }
 });
 

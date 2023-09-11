@@ -19,14 +19,14 @@ beerRoutes.get('/api/beers', async (req: Request, res: Response) => {
 beerRoutes.post('/api/beers/cat', async (req: Request, res: Response) => {
   if (!req.body.cat) {
     res.statusCode = 400;
-    return res.send('No category provided');
+    return res.json({ Error: 'No category provided' });
   }
   try {
     const beers = await getBeerByCategory(req.body.cat);
     return res.send(beers);
   } catch (err) {
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 
@@ -42,12 +42,12 @@ beerRoutes.get('/api/beers/:id', async (req: Request, res: Response) => {
     const beer = await getBeerById(parseInt(req.params.id));
     if (!beer) {
       res.statusCode = 204;
-      return res.send('Beer not found');
+      return res.json({ Error: 'Beer not found' });
     }
     return res.send(beer);
   } catch (err) {
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 
@@ -57,12 +57,12 @@ beerRoutes.get('/api/beers/:id/collections', async (req: Request, res: Response)
     const collections = await getCollectionsByBeerId(parseInt(req.params.id));
     if (!collections) {
       res.statusCode = 204;
-      return res.send('Beer does notbelong to any collections');
+      return res.json({ Error: 'Beer does notbelong to any collections' });
     }
     return res.send(collections);
   } catch (err) {
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 

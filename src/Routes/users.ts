@@ -17,13 +17,13 @@ userRoutes.get('/api/userbyuid/:uid', async (req: Request, res: Response) => {
     const user = await getUserByUid(req.params.uid);
     if (!user) {
       res.statusCode = 404;
-      return res.send('User not found');
+      return res.json({ Error: 'User not found' });
     }
     return res.send(user);
   } catch (err) {
     console.log('Errored');
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 
@@ -37,13 +37,13 @@ userRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
     });
     if (!user) {
       res.statusCode = 404;
-      return res.send('User not found');
+      return res.json({ Errror: 'User not found' });
     }
     return res.send(user);
   } catch (err) {
     console.log('Errored');
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 
@@ -51,7 +51,7 @@ userRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
 userRoutes.post('/api/users', async (req: Request, res: Response) => {
   if (!req.body.uid || !req.body.email || !req.body.age || !req.body.user_name) {
     res.statusCode = 400;
-    return res.send('Missing uid, email, age, or user_name');
+    return res.json({ Error: 'Missing uid, email, age, or user_name' });
   }
   const add_user = {
     uid: req.body.uid,
@@ -65,10 +65,10 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
       res.statusCode = 400;
-      return res.send('User already exists');
+      return res.json({ Error: 'User already exists' });
     }
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 
@@ -79,7 +79,7 @@ userRoutes.delete('/api/users/:uid', async (req: Request, res: Response) => {
     return res.send(user);
   } catch (err) {
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 

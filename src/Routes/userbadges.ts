@@ -9,12 +9,12 @@ userbadgeRoutes.get('/api/userbadges/:id', async (req: Request, res: Response) =
     const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
     if (!userBadges) {
       res.statusCode = 204;
-      return res.send('UserBadges not found');
+      return res.json({ Error: 'UserBadges not found' });
     }
     return res.send(userBadges);
   } catch (err) {
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 
