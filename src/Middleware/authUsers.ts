@@ -5,9 +5,7 @@ export const decodeUserToken = async (req: Request, res: Response, next: NextFun
   if (!req.headers.authorization) {
     return res.json({ message: 'Unauthorized' });
   }
-  console.log('Headers', req.headers.authorization);
   const token = req.headers.authorization.split(' ')[1];
-  console.log('Token', token);
   try {
     const decodeValue = await admin.auth().verifyIdToken(token);
     if (decodeValue) {

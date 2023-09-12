@@ -39,7 +39,12 @@ beerRoutes.get('/api/categories', async (req: Request, res: Response) => {
 // Get beer by id
 beerRoutes.get('/api/beers/:id', async (req: Request, res: Response) => {
   try {
-    const beer = await getBeerById(parseInt(req.params.id));
+    const beer = await getBeerById(
+      parseInt(req.params.id),
+      req.query.includeCategory === 'true' ? true : false,
+      req.query.includeBrewery === 'true' ? true : false,
+      req.query.includeStyle === 'true' ? true : false,
+    );
     if (!beer) {
       res.statusCode = 204;
       return res.json({ Error: 'Beer not found' });

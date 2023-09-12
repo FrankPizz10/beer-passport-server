@@ -26,15 +26,20 @@ export const getBeerByCategory = async (cat: string) => {
   return beers.splice(0, 20);
 };
 
-export const getBeerById = async (id: number) => {
+export const getBeerById = async (
+  id: number,
+  includeCategory: boolean,
+  includeBrewery: boolean,
+  includeStyle: boolean,
+) => {
   const beer = await prismaCtx.prisma.beers.findUnique({
     where: {
       id: id,
     },
     include: {
-      category: true,
-      brewery: true,
-      style: true,
+      category: includeCategory,
+      brewery: includeBrewery,
+      style: includeStyle,
     },
   });
   return beer;
