@@ -1,3 +1,4 @@
+import { getUserByUid } from '../DBclient/userclient';
 import { admin } from '../Firebase/firebase';
 import { Request, Response, NextFunction } from 'express';
 
@@ -9,6 +10,7 @@ export const decodeUserToken = async (req: Request, res: Response, next: NextFun
   try {
     const decodeValue = await admin.auth().verifyIdToken(token);
     if (decodeValue) {
+      res.locals.user = await getUserByUid(decodeValue.user_id);
       return next();
     }
     return res.json({ message: 'Unauthorized' });

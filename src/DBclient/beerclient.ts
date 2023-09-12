@@ -1,11 +1,6 @@
 import { Context } from '../../context';
 import { prismaCtx } from '../index';
 
-export const getAllBeers = async () => {
-  const beers = await prismaCtx.prisma.beers.findMany();
-  return beers as Beer[];
-};
-
 export const getBeerByCategory = async (cat: string) => {
   // Get category that contains cat
   const category = await prismaCtx.prisma.categories.findFirst({
@@ -70,47 +65,6 @@ export const getCollectionsByBeerId = async (beerId: number) => {
     },
   });
   return collections;
-};
-
-export const addBeer = async (beer: CreateBeer, ctx: Context) => {
-  const newBeer = await ctx.prisma.beers.create({
-    data: {
-      brewery_id: beer.brewery_id,
-      name: beer.name,
-      cat_id: beer.cat_id,
-      style_id: beer.style_id,
-      abv: beer.abv,
-      ibu: beer.ibu,
-      srm: beer.srm,
-      upc: beer.upc,
-      descript: beer.descript,
-    },
-  });
-  return newBeer;
-};
-
-export const addCollection = async (collection: CreateCollection, ctx: Context) => {
-  const newCollection = await ctx.prisma.collections.create({
-    data: {
-      name: collection.name,
-      difficulty: collection.difficulty,
-      description: collection.description,
-    },
-  });
-  return newCollection;
-};
-
-export const addBeerToCollection = async (
-  addBeerToCollection: AddBeerToCollection,
-  ctx: Context,
-) => {
-  const newCollectionBeer = await ctx.prisma.collection_beers.create({
-    data: {
-      beer_id: addBeerToCollection.beer_id,
-      collection_id: addBeerToCollection.collection_id,
-    },
-  });
-  return newCollectionBeer;
 };
 
 export const getCollectionBeerByCollectionIdAndBeerId = async (

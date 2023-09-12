@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
-import { addUser, deleteUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
+import { deleteUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
 import { Prisma } from '@prisma/client';
 
 const userRoutes: Express = express();
@@ -53,14 +53,15 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
     res.statusCode = 400;
     return res.json({ Error: 'Missing uid, email, age, or user_name' });
   }
-  const add_user = {
-    uid: req.body.uid,
-    email: req.body.email,
-    age: parseInt(req.body.age),
-    user_name: req.body.user_name,
-  };
   try {
-    const user = await addUser(add_user, prismaCtx);
+    const user = await prismaCtx.prisma.users.create({
+      data: {
+        uid: req.body.uid,
+        email: req.body.email,
+        age: parseInt(req.body.age),
+        user_name: req.body.user_name,
+      },
+    });
     return res.send(user);
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {

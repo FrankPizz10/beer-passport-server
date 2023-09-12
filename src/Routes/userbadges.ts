@@ -4,9 +4,9 @@ import { getUserBadgesByUserId } from '../DBclient/userclient';
 const userbadgeRoutes: Express = express();
 
 // Get user badges by user id
-userbadgeRoutes.get('/api/userbadges/:id', async (req: Request, res: Response) => {
+userbadgeRoutes.get('/api/userbadges/', async (req: Request, res: Response) => {
   try {
-    const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
+    const userBadges = await getUserBadgesByUserId(parseInt(res.locals.user.id));
     if (!userBadges) {
       res.statusCode = 204;
       return res.json({ Error: 'UserBadges not found' });

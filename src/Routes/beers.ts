@@ -1,17 +1,14 @@
 import express, { Express, Request, Response } from 'express';
-import {
-  getAllBeers,
-  getBeerByCategory,
-  getBeerById,
-  getCollectionsByBeerId,
-} from '../DBclient/beerclient';
+import { getBeerByCategory, getBeerById, getCollectionsByBeerId } from '../DBclient/beerclient';
 import { getCategories } from '../DBclient/gettableinfo';
+import { ResponseLocals } from '../DBclient/types';
+import { prismaCtx } from '..';
 
 const beerRoutes: Express = express();
 
 // Get all beers
 beerRoutes.get('/api/beers', async (req: Request, res: Response) => {
-  const beers = await getAllBeers();
+  const beers = await prismaCtx.prisma.beers.findMany();
   return res.send(beers);
 });
 
@@ -37,7 +34,7 @@ beerRoutes.get('/api/categories', async (req: Request, res: Response) => {
 });
 
 // Get beer by id
-beerRoutes.get('/api/beers/:id', async (req: Request, res: Response) => {
+beerRoutes.get('/api/beers/:id', async (req, res) => {
   try {
     const beer = await getBeerById(
       parseInt(req.params.id),

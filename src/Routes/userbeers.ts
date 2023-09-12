@@ -14,27 +14,27 @@ const userbeerRoutes: Express = express();
 
 // Update or create user beer
 userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
-  const userBeerParams: UserBeer = {
-    user_id: req.body.userBeer.user_id,
-    beer_id: req.body.userBeer.beer_id,
-    liked: req.body.userBeer.liked,
-    collection_id: req.body.userBeer.collection_id,
-  };
-  if (!userBeerParams.user_id || !userBeerParams.beer_id || userBeerParams.liked === undefined) {
+  if (!req.body.beer_id || req.body.liked === undefined) {
     res.statusCode = 400;
-    return res.json({ Error: 'Missing user_id, beer_id, or liked' });
+    return res.json({ Error: 'Missing beer_id, or liked' });
   }
-  const beer = await getBeerById(userBeerParams.beer_id);
+  const beer = await getBeerById(req.body.beer_id, false, false, false);
   if (!beer) {
     res.statusCode = 400;
     return res.json({ Error: 'Beer not found' });
   }
-  const user = await getUserById(userBeerParams.user_id);
+  const user = await getUserById(res.locals.user.id);
   if (!user) {
     res.statusCode = 400;
     return res.json({ Error: 'User not found' });
   }
-  const userBeer = await updateOrCreateUserBeers(userBeerParams, prismaCtx);
+  const userBeer = await updateOrCreateUserBeers(
+    res.locals.user.id,
+    parseInt(req.body.beer_id),
+    req.body.liked,
+    parseInt(req.body.collection_id),
+    prismaCtx,
+  );
   return res.send(userBeer);
 });
 
@@ -54,10 +54,10 @@ userbeerRoutes.get('/api/userbeers/:id', async (req: Request, res: Response) => 
 });
 
 // Get user beer by user and beer
-userbeerRoutes.get('/api/userbeer/:user_id/:beer_id', async (req: Request, res: Response) => {
+userbeerRoutes.get('/api/userbeer/:beer_id', async (req: Request, res: Response) => {
   try {
     const userBeer = await getUserBeerByUserIdAndBeerId(
-      parseInt(req.params.user_id),
+      parseInt(res.locals.user.id),
       parseInt(req.params.beer_id),
     );
     if (!userBeer) {

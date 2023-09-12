@@ -1,7 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
 import { decodeAdminToken } from '../Middleware/authAdmin';
-import { addBeer, addBeerToCollection, addCollection } from '../DBclient/beerclient';
 const adminRoutes: Express = express();
 
 adminRoutes.use('/admin', decodeAdminToken);
@@ -40,18 +39,18 @@ adminRoutes.post('/admin/beers', async (req: Request, res: Response) => {
 
 // Add a new collection
 adminRoutes.post('/admin/collections', async (req: Request, res: Response) => {
-  console.log(req.body);
-  const collectionParams: CreateCollection = {
-    name: req.body.collection.name,
-    difficulty: parseInt(req.body.collection.difficulty),
-    description: req.body.collection.description,
-  };
-  if (!collectionParams.name || !collectionParams.description || !collectionParams.difficulty) {
+  if (!req.body.name || !req.body.description || !req.body.difficulty) {
     res.statusCode = 400;
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const collection = await addCollection(collectionParams, prismaCtx);
+    const collection = await prismaCtx.prisma.collections.create({
+      data: {
+        name: req.body.name,
+        difficulty: parseInt(req.body.difficulty),
+        description: req.body.description,
+      },
+    });
     return res.send(collection);
   } catch (e) {
     console.log(e);
@@ -62,16 +61,17 @@ adminRoutes.post('/admin/collections', async (req: Request, res: Response) => {
 
 // Add a beer to a collection
 adminRoutes.post('/admin/collections/addBeer', async (req: Request, res: Response) => {
-  const collectionBeerParams: AddBeerToCollection = {
-    collection_id: parseInt(req.body.addBeerToColelction.collection_id),
-    beer_id: parseInt(req.body.addBeerToColelction.beer_id),
-  };
-  if (!collectionBeerParams?.collection_id || !collectionBeerParams?.beer_id) {
+  if (!req.body.collection_id || !req.body.beer_id) {
     res.statusCode = 400;
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const collectionBeer = await addBeerToCollection(collectionBeerParams, prismaCtx);
+    const collectionBeer = await prismaCtx.prisma.collection_beers.create({
+      data: {
+        collection_id: parseInt(req.body.collection_id),
+        beer_id: parseInt(req.body.beer_id),
+      },
+    });
     return res.send(collectionBeer);
   } catch (e: any) {
     console.log(e);
