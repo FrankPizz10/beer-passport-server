@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
-import { decodeAdminToken } from '../Middleware/authAdmin';
+import { decodeAdminToken } from '../Middleware/authUsers';
 const adminRoutes: Express = express();
 
 adminRoutes.use('/admin', decodeAdminToken);
