@@ -1,4 +1,3 @@
-import { Context } from '../../context';
 import { prismaCtx } from '../index';
 
 export const getBeerByCategory = async (cat: string) => {
@@ -16,6 +15,10 @@ export const getBeerByCategory = async (cat: string) => {
       cat_id: {
         equals: id,
       },
+    },
+    select: {
+      id: true,
+      name: true,
     },
   });
   return beers.splice(0, 20);

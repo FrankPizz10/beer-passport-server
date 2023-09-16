@@ -18,4 +18,18 @@ userbadgeRoutes.get('/api/userbadges/', async (req: Request, res: Response) => {
   }
 });
 
+userbadgeRoutes.get('/api/userbadges/:id', async (req: Request, res: Response) => {
+  try {
+    const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
+    if (!userBadges) {
+      res.statusCode = 204;
+      return res.json({ Error: 'UserBadges not found' });
+    }
+    return res.send(userBadges);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
 export default userbadgeRoutes;

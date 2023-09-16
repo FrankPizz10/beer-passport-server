@@ -7,6 +7,17 @@ export const getAllUsers = async () => {
   return users;
 };
 
+export const getAllUserBasicInfo = async () => {
+  const users = await prismaCtx.prisma.users.findMany({
+    select: {
+      user_name: true,
+      id: true,
+      private: true,
+    },
+  });
+  return users;
+};
+
 export const getUserByUid = async (id: string) => {
   const user = await prismaCtx.prisma.users.findUnique({
     where: {

@@ -1,50 +1,45 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
-import { deleteUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
+import { deleteUser, getAllUserBasicInfo } from '../DBclient/userclient';
 import { Prisma } from '@prisma/client';
 
 const userRoutes: Express = express();
 
-// Get all users
+// Get all user basic info
 userRoutes.get('/api/users', async (req: Request, res: Response) => {
-  const users = await getAllUsers();
+  const users = await getAllUserBasicInfo();
   return res.send(users);
+});
+
+// Get user name by id
+userRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
+  const user = await prismaCtx.prisma.users.findUnique({
+    where: {
+      id: parseInt(req.params.id),
+    },
+    select: {
+      user_name: true,
+    },
+  });
+  if (!user) {
+    res.statusCode = 404;
+    return res.json({ Error: 'User not found' });
+  }
+  return res.send(user);
 });
 
 // Get user by uid
 userRoutes.get('/api/userbyuid/:uid', async (req: Request, res: Response) => {
-  try {
-    const user = await getUserByUid(req.params.uid);
-    if (!user) {
-      res.statusCode = 404;
-      return res.json({ Error: 'User not found' });
-    }
-    return res.send(user);
-  } catch (err) {
-    console.log('Errored');
-    res.statusCode = 500;
-    return res.json({ Error: 'Something went wrong' });
+  const user = await prismaCtx.prisma.users.findUnique({
+    where: {
+      uid: res.locals.user.uid,
+    },
+  });
+  if (!user) {
+    res.statusCode = 404;
+    return res.json({ Error: 'User not found' });
   }
-});
-
-// Get user by id
-userRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
-  try {
-    const user = await prismaCtx.prisma.users.findUnique({
-      where: {
-        id: parseInt(req.params.id),
-      },
-    });
-    if (!user) {
-      res.statusCode = 404;
-      return res.json({ Errror: 'User not found' });
-    }
-    return res.send(user);
-  } catch (err) {
-    console.log('Errored');
-    res.statusCode = 500;
-    return res.json({ Error: 'Something went wrong' });
-  }
+  return res.send(user);
 });
 
 // Add user
@@ -74,9 +69,9 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
 });
 
 // Delete user
-userRoutes.delete('/api/users/:uid', async (req: Request, res: Response) => {
+userRoutes.delete('/api/users/', async (req: Request, res: Response) => {
   try {
-    const user = await deleteUser(req.params.uid, prismaCtx);
+    const user = await deleteUser(res.locals.user.uid, prismaCtx);
     return res.send(user);
   } catch (err) {
     res.statusCode = 500;

@@ -1,7 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { getBeerByCategory, getBeerById, getCollectionsByBeerId } from '../DBclient/beerclient';
 import { getCategories } from '../DBclient/gettableinfo';
-import { ResponseLocals } from '../DBclient/types';
 import { prismaCtx } from '..';
 
 const beerRoutes: Express = express();
@@ -9,6 +8,17 @@ const beerRoutes: Express = express();
 // Get all beers
 beerRoutes.get('/api/beers', async (req: Request, res: Response) => {
   const beers = await prismaCtx.prisma.beers.findMany();
+  return res.send(beers);
+});
+
+// Get all basic beer info
+beerRoutes.get('/api/beers/basic', async (req: Request, res: Response) => {
+  const beers = await prismaCtx.prisma.beers.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
   return res.send(beers);
 });
 

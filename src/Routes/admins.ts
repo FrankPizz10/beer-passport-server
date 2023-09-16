@@ -1,12 +1,66 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
 import { decodeAdminToken } from '../Middleware/authUsers';
+import { deleteUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
 const adminRoutes: Express = express();
 
 adminRoutes.use('/admin', decodeAdminToken);
 
 adminRoutes.get('/admin', (req: Request, res: Response) => {
   return res.send('Success!');
+});
+
+// Get all users
+adminRoutes.get('/api/users', async (req: Request, res: Response) => {
+  const users = await getAllUsers();
+  return res.send(users);
+});
+
+// Get user by id
+adminRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
+  try {
+    const user = await prismaCtx.prisma.users.findUnique({
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    if (!user) {
+      res.statusCode = 404;
+      return res.json({ Errror: 'User not found' });
+    }
+    return res.send(user);
+  } catch (err) {
+    console.log('Errored');
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
+// Get user by uid
+adminRoutes.get('/admin/userbyuid/:uid', async (req: Request, res: Response) => {
+  try {
+    const user = await getUserByUid(req.params.uid);
+    if (!user) {
+      res.statusCode = 404;
+      return res.json({ Error: 'User not found' });
+    }
+    return res.send(user);
+  } catch (err) {
+    console.log('Errored');
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
+// Delete user
+adminRoutes.delete('/api/users/:uid', async (req: Request, res: Response) => {
+  try {
+    const user = await deleteUser(req.params.uid, prismaCtx);
+    return res.send(user);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
 });
 
 // Add a beer to the database
