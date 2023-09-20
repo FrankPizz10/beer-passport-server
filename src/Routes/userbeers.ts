@@ -41,7 +41,9 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
 // Get user beers by user
 userbeerRoutes.get('/api/userbeers/:id', async (req: Request, res: Response) => {
   try {
-    const beers = await getUserBeersByUserId(parseInt(req.params.id));
+    const id =
+      req.params.id && req.params.id !== 'undefined' ? parseInt(req.params.id) : res.locals.user.id;
+    const beers = await getUserBeersByUserId(id);
     if (!beers) {
       res.statusCode = 204;
       return res.json({ Error: 'User beers not found' });
@@ -74,7 +76,9 @@ userbeerRoutes.get('/api/userbeer/:beer_id', async (req: Request, res: Response)
 // Get tried beers by user id
 userbeerRoutes.get('/api/triedbeers/:id', async (req: Request, res: Response) => {
   try {
-    const triedBeers = await getTriedBeersByUserId(parseInt(req.params.id));
+    const id =
+      req.params.id && req.params.id !== 'undefined' ? parseInt(req.params.id) : res.locals.user.id;
+    const triedBeers = await getTriedBeersByUserId(id);
     if (!triedBeers) {
       res.statusCode = 204;
       return res.json({ Error: 'User not found' });
@@ -89,7 +93,9 @@ userbeerRoutes.get('/api/triedbeers/:id', async (req: Request, res: Response) =>
 // Get liked beers by user id
 userbeerRoutes.get('/api/likedbeers/:id', async (req: Request, res: Response) => {
   try {
-    const likedBeers = await getLikedBeersByUserId(parseInt(req.params.id));
+    const id =
+      req.params.id && req.params.id !== 'undefined' ? parseInt(req.params.id) : res.locals.user.id;
+    const likedBeers = await getLikedBeersByUserId(id);
     if (!likedBeers) {
       res.statusCode = 204;
       return res.json({ Error: 'User not found' });

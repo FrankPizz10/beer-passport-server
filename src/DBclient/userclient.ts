@@ -124,7 +124,7 @@ const updateUserBadges = async (
   progress: number,
   ctx: Context,
 ) => {
-  await ctx.prisma.user_badges.upsert({
+  const badgeUpdate = await ctx.prisma.user_badges.upsert({
     where: {
       user_id_collection_id: {
         user_id: user_id,
@@ -142,6 +142,20 @@ const updateUserBadges = async (
       progress: progress,
     },
   });
+  if (earned) {
+    const collection = await ctx.prisma.collections.findUnique({
+      where: {
+        id: collection_id,
+      },
+    });
+    await ctx.prisma.notifications.create({
+      data: {
+        user_id: user_id,
+        type: 'BADGE_EARNED',
+        message: `You earned the ${collection?.name} badge!`,
+      },
+    });
+  }
 };
 
 export const getUserBadgesByUserId = async (user_id: number) => {

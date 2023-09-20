@@ -18,6 +18,7 @@ userbadgeRoutes.get('/api/userbadges/', async (req: Request, res: Response) => {
   }
 });
 
+// Used to get friends badges
 userbadgeRoutes.get('/api/userbadges/:id', async (req: Request, res: Response) => {
   try {
     const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
