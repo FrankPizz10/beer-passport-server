@@ -4,7 +4,7 @@ import { prismaCtx } from '..';
 const notificationsRoutes: Express = express();
 
 // Get notifications by user id
-notificationsRoutes.get('/api/notifications/:id', async (req, res) => {
+notificationsRoutes.get('/api/notifications', async (req, res) => {
   try {
     const notifications = await prismaCtx.prisma.notifications.findMany({
       where: {
@@ -17,3 +17,5 @@ notificationsRoutes.get('/api/notifications/:id', async (req, res) => {
     return res.json({ Error: 'Something went wrong' });
   }
 });
+
+export default notificationsRoutes;

@@ -12,6 +12,7 @@ import userbadgeRoutes from './Routes/userbadges';
 import collectionbeerRoutes from './Routes/collectionbeers';
 import collectionRoutes from './Routes/collections';
 import friendRoutes from './Routes/friends';
+import notificationsRoutes from './Routes/notifications';
 import { seedDatabase } from './DBclient/seedDatabase';
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.use(userbadgeRoutes);
 app.use(collectionRoutes);
 app.use(collectionbeerRoutes);
 app.use(friendRoutes);
+app.use(notificationsRoutes);
 
 export const prismaCtx = createContext();
 

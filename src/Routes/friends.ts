@@ -47,7 +47,7 @@ firendRoutes.post('/api/friends/:user2', async (req: Request, res: Response) => 
     data: {
       user_id: parseInt(req.params.user2),
       type: 'NEW_FRIEND',
-      message: `${res.locals.user.username} added you as a friend`,
+      message: `${res.locals.user.user_name} added you as a friend`,
     },
   });
 
