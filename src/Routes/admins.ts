@@ -11,13 +11,13 @@ adminRoutes.get('/admin', (req: Request, res: Response) => {
 });
 
 // Get all users
-adminRoutes.get('/api/users', async (req: Request, res: Response) => {
+adminRoutes.get('/admin/users', async (req: Request, res: Response) => {
   const users = await getAllUsers();
   return res.send(users);
 });
 
 // Get user by id
-adminRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
+adminRoutes.get('/admin/users/:id', async (req: Request, res: Response) => {
   try {
     const user = await prismaCtx.prisma.users.findUnique({
       where: {
@@ -53,7 +53,7 @@ adminRoutes.get('/admin/userbyuid/:uid', async (req: Request, res: Response) => 
 });
 
 // Delete user
-adminRoutes.delete('/api/users/:uid', async (req: Request, res: Response) => {
+adminRoutes.delete('/admin/users/:uid', async (req: Request, res: Response) => {
   try {
     const user = await deleteUser(req.params.uid, prismaCtx);
     return res.send(user);

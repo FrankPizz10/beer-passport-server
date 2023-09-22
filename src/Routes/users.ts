@@ -13,12 +13,35 @@ userRoutes.get('/api/users', async (req: Request, res: Response) => {
 
 // Get user name by id
 userRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
+  if (isNaN(parseInt(req.params.id))) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Invalid id' });
+  }
   const user = await prismaCtx.prisma.users.findUnique({
     where: {
       id: parseInt(req.params.id),
     },
     select: {
       user_name: true,
+    },
+  });
+  if (!user) {
+    res.statusCode = 404;
+    return res.json({ Error: 'User not found' });
+  }
+  return res.send(user);
+});
+
+// Get basic info for user by user name
+userRoutes.get('/api/userbyname/:user_name', async (req: Request, res: Response) => {
+  const user = await prismaCtx.prisma.users.findUnique({
+    where: {
+      user_name: req.params.user_name,
+    },
+    select: {
+      id: true,
+      user_name: true,
+      private: true,
     },
   });
   if (!user) {
