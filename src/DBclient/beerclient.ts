@@ -1,10 +1,4 @@
-import { Context } from '../../context';
 import { prismaCtx } from '../index';
-
-export const getAllBeers = async () => {
-  const beers = await prismaCtx.prisma.beers.findMany();
-  return beers as Beer[];
-};
 
 export const getBeerByCategory = async (cat: string) => {
   // Get category that contains cat
@@ -22,19 +16,28 @@ export const getBeerByCategory = async (cat: string) => {
         equals: id,
       },
     },
+    select: {
+      id: true,
+      name: true,
+    },
   });
   return beers.splice(0, 20);
 };
 
-export const getBeerById = async (id: number) => {
+export const getBeerById = async (
+  id: number,
+  includeCategory: boolean,
+  includeBrewery: boolean,
+  includeStyle: boolean,
+) => {
   const beer = await prismaCtx.prisma.beers.findUnique({
     where: {
       id: id,
     },
     include: {
-      category: true,
-      brewery: true,
-      style: true,
+      category: includeCategory,
+      brewery: includeBrewery,
+      style: includeStyle,
     },
   });
   return beer;
@@ -65,48 +68,6 @@ export const getCollectionsByBeerId = async (beerId: number) => {
     },
   });
   return collections;
-};
-
-export const addBeer = async (beer: CreateBeer, ctx: Context) => {
-  const newBeer = await ctx.prisma.beers.create({
-    data: {
-      brewery_id: beer.brewery_id,
-      name: beer.name,
-      cat_id: beer.cat_id,
-      style_id: beer.style_id,
-      abv: beer.abv,
-      ibu: beer.ibu,
-      srm: beer.srm,
-      upc: beer.upc,
-      filepath: beer.filepath,
-      descript: beer.descript,
-    },
-  });
-  return newBeer;
-};
-
-export const addCollection = async (collection: CreateCollection, ctx: Context) => {
-  const newCollection = await ctx.prisma.collections.create({
-    data: {
-      name: collection.name,
-      difficulty: collection.difficulty,
-      description: collection.description,
-    },
-  });
-  return newCollection;
-};
-
-export const addBeerToCollection = async (
-  addBeerToCollection: AddBeerToCollection,
-  ctx: Context,
-) => {
-  const newCollectionBeer = await ctx.prisma.collection_beers.create({
-    data: {
-      beer_id: addBeerToCollection.beer_id,
-      collection_id: addBeerToCollection.collection_id,
-    },
-  });
-  return newCollectionBeer;
 };
 
 export const getCollectionBeerByCollectionIdAndBeerId = async (

@@ -14,12 +14,12 @@ collectionbeerRoutes.get(
       );
       if (!collectionBeer) {
         res.statusCode = 204;
-        return res.send('CollectionBeer not found');
+        return res.json({ Error: 'CollectionBeer not found' });
       }
-      res.send(collectionBeer);
+      return res.send(collectionBeer);
     } catch (err) {
       res.statusCode = 500;
-      return res.send('Something went wrong');
+      return res.json({ Error: 'Something went wrong' });
     }
   },
 );

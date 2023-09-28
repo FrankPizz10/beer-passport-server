@@ -4,17 +4,32 @@ import { getUserBadgesByUserId } from '../DBclient/userclient';
 const userbadgeRoutes: Express = express();
 
 // Get user badges by user id
+userbadgeRoutes.get('/api/userbadges/', async (req: Request, res: Response) => {
+  try {
+    const userBadges = await getUserBadgesByUserId(parseInt(res.locals.user.id));
+    if (!userBadges) {
+      res.statusCode = 204;
+      return res.json({ Error: 'UserBadges not found' });
+    }
+    return res.send(userBadges);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
+// Used to get friends badges
 userbadgeRoutes.get('/api/userbadges/:id', async (req: Request, res: Response) => {
   try {
     const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
     if (!userBadges) {
       res.statusCode = 204;
-      return res.send('UserBadges not found');
+      return res.json({ Error: 'UserBadges not found' });
     }
-    res.send(userBadges);
+    return res.send(userBadges);
   } catch (err) {
     res.statusCode = 500;
-    return res.send('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 
