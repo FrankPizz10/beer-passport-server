@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "start": "node dist/src/index.js",
+    "start:prod": "npx prisma migrate deploy && node dist/src/index.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/src/index.js\"",
     "test": "jest",
     "lint": "eslint . --ext .ts"

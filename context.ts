@@ -17,6 +17,6 @@ export const createMockContext = (): MockContext => {
 
 export const createContext = (): Context => {
   return {
-    prisma: new PrismaClient(),
+    prisma: new PrismaClient({ datasources: { db: { url: process.env.DATABASE_URL } } }),
   };
 };
