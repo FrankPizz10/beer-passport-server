@@ -38,6 +38,27 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
   return res.send(userBeer);
 });
 
+// Get liked and tried user beers by user
+userbeerRoutes.get('/api/userbeers/count', async (req: Request, res: Response) => {
+  try {
+    const likedBeersCount = await prismaCtx.prisma.user_beers.count({
+      where: {
+        user_id: parseInt(res.locals.user.id),
+        liked: true,
+      },
+    });
+    const triedBeersCount = await prismaCtx.prisma.user_beers.count({
+      where: {
+        user_id: parseInt(res.locals.user.id),
+      },
+    });
+    return res.send({ likedBeersCount: likedBeersCount, triedBeersCount: triedBeersCount });
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
 // Get user beers by user
 userbeerRoutes.get('/api/userbeers/:id', async (req: Request, res: Response) => {
   try {

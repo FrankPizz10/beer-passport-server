@@ -52,7 +52,7 @@ userRoutes.get('/api/userbyname/:user_name', async (req: Request, res: Response)
 });
 
 // Get user by uid
-userRoutes.get('/api/userbyuid/:uid', async (req: Request, res: Response) => {
+userRoutes.get('/api/userbyuid/', async (req: Request, res: Response) => {
   const user = await prismaCtx.prisma.users.findUnique({
     where: {
       uid: res.locals.user.uid,
