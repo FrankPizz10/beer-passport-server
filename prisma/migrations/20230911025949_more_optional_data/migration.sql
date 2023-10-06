@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE `beers` ALTER COLUMN `brewery_id` DROP DEFAULT,
+    ALTER COLUMN `cat_id` DROP DEFAULT,
+    ALTER COLUMN `style_id` DROP DEFAULT,
+    MODIFY `abv` FLOAT NULL,
+    MODIFY `ibu` FLOAT NULL,
+    MODIFY `srm` FLOAT NULL,
+    MODIFY `upc` INTEGER NULL;

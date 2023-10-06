@@ -1,4 +1,3 @@
-import { getAllBeers, getBeerById } from './beerclient';
 import { Context } from '../../context';
 import { prismaCtx } from '..';
 import { getCollectionSize } from './gettableinfo';
@@ -8,35 +7,18 @@ export const getAllUsers = async () => {
   return users;
 };
 
-export const addUser = async (user: AddUser, ctx: Context) => {
-  const newUser = await ctx.prisma.users.create({
-    data: {
-      uid: user.uid,
-      email: user.email,
-      age: user.age,
-      user_name: user.user_name,
+export const getAllUserBasicInfo = async () => {
+  const users = await prismaCtx.prisma.users.findMany({
+    select: {
+      user_name: true,
+      id: true,
+      private: true,
     },
   });
-  // await addAllNewUserBeers(newUser.id, ctx);
-  return newUser;
+  return users;
 };
 
-// const addAllNewUserBeers = async (user_id: number, ctx: Context) => {
-//   const beers: Beer[] = await getAllBeers();
-//   await Promise.all(
-//     beers.map(async beer => {
-//       const userBeer: UserBeer = {
-//         user_id: user_id,
-//         beer_id: beer.id,
-//         tried: false,
-//         liked: false,
-//       };
-//       return updateOrCreateUserBeers(userBeer, ctx);
-//     }),
-//   );
-// };
-
-export const getUser = async (id: string) => {
+export const getUserByUid = async (id: string) => {
   const user = await prismaCtx.prisma.users.findUnique({
     where: {
       uid: id,
@@ -45,30 +27,44 @@ export const getUser = async (id: string) => {
   return user;
 };
 
-export const updateOrCreateUserBeers = async (userBeer: UserBeer, ctx: Context) => {
-  const triedBeer = await ctx.prisma.user_beers.upsert({
+export const getUserById = async (id: number) => {
+  const user = await prismaCtx.prisma.users.findUnique({
+    where: {
+      id: id,
+    },
+  });
+  return user;
+};
+
+export const updateOrCreateUserBeers = async (
+  user_id: number,
+  beer_id: number,
+  liked: boolean,
+  collection_id: number | undefined,
+  ctx: Context,
+) => {
+  const newUserBeer = await ctx.prisma.user_beers.upsert({
     where: {
       user_id_beer_id: {
-        user_id: userBeer.user_id,
-        beer_id: userBeer.beer_id,
+        user_id: user_id,
+        beer_id: beer_id,
       },
     },
     update: {
-      liked: userBeer.liked,
+      liked: liked,
     },
     create: {
-      user_id: userBeer.user_id,
-      beer_id: userBeer.beer_id,
-      liked: userBeer.liked,
-      collection_id: userBeer.collection_id,
+      user_id: user_id,
+      beer_id: beer_id,
+      liked: liked,
     },
   });
-  if (userBeer.collection_id) {
-    const badgeProgress = await calcUserBadgeProgress(userBeer.user_id, userBeer.collection_id);
-    const earned = badgeProgress === 1 ? true : false;
-    await updateUserBadges(userBeer.user_id, userBeer.collection_id, earned, badgeProgress, ctx);
+  if (collection_id) {
+    const badgeProgress = await calcUserBadgeProgress(user_id, collection_id);
+    const earned = Math.abs(1 - badgeProgress) < 0.001 ? true : false;
+    await updateUserBadges(user_id, collection_id, earned, badgeProgress, ctx);
   }
-  return triedBeer;
+  return newUserBeer;
 };
 
 export const getUserBeersByUserId = async (id: number) => {
@@ -113,8 +109,11 @@ export const getLikedBeersByUserId = async (id: number) => {
 
 // Returns the progress of a user's badge for a given collection
 const calcUserBadgeProgress = async (user_id: number, collection_id: number) => {
-  const collectionProgress = (await getUserBeersByCollectionId(user_id, collection_id)).length;
+  const collectionProgress = await getCollectionProgress(user_id, collection_id);
   const collectionSize = await getCollectionSize(collection_id);
+  if (collectionSize === 0) {
+    throw new Error('Collection size is 0');
+  }
   return parseFloat((collectionProgress / collectionSize).toFixed(2));
 };
 
@@ -125,7 +124,7 @@ const updateUserBadges = async (
   progress: number,
   ctx: Context,
 ) => {
-  const userBadges = await ctx.prisma.user_badges.upsert({
+  const badgeUpdate = await ctx.prisma.user_badges.upsert({
     where: {
       user_id_collection_id: {
         user_id: user_id,
@@ -143,6 +142,20 @@ const updateUserBadges = async (
       progress: progress,
     },
   });
+  if (earned) {
+    const collection = await ctx.prisma.collections.findUnique({
+      where: {
+        id: collection_id,
+      },
+    });
+    await ctx.prisma.notifications.create({
+      data: {
+        user_id: user_id,
+        type: 'BADGE_EARNED',
+        message: `You earned the ${collection?.name} badge!`,
+      },
+    });
+  }
 };
 
 export const getUserBadgesByUserId = async (user_id: number) => {
@@ -157,11 +170,55 @@ export const getUserBadgesByUserId = async (user_id: number) => {
   return userBadges;
 };
 
-const getUserBeersByCollectionId = async (user_id: number, collection_id: number) => {
-  const userBeers = await prismaCtx.prisma.user_beers.findMany({
+const getCollectionProgress = async (user_id: number, collection_id: number) => {
+  const collectionBeers = await prismaCtx.prisma.collection_beers.findMany({
     where: {
       collection_id: collection_id,
     },
   });
-  return userBeers;
+  const userBeers = await prismaCtx.prisma.user_beers.findMany({
+    where: {
+      user_id: user_id,
+    },
+  });
+  let progress = 0;
+  for (let i = 0; i < collectionBeers.length; i++) {
+    const collectionBeer = collectionBeers[i];
+    const userBeer = userBeers.find(beer => beer.beer_id === collectionBeer.beer_id);
+    if (userBeer) {
+      progress++;
+    }
+  }
+  return progress;
+};
+
+export const getFriendsByUserId = async (user_id: number) => {
+  const friends = await prismaCtx.prisma.friends.findMany({
+    where: {
+      user_1: user_id,
+    },
+    include: {
+      users_friends_user_2Tousers: true,
+    },
+  });
+  return friends;
+};
+
+export const deleteUser = async (id: string, ctx: Context) => {
+  const deletedUser = await ctx.prisma.users.delete({
+    where: {
+      uid: id,
+    },
+  });
+  return deletedUser;
+};
+
+export const addFriend = async (user1: number, user2: number) => {
+  const friend = await prismaCtx.prisma.friends.create({
+    data: {
+      user_1: user1,
+      user_2: user2,
+    },
+  });
+  return friend;
 };

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "start": "node dist/src/index.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/Backend/beer-passport-server/src/index.js\"",
+    "start:prod": "npx prisma migrate deploy && node dist/src/index.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/src/index.js\"",
     "test": "jest",
     "lint": "eslint . --ext .ts"
   },
@@ -21,9 +21,10 @@
   },
   "homepage": "https://github.com/FrankPizz10/beer-passport-server#readme",
   "dependencies": {
-    "@prisma/client": "^4.14.0",
+    "@prisma/client": "4.11.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "firebase-admin": "^11.10.1"
@@ -46,7 +47,7 @@
     "jest-mock-extended": "^3.0.4",
     "nodemon": "^2.0.22",
     "prettier": "2.8.8",
-    "prisma": "^4.14.0",
+    "prisma": "4.11.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
   }
