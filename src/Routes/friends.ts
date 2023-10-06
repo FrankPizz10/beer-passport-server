@@ -12,7 +12,6 @@ firendRoutes.get('/api/friends/', async (req: Request, res: Response) => {
 
 // Check if a user is a friend
 firendRoutes.get('/api/friends/:user2', async (req: Request, res: Response) => {
-  console.log(req.params.user2);
   if (!req.params.user2 || isNaN(parseInt(req.params.user2))) {
     return res.status(400).json({ Error: 'Invalid user2' });
   }

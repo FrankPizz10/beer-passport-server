@@ -1,5 +1,5 @@
 # Start your image with a node base image
-FROM node:18
+FROM node:lts-alpine
 
 # The /app directory should act as the main application directory
 WORKDIR /beer-passport-server
