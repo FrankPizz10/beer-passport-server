@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { getUserBadgesByUserId } from '../DBclient/userclient';
+import { prismaCtx } from '..';
 
 const userbadgeRoutes: Express = express();
 
@@ -15,6 +16,21 @@ userbadgeRoutes.get('/api/userbadges/', async (req: Request, res: Response) => {
   } catch (err) {
     res.statusCode = 500;
     return res.json({ Error: 'Something went wrong' });
+  }
+});
+
+// Get badge count
+userbadgeRoutes.get('/api/userbadges/count', async (req: Request, res: Response) => {
+  try {
+    const badgeCount = await prismaCtx.prisma.user_badges.count({
+      where: {
+        user_id: parseInt(res.locals.user.id),
+      },
+    });
+    return res.send({ badgeCount: badgeCount });
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong with user badge count' });
   }
 });
 
