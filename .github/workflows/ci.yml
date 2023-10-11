@@ -1,4 +1,4 @@
-name: Beer-Passport-Server
+name: Beer-Passport-Server/CI
 on: # Controls when the action will run.
   # Triggers the workflow on push or pull request events but only for the master branch. If you want to trigger the action on other branches, add here
   push:
@@ -22,6 +22,4 @@ jobs:
         with:
           node-version: '18'
       - name: Build and test backend service
-        env: # Pass the DB secrets into environmental variables for the backend tests to use
-          CLEARDB_DATABASE_URL: ${{ secrets.CLEARDB_DATABASE_URL }}
         run: npm install && npm run lint # && npm run build && npm run test
