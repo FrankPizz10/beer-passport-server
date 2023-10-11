@@ -1,0 +1,20 @@
+name: Beer-Passport-Server/CD
+on: 
+  # Run this pipeline whenever the CI pipeline completes successfully 
+  workflow_run:
+    workflows: ["Beer-Passport-Server/CI"]
+    branches: [master]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    
+    steps:
+      -name: Pull Git Repo
+        sudo git pull master
+      -name: Build Docker Image
+        sudo docker-compose build --rm
+      -name: Run Docker Container
+        sudo docker-compose up -d
