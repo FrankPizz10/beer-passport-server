@@ -17,7 +17,7 @@ jobs:
       - name: Change to project directory
         run: cd /home/ubuntu/beerpassport/beer-passport-server
       - name: Pull Git Repo
-        run: sudo git pull master
+        run: sudo git pull
       - name: Build Docker Image
         run: sudo docker-compose build --rm
       - name: Run Docker Container
