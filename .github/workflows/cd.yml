@@ -11,8 +11,6 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
-      -name: Run code from my git directory
-        working-directory: ~/beerpassport/beer-passport-server
       -name: Pull Git Repo
         run: sudo git pull master
       -name: Build Docker Image
