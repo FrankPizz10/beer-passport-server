@@ -127,7 +127,7 @@ adminRoutes.post('/admin/collections/addBeer', async (req: Request, res: Respons
       },
     });
     return res.send(collectionBeer);
-  } catch (e: any) {
+  } catch (e) {
     console.log(e);
     res.statusCode = 503;
     return res.json({ Error: 'Error adding beer to collection' });

@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express } from 'express';
 import { prismaCtx } from '..';
 
 const notificationsRoutes: Express = express();

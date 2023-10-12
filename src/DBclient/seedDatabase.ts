@@ -3,7 +3,9 @@ import fs from 'fs';
 import { prismaCtx } from '..';
 
 const readCSVData = async (filepath: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const beers: any[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return new Promise<any[]>((resolve, reject) => {
     fs.createReadStream('../beer-passport-server/data' + filepath)
       .pipe(csvParser())
@@ -173,7 +175,7 @@ const seedCollections = async () => {
   console.log('Collections seeded...');
 };
 
-function tryParseDate(last_mod: any): Date {
+function tryParseDate(last_mod: string): Date {
   try {
     const parsedDate = new Date(last_mod);
 
@@ -188,7 +190,7 @@ function tryParseDate(last_mod: any): Date {
   }
 }
 
-function parseId(id: any): number | undefined {
+function parseId(id: string): number | undefined {
   if (isNaN(parseInt(id))) {
     console.log('NaN');
     return undefined;
