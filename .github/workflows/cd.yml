@@ -8,12 +8,14 @@ on:
       - completed
 
 jobs:
-  build-and-test: #
+  deploy: #
     # The type of runner that the job will run on
     runs-on: self-hosted
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Change to project directory
+        run: cd ../beerpassport/beer-passport-server/
       - name: Pull Git Repo
         run: sudo git pull master
       - name: Build Docker Image
