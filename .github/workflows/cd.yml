@@ -15,7 +15,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Change to project directory
-        working-directory: ~/beerpassport/beer-passport-server
+        run: cd ../../../beerpassport/beer-passport-server/
       - name: Pull Git Repo
         run: sudo git pull master
       - name: Build Docker Image
