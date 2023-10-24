@@ -22,4 +22,4 @@ RUN npm install\
 EXPOSE 3000
 
 # Start the app
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "start:prod" ]

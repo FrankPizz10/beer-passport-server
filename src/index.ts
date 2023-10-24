@@ -29,7 +29,7 @@ app.use(
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use(decodeUserToken);
+app.use('/api', decodeUserToken);
 app.use(adminRoutes);
 app.use(userRoutes);
 app.use(beerRoutes);
@@ -45,7 +45,7 @@ export const prismaCtx = createContext();
 seedDatabase();
 
 app.get('/', (req: Request, res: Response) => {
-  return res.send('Express + TypeScript Server');
+  return res.send('BeerPassport Server Running! Stay Thirsty!');
 });
 
 export const server = app.listen(PORT, () => {
