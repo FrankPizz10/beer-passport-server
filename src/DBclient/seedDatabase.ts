@@ -1,6 +1,7 @@
 import csvParser from 'csv-parser';
 import fs from 'fs';
 import { prismaCtx } from '..';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 const readCSVData = async (filepath: string) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,48 +24,62 @@ const readCSVData = async (filepath: string) => {
 
 export const seedDatabase = async () => {
   console.log('Seeding database...');
-  await seedBreweries();
-  await seedStyles();
-  await seedCategories();
-  await seedBeers();
-  if (process.env.NODE_ENV !== 'production') {
-    await seedUsers();
-    await seedCollections();
+  try {
+    await prismaCtx.prisma.$transaction(async (prisma) => {
+      await seedBreweries(prisma);
+      await seedStyles(prisma);
+      await seedCategories(prisma);
+      await seedBeers(prisma);
+      await seedUsers(prisma);
+      await seedCollections(prisma);
+    },
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
+      maxWait: 5000, // default: 2000
+      timeout: 30000, // default: 5000
+    });
+    console.log('Database seeded...');
   }
-  console.log('Database seeded...');
+  catch (err) {
+    console.error('Error seeding database', err);
+  }
 };
 
-const seedBeers = async () => {
-  if ((await prismaCtx.prisma.beers.count()) > 0) {
+const seedBeers = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+  if ((await prisma.beers.count()) > 0) {
     return;
   }
   const beers = await readCSVData('/beers.csv');
   console.log('Beers read....');
-  await prismaCtx.prisma.beers.createMany({
-    data: beers.map(beer => ({
-      id: parseInt(beer.id),
-      name: beer.name,
-      brewery_id: parseId(beer.brewery_id),
-      style_id: parseId(beer.style_id),
-      cat_id: parseId(beer.cat_id),
-      abv: beer.abv != undefined ? parseFloat(beer.abv) : undefined,
-      ibu: beer.ibu != undefined ? parseFloat(beer.ibu) : undefined,
-      srm: beer.srm != undefined ? parseFloat(beer.srm) : undefined,
-      upc: beer.upc != undefined ? parseInt(beer.upc) : undefined,
-      descript: beer.descript,
-      last_mod: tryParseDate(beer.last_mod),
-    })),
-  });
-  console.log('Beers seeded...');
+  try {
+    await prisma.beers.createMany({
+      data: beers.map(beer => ({
+        id: parseInt(beer.id),
+        name: beer.name,
+        brewery_id: parseId(beer.brewery_id),
+        style_id: parseId(beer.style_id),
+        cat_id: parseId(beer.cat_id),
+        abv: beer.abv != undefined ? parseFloat(beer.abv) : undefined,
+        ibu: beer.ibu != undefined ? parseFloat(beer.ibu) : undefined,
+        srm: beer.srm != undefined ? parseFloat(beer.srm) : undefined,
+        upc: beer.upc != undefined ? parseInt(beer.upc) : undefined,
+        descript: beer.descript,
+        last_mod: tryParseDate(beer.last_mod),
+      })),
+    });
+    console.log('Beers seeded...');
+  } catch (err) {
+    console.error('Error seeding beers', err);
+  }
 };
 
-const seedBreweries = async () => {
-  if ((await prismaCtx.prisma.breweries.count()) > 0) {
+const seedBreweries = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+  if ((await prisma.breweries.count()) > 0) {
     return;
   }
   const breweries = await readCSVData('/breweries.csv');
   console.log('Breweries read...');
-  await prismaCtx.prisma.breweries.createMany({
+  await prisma.breweries.createMany({
     data: breweries.map(brewery => ({
       id: parseInt(brewery.id),
       name: brewery.name,
@@ -83,13 +98,13 @@ const seedBreweries = async () => {
   console.log('Breweries seeded...');
 };
 
-const seedStyles = async () => {
-  if ((await prismaCtx.prisma.styles.count()) > 0) {
+const seedStyles = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+  if ((await prisma.styles.count()) > 0) {
     return;
   }
   const styles = await readCSVData('/styles.csv');
   console.log('Styles read...');
-  await prismaCtx.prisma.styles.createMany({
+  await prisma.styles.createMany({
     data: styles.map(style => ({
       id: parseInt(style.id),
       cat_id: parseInt(style.cat_id),
@@ -100,13 +115,13 @@ const seedStyles = async () => {
   console.log('Styles seeded...');
 };
 
-const seedCategories = async () => {
-  if ((await prismaCtx.prisma.categories.count()) > 0) {
+const seedCategories = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+  if ((await prisma.categories.count()) > 0) {
     return;
   }
   const categories = await readCSVData('/categories.csv');
   console.log('Categories read...');
-  await prismaCtx.prisma.categories.createMany({
+  await prisma.categories.createMany({
     data: categories.map(category => ({
       id: parseInt(category.id),
       cat_name: category.cat_name,
@@ -116,12 +131,12 @@ const seedCategories = async () => {
   console.log('Categories seeded...');
 };
 
-const seedUsers = async () => {
-  if ((await prismaCtx.prisma.users.count()) > 0) {
+const seedUsers = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+  if ((await prisma.users.count()) > 0) {
     return;
   }
   console.log('Seeding users...');
-  await prismaCtx.prisma.users.createMany({
+  await prisma.users.createMany({
     data: [
       {
         uid: 'ziEpTbNdFCgWqUiqkZTqlMSRRMA3',
@@ -158,12 +173,12 @@ const seedUsers = async () => {
   console.log('Users seeded...');
 };
 
-const seedCollections = async () => {
-  if ((await prismaCtx.prisma.collections.count()) > 0) {
+const seedCollections = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+  if ((await prisma.collections.count()) > 0) {
     return;
   }
   console.log('Seeding collections...');
-  await prismaCtx.prisma.collections.createMany({
+  await prisma.collections.createMany({
     data: [
       {
         name: 'Test Collection 1',
