@@ -1,6 +1,7 @@
 import { getUserByUid } from '../DBclient/userclient';
 import { admin } from '../Firebase/firebase';
 import { Request, Response, NextFunction } from 'express';
+import { captureException } from '@sentry/node';
 
 export const decodeUserToken = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.headers.authorization) {
@@ -15,6 +16,7 @@ export const decodeUserToken = async (req: Request, res: Response, next: NextFun
     }
     return res.json({ message: 'Unauthorized' });
   } catch (e) {
+    captureException(e);
     return res.json({ message: 'Auth Internal Error' });
   }
 };

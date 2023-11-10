@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc",
+    "build": "npx tsc && npm run sentry:sourcemaps",
     "start:prod": "node dist/src/Environment/healthcheck.js && npx prisma migrate deploy && node dist/src/index.js",
     "start:dockerLocal": "node dist/src/Environment/healthcheck.js && npx prisma migrate deploy && node dist/src/index.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/src/index.js\"",
     "test": "jest",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org frank-pizzella --project node-express ./dist && sentry-cli sourcemaps upload --org frank-pizzella --project node-express ./dist"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.432.0",
     "@prisma/client": "4.11.0",
+    "@sentry/cli": "^2.21.3",
     "@sentry/node": "^7.79.0",
     "@sentry/profiling-node": "^1.2.6",
     "body-parser": "^1.20.2",

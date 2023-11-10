@@ -15,6 +15,9 @@ COPY ./src ./src
 COPY ./prisma ./prisma
 COPY ./data ./data
 
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+
 # Install node packages, install serve, build the app, and remove dependencies at the end
 RUN npm install\
     && npm run build

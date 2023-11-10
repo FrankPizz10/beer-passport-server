@@ -8,3 +8,6 @@ docker-compose.yml
 dist
 
 Secrets
+# Sentry Config File
+.sentryclirc
+

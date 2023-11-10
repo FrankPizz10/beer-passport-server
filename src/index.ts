@@ -14,17 +14,42 @@ import collectionRoutes from './Routes/collections';
 import friendRoutes from './Routes/friends';
 import notificationsRoutes from './Routes/notifications';
 import { seedDatabase } from './DBclient/seedDatabase';
+import * as Sentry from "@sentry/node";
+import { ProfilingIntegration } from "@sentry/profiling-node";
 
 dotenv.config();
 
 const app: Express = express();
 const PORT = process.env.PORT;
 
+Sentry.init({
+  dsn: 'https://ccf26de0744f7d798d87f9c0fa57c8a0@o4506191549104128.ingest.sentry.io/4506191553167360',
+  integrations: [
+    // enable HTTP calls tracing
+    new Sentry.Integrations.Http({ tracing: true }),
+    // enable Express.js middleware tracing
+    new Sentry.Integrations.Express({ app }),
+    new ProfilingIntegration(),
+  ],
+  // Performance Monitoring
+  tracesSampleRate: 1.0,
+  // Set sampling rate for profiling - this is relative to tracesSampleRate
+  profilesSampleRate: 1.0,
+});
+
+// The request handler must be the first middleware on the app
+app.use(Sentry.Handlers.requestHandler());
+
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler());
+
 app.use(
   bodyParser.urlencoded({
     extended: false,
   }),
 );
+
+app.use(Sentry.Handlers.errorHandler());
 
 app.use(bodyParser.json());
 app.use(cors());
