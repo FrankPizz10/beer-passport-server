@@ -43,6 +43,7 @@ interface EnvironmentVariables {
   FIREBASE_UNIVERSE_DOMAIN: string | undefined;
   MYSQL_ROOT_PASSWORD: string | undefined;
   MYSQL_DATABASE: string | undefined;
+  SENTRY_DSN: string | undefined;
 }
 
 export const environmentVariablesClient = async () => {
@@ -67,6 +68,7 @@ export const environmentVariablesClient = async () => {
     FIREBASE_UNIVERSE_DOMAIN: secretJSON.FIREBASE_UNIVERSE_DOMAIN,
     MYSQL_ROOT_PASSWORD: secretJSON.MYSQL_ROOT_PASSWORD,
     MYSQL_DATABASE: secretJSON.MYSQL_DATABASE,
+    SENTRY_DSN: secretJSON.SENTRY_DSN,
   };
   if (hasUndefinedKeys(environmentVariables)) {
     throw new Error('Missing environment variables production');

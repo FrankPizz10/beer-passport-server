@@ -9,18 +9,16 @@ COPY package*.json ./
 COPY tsconfig.json ./
 COPY context.ts ./
 COPY .babelrc ./
+COPY .env ./
 
 # Copy local directories to the current local directory of our docker image (/app)
 COPY ./src ./src
 COPY ./prisma ./prisma
 COPY ./data ./data
 
-ARG SENTRY_AUTH_TOKEN
-ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
-
 # Install node packages, install serve, build the app, and remove dependencies at the end
 RUN npm install\
-    && npm run build
+    && npm run build:prod
 
 EXPOSE 3000
 
