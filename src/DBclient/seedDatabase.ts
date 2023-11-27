@@ -25,27 +25,37 @@ const readCSVData = async (filepath: string) => {
 export const seedDatabase = async () => {
   console.log('Seeding database...');
   try {
-    await prismaCtx.prisma.$transaction(async (prisma) => {
-      await seedBreweries(prisma);
-      await seedStyles(prisma);
-      await seedCategories(prisma);
-      await seedBeers(prisma);
-      await seedUsers(prisma);
-      await seedCollections(prisma);
-    },
-    {
-      isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
-      maxWait: 5000, // default: 2000
-      timeout: 30000, // default: 5000
-    });
+    await prismaCtx.prisma.$transaction(
+      async prisma => {
+        await seedBreweries(prisma);
+        await seedStyles(prisma);
+        await seedCategories(prisma);
+        await seedBeers(prisma);
+        await seedUsers(prisma);
+        await seedCollections(prisma);
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
+        maxWait: 5000, // default: 2000
+        timeout: 30000, // default: 5000
+      },
+    );
     console.log('Database seeded...');
-  }
-  catch (err) {
+  } catch (err) {
     console.error('Error seeding database', err);
   }
 };
 
-const seedBeers = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+const seedBeers = async (
+  prisma: Omit<
+    PrismaClient<
+      Prisma.PrismaClientOptions,
+      never,
+      Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+    >,
+    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+  >,
+) => {
   if ((await prisma.beers.count()) > 0) {
     return;
   }
@@ -73,7 +83,16 @@ const seedBeers = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, n
   }
 };
 
-const seedBreweries = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+const seedBreweries = async (
+  prisma: Omit<
+    PrismaClient<
+      Prisma.PrismaClientOptions,
+      never,
+      Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+    >,
+    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+  >,
+) => {
   if ((await prisma.breweries.count()) > 0) {
     return;
   }
@@ -98,7 +117,16 @@ const seedBreweries = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOption
   console.log('Breweries seeded...');
 };
 
-const seedStyles = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+const seedStyles = async (
+  prisma: Omit<
+    PrismaClient<
+      Prisma.PrismaClientOptions,
+      never,
+      Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+    >,
+    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+  >,
+) => {
   if ((await prisma.styles.count()) > 0) {
     return;
   }
@@ -115,7 +143,16 @@ const seedStyles = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, 
   console.log('Styles seeded...');
 };
 
-const seedCategories = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+const seedCategories = async (
+  prisma: Omit<
+    PrismaClient<
+      Prisma.PrismaClientOptions,
+      never,
+      Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+    >,
+    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+  >,
+) => {
   if ((await prisma.categories.count()) > 0) {
     return;
   }
@@ -131,7 +168,16 @@ const seedCategories = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptio
   console.log('Categories seeded...');
 };
 
-const seedUsers = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+const seedUsers = async (
+  prisma: Omit<
+    PrismaClient<
+      Prisma.PrismaClientOptions,
+      never,
+      Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+    >,
+    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+  >,
+) => {
   if ((await prisma.users.count()) > 0) {
     return;
   }
@@ -173,7 +219,16 @@ const seedUsers = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, n
   console.log('Users seeded...');
 };
 
-const seedCollections = async (prisma: Omit<PrismaClient<Prisma.PrismaClientOptions, never, Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use">) => {
+const seedCollections = async (
+  prisma: Omit<
+    PrismaClient<
+      Prisma.PrismaClientOptions,
+      never,
+      Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
+    >,
+    '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+  >,
+) => {
   if ((await prisma.collections.count()) > 0) {
     return;
   }

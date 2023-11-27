@@ -14,8 +14,8 @@ import collectionRoutes from './Routes/collections';
 import friendRoutes from './Routes/friends';
 import notificationsRoutes from './Routes/notifications';
 import { seedDatabase } from './DBclient/seedDatabase';
-import * as Sentry from "@sentry/node";
-import { ProfilingIntegration } from "@sentry/profiling-node";
+import * as Sentry from '@sentry/node';
+import { ProfilingIntegration } from '@sentry/profiling-node';
 
 dotenv.config();
 

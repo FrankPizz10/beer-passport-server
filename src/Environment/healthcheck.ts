@@ -1,15 +1,15 @@
 import * as mysql from 'mysql2/promise';
 
-const url = process.env.DATABASE_URL;
-const dbServer = process.env.ENVIRONMENT === 'PROD' ? 'localhost' : 'mysql-db'
-console.log(`DatabaseUrl in healthcheck: ${url}`);
+const URL = process.env.DATABASE_URL;
+const DBSERVER = process.env.ENVIRONMENT === 'PROD' ? 'localhost' : 'mysql-db';
+console.log(`DatabaseUrl in healthcheck: ${URL}`);
 
 const dbConfig = {
-  host: dbServer,     // Replace with your MySQL host
-  user: 'root',          // Replace with your MySQL username
+  host: DBSERVER, // Replace with your MySQL host
+  user: 'root', // Replace with your MySQL username
   password: 'beerpassport210', // Replace with your MySQL password
-  port: 3306,            // MySQL port
-  database: 'beersdb',   // Name of the database to check
+  port: 3306, // MySQL port
+  database: 'beersdb', // Name of the database to check
 };
 
 let numTries = 1;
@@ -32,13 +32,13 @@ async function healthCheck() {
 }
 
 const healthCheckRunner = async () => {
-    while (numTries < 15) {
-        if (await healthCheck()) {
-            break;
-        }
-        await new Promise(resolve => setTimeout(resolve, 10000));
-        numTries++;
+  while (numTries < 15) {
+    if (await healthCheck()) {
+      break;
     }
-}
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    numTries++;
+  }
+};
 
 healthCheckRunner();
