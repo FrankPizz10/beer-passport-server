@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-const SECRET_NAME = 'prod/beerpassport/backend';
+const SECRET_NAME = process.env.SECRET_NAME || 'prod/beerpassport/backend';
 
 const client = new SecretsManagerClient({
   region: 'us-east-1',

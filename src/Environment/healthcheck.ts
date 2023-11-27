@@ -1,15 +1,16 @@
 import * as mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
 
-const URL = process.env.DATABASE_URL;
+dotenv.config();
+
 const DBSERVER = process.env.ENVIRONMENT === 'PROD' ? 'localhost' : 'mysql-db';
-console.log(`DatabaseUrl in healthcheck: ${URL}`);
 
 const dbConfig = {
   host: DBSERVER, // Replace with your MySQL host
   user: 'root', // Replace with your MySQL username
-  password: 'beerpassport210', // Replace with your MySQL password
+  password: process.env.MYSQL_ROOT_PASSWORD, // Replace with your MySQL password
   port: 3306, // MySQL port
-  database: 'beersdb', // Name of the database to check
+  database: process.env.MYSQL_DATABASE, // Name of the database to check
 };
 
 let numTries = 1;
@@ -22,7 +23,9 @@ async function healthCheck() {
     // Attempt to ping the database
     await connection.ping();
 
-    console.log(`Health check ${numTries}: beersdb exists and is accessible.`);
+    console.log(
+      `Health check ${numTries}: ${process.env.MYSQL_DATABASE} exists and is accessible.`,
+    );
     connection.end();
     process.exit(0);
   } catch (error) {
