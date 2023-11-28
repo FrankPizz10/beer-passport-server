@@ -1,5 +1,6 @@
 import express, { Express } from 'express';
 import { prismaCtx } from '..';
+import { sendNotifications } from '../Notifications/sendNotifications';
 
 const notificationsRoutes: Express = express();
 
@@ -12,6 +13,29 @@ notificationsRoutes.get('/api/notifications', async (req, res) => {
       },
     });
     return res.send(notifications);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
+// Set notifications token
+notificationsRoutes.post('/api/notification-token', async (req, res) => {
+  const { pushToken } = req.body;
+  if (!pushToken) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Missing pushToken' });
+  }
+  try {
+    await prismaCtx.prisma.users.update({
+      where: {
+        id: parseInt(res.locals.user.id),
+      },
+      data: {
+        notification_token: pushToken,
+      },
+    });
+    return res.send({ message: 'Token updated successfully' });
   } catch (err) {
     res.statusCode = 500;
     return res.json({ Error: 'Something went wrong' });

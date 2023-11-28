@@ -88,6 +88,7 @@ model user_beers {
 model users {
   id                            Int             @id @unique(map: "id") @default(autoincrement())
   uid                           String          @unique(map: "uid") @db.VarChar(255)
+  notification_token            String?         @unique @db.VarChar(255)
   age                           Int
   email                         String          @unique(map: "email") @db.VarChar(255)
   user_name                     String          @unique(map: "user_name") @db.VarChar(255)

@@ -16,11 +16,13 @@ import notificationsRoutes from './Routes/notifications';
 import { seedDatabase } from './DBclient/seedDatabase';
 import * as Sentry from '@sentry/node';
 import { ProfilingIntegration } from '@sentry/profiling-node';
+import { Expo } from 'expo-server-sdk';
 
 dotenv.config();
 
 const app: Express = express();
 const PORT = process.env.PORT;
+export const expo = new Expo();
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
