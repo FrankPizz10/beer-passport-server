@@ -1,6 +1,5 @@
 import express, { Express } from 'express';
 import { prismaCtx } from '..';
-import { sendNotifications } from '../Notifications/sendNotifications';
 
 const notificationsRoutes: Express = express();
 

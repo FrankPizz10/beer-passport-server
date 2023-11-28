@@ -11,7 +11,7 @@
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/src/index.js\"",
     "test": "jest",
     "lint": "eslint . --ext .ts",
-    "setSentryAuth": "node dist/src/Environment/buildVariablesClient.js",
+    "setSentryAuth": "npx tsc && node dist/src/Environment/buildVariablesClient.js",
     "sentry:sourcemapsProd": "(. .env && sentry-cli sourcemaps inject --org frank-pizzella --project node-express ./dist && sentry-cli sourcemaps upload --org frank-pizzella --project node-express ./dist)",
     "sentry:sourcemapsDev": "call .env && sentry-cli sourcemaps inject --org frank-pizzella --project node-express ./dist && sentry-cli sourcemaps upload --org frank-pizzella --project node-express ./dist"
   },
