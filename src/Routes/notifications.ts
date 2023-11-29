@@ -18,6 +18,49 @@ notificationsRoutes.get('/api/notifications', async (req, res) => {
   }
 });
 
+// Get number of unviewed notifications and list of ids
+notificationsRoutes.get('/api/notifications/unviewed', async (req, res) => {
+  try {
+    const unViewed = await prismaCtx.prisma.notifications.findMany({
+      where: {
+        user_id: parseInt(res.locals.user.id),
+        viewed: false,
+      },
+    });
+    return res.send({ unViewedCount: unViewed.length, unViewedIds: unViewed.map((n) => n.id) });
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
+// Mark notifications as viewed
+notificationsRoutes.post('/api/notifications/view', async (req, res) => {
+  if (!req.body.notificationIds || !Array.isArray(req.body.notificationIds) || req.body.notificationIds.length === 0) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Missing or malformed notificationIds' });
+  }
+  try {
+    await prismaCtx.prisma.notifications.updateMany({
+      where: {
+        id: {
+          in: req.body.notificationIds,
+        },
+        AND: {
+          user_id: parseInt(res.locals.user.id),
+        },
+      },
+      data: {
+        viewed: true,
+      },
+    });
+    return res.send({ message: 'Notifications updated successfully' });
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
 // Set notifications token
 notificationsRoutes.post('/api/notification-token', async (req, res) => {
   const { pushToken } = req.body;
