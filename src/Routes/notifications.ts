@@ -36,9 +36,18 @@ notificationsRoutes.get('/api/notifications/unviewed', async (req, res) => {
 
 // Mark notifications as viewed
 notificationsRoutes.post('/api/notifications/view', async (req, res) => {
-  if (!req.body.notificationIds || !Array.isArray(req.body.notificationIds) || req.body.notificationIds.length === 0) {
+  if (!req.body.notificationIds || !Array.isArray(req.body.notificationIds)) {
     res.statusCode = 400;
     return res.json({ Error: 'Missing or malformed notificationIds' });
+  }
+  if (req.body.notificationIds.length === 0) {
+    res.statusCode = 204;
+    return res.json({ Error: 'No notificationIds provided' });
+  }
+  const invalidIds = req.body.notificationIds.filter((id: string) => isNaN(parseInt(id)));
+  if (invalidIds.length > 0) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Invalid notificationIds' });
   }
   try {
     await prismaCtx.prisma.notifications.updateMany({
