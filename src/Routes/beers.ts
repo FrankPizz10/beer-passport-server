@@ -86,6 +86,25 @@ beerRoutes.get('/api/beers/:id', async (req, res) => {
   }
 });
 
+// Get Beer by name
+beerRoutes.get('/api/beers/name/:name', async (req: Request, res: Response) => {
+  try {
+    const beer = await prismaCtx.prisma.beers.findFirst({
+      where: {
+        name: req.params.name,
+      },
+    });
+    if (!beer) {
+      res.statusCode = 204;
+      return res.json({ Error: 'Beer not found' });
+    }
+    return res.send(beer);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
 // Get all collections beer belongs to
 beerRoutes.get('/api/beers/:id/collections', async (req: Request, res: Response) => {
   try {
