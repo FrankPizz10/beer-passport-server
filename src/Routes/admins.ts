@@ -185,22 +185,6 @@ adminRoutes.put('/admin/collections/:id', async (req: Request, res: Response) =>
   }
 });
 
-// Delete a collection
-adminRoutes.delete('/admin/collections/:id', async (req: Request, res: Response) => {
-  try {
-    const collection = await prismaCtx.prisma.collections.delete({
-      where: {
-        id: parseInt(req.params.id),
-      },
-    });
-    return res.send(collection);
-  } catch (e) {
-    console.log(e);
-    res.statusCode = 503;
-    return res.json({ Error: 'Error deleting collection' });
-  }
-});
-
 // Add a beer to a collection
 adminRoutes.post('/admin/collections/addBeer', async (req: Request, res: Response) => {
   if (!req.body.collection_id || !req.body.beer_id) {
@@ -242,6 +226,22 @@ adminRoutes.delete('/admin/collections/deleteBeer', async (req: Request, res: Re
     console.log(e);
     res.statusCode = 503;
     return res.json({ Error: 'Error deleting beer from collection' });
+  }
+});
+
+// Delete a collection
+adminRoutes.delete('/admin/collections/:id', async (req: Request, res: Response) => {
+  try {
+    const collection = await prismaCtx.prisma.collections.delete({
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    return res.send(collection);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.json({ Error: 'Error deleting collection' });
   }
 });
 
