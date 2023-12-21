@@ -27,7 +27,7 @@ notificationsRoutes.get('/api/notifications/unviewed', async (req, res) => {
         viewed: false,
       },
     });
-    return res.send({ unViewedCount: unViewed.length, unViewedIds: unViewed.map((n) => n.id) });
+    return res.send({ unViewedCount: unViewed.length, unViewedIds: unViewed.map(n => n.id) });
   } catch (err) {
     res.statusCode = 500;
     return res.json({ Error: 'Something went wrong' });

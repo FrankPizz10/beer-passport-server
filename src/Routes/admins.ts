@@ -162,7 +162,13 @@ adminRoutes.post('/admin/collections', async (req: Request, res: Response) => {
 
 // Update a collection
 adminRoutes.put('/admin/collections/:id', async (req: Request, res: Response) => {
-  if (!req.body.name || !req.body.description || !req.body.difficulty || !req.params.id || !parseInt(req.params.id)) {
+  if (
+    !req.body.name ||
+    !req.body.description ||
+    !req.body.difficulty ||
+    !req.params.id ||
+    !parseInt(req.params.id)
+  ) {
     res.statusCode = 400;
     return res.json({ Error: 'Missing required fields' });
   }

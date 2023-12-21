@@ -52,16 +52,15 @@ beerRoutes.get('/api/beers/newest', async (req: Request, res: Response) => {
         last_mod: 'desc',
       },
     });
-    
     if (!beer) {
       res.statusCode = 204;
-      console.log("No beers found");
+      console.log('No beers found');
       return res.json({ Error: 'No beers found' });
     }
     return res.send({ lastMod: beer.last_mod });
   } catch (err) {
     res.statusCode = 500;
-    console.log("Something went wrong");
+    console.log('Something went wrong');
     return res.json({ Error: 'Something went wrong' });
   }
 });
