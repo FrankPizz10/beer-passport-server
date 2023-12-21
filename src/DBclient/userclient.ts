@@ -124,7 +124,7 @@ const updateUserBadges = async (
   progress: number,
   ctx: Context,
 ) => {
-  const badgeUpdate = await ctx.prisma.user_badges.upsert({
+  await ctx.prisma.user_badges.upsert({
     where: {
       user_id_collection_id: {
         user_id: user_id,

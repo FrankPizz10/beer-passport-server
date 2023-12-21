@@ -51,6 +51,9 @@ module.exports = {
           leadingUnderscore: 'require',
         },
       ],
+      'no-unused-vars': 'error',
+      'no-unused-expressions': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   };
   

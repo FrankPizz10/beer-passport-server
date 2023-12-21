@@ -9,6 +9,7 @@ COPY package*.json ./
 COPY tsconfig.json ./
 COPY context.ts ./
 COPY .babelrc ./
+COPY .env ./
 
 # Copy local directories to the current local directory of our docker image (/app)
 COPY ./src ./src
@@ -17,9 +18,9 @@ COPY ./data ./data
 
 # Install node packages, install serve, build the app, and remove dependencies at the end
 RUN npm install\
-    && npm run build
+    && npm run build:prod
 
 EXPOSE 3000
 
 # Start the app
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "start:prod" ]

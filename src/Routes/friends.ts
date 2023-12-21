@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import { addFriend, getFriendsByUserId } from '../DBclient/userclient';
 import { prismaCtx } from '..';
+import { sendNotifications } from '../Notifications/sendNotifications';
 
 const firendRoutes: Express = express();
 
@@ -69,6 +70,17 @@ firendRoutes.post('/api/friends/:user2', async (req: Request, res: Response) => 
         message: `${res.locals.user.user_name} added you as a friend`,
       },
     });
+    const friend2 = await prismaCtx.prisma.users.findUnique({
+      where: {
+        id: parseInt(req.params.user2),
+      },
+    });
+    if (friend2 && friend2.notification_token) {
+      sendNotifications([friend2.notification_token], {
+        title: 'New Friend',
+        body: `${res.locals.user.user_name} added you as a friend`,
+      });
+    }
     return res.send(friend);
   } catch (err) {
     console.log(err);
