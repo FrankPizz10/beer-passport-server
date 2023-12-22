@@ -62,7 +62,7 @@ export const updateOrCreateUserBeers = async (
   if (collection_id) {
     const badgeProgress = await calcUserBadgeProgress(user_id, collection_id);
     const earned = Math.abs(1 - badgeProgress) < 0.001 ? true : false;
-    await updateUserBadges(user_id, collection_id, earned, badgeProgress, ctx);
+    await updateUserBadge(user_id, collection_id, earned, badgeProgress, ctx);
   }
   return newUserBeer;
 };
@@ -117,7 +117,7 @@ const calcUserBadgeProgress = async (user_id: number, collection_id: number) => 
   return parseFloat((collectionProgress / collectionSize).toFixed(2));
 };
 
-const updateUserBadges = async (
+const updateUserBadge = async (
   user_id: number,
   collection_id: number,
   earned: boolean,
