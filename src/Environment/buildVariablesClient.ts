@@ -53,7 +53,7 @@ const setBuildVariables = async () => {
     .map(key => `${key}=${envData[key]}`)
     .join('\n');
   try {
-    fs.writeFileSync('.env', envString, 'utf8');
+    fs.appendFileSync('.env', `${envString}\n`, 'utf8');
     console.log('.env file has been updated with build variables.');
   } catch (error) {
     console.error('Error writing .env file:', error);

@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import { getCollections } from '../DBclient/gettableinfo';
 import { getBeersByCollectionId, getCollectionById } from '../DBclient/beerclient';
+import { prismaCtx } from '..';
 
 const collectionRoutes: Express = express();
 
@@ -14,6 +15,25 @@ collectionRoutes.get('/api/collections', async (req: Request, res: Response) => 
 collectionRoutes.get('/api/collections/:id', async (req: Request, res: Response) => {
   try {
     const collection = await getCollectionById(parseInt(req.params.id));
+    if (!collection) {
+      res.statusCode = 204;
+      return res.json({ Error: 'Collection not found' });
+    }
+    return res.send(collection);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
+// Get collection by name
+collectionRoutes.get('/api/collections/name/:name', async (req: Request, res: Response) => {
+  try {
+    const collection = await prismaCtx.prisma.collections.findFirst({
+      where: {
+        name: req.params.name,
+      },
+    });
     if (!collection) {
       res.statusCode = 204;
       return res.json({ Error: 'Collection not found' });

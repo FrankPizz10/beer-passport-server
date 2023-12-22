@@ -74,7 +74,7 @@ model user_beers {
   id         Int       @id @default(autoincrement())
   user_id    Int
   beer_id    Int
-  liked      Boolean?  @default(false)
+  liked      Boolean   @default(false)
   created_at DateTime? @default(now()) @db.Timestamp(0)
   updated_at DateTime? @default(now()) @db.Timestamp(0)
   users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_beers_user_id")
@@ -88,6 +88,7 @@ model user_beers {
 model users {
   id                            Int             @id @unique(map: "id") @default(autoincrement())
   uid                           String          @unique(map: "uid") @db.VarChar(255)
+  notification_token            String?         @unique @db.VarChar(255)
   age                           Int
   email                         String          @unique(map: "email") @db.VarChar(255)
   user_name                     String          @unique(map: "user_name") @db.VarChar(255)

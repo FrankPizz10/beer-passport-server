@@ -17,6 +17,7 @@ beerRoutes.get('/api/beers/basic', async (req: Request, res: Response) => {
     select: {
       id: true,
       name: true,
+      last_mod: true,
     },
   });
   return res.send(beers);
@@ -43,6 +44,27 @@ beerRoutes.get('/api/categories', async (req: Request, res: Response) => {
   return res.send(categories);
 });
 
+// Get newest beer
+beerRoutes.get('/api/beers/newest', async (req: Request, res: Response) => {
+  try {
+    const beer = await prismaCtx.prisma.beers.findFirst({
+      orderBy: {
+        last_mod: 'desc',
+      },
+    });
+    if (!beer) {
+      res.statusCode = 204;
+      console.log('No beers found');
+      return res.json({ Error: 'No beers found' });
+    }
+    return res.send({ lastMod: beer.last_mod });
+  } catch (err) {
+    res.statusCode = 500;
+    console.log('Something went wrong');
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
 // Get beer by id
 beerRoutes.get('/api/beers/:id', async (req, res) => {
   try {
@@ -52,6 +74,25 @@ beerRoutes.get('/api/beers/:id', async (req, res) => {
       req.query.includeBrewery === 'true' ? true : false,
       req.query.includeStyle === 'true' ? true : false,
     );
+    if (!beer) {
+      res.statusCode = 204;
+      return res.json({ Error: 'Beer not found' });
+    }
+    return res.send(beer);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
+// Get Beer by name
+beerRoutes.get('/api/beers/name/:name', async (req: Request, res: Response) => {
+  try {
+    const beer = await prismaCtx.prisma.beers.findFirst({
+      where: {
+        name: req.params.name,
+      },
+    });
     if (!beer) {
       res.statusCode = 204;
       return res.json({ Error: 'Beer not found' });
