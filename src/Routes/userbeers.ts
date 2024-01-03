@@ -38,6 +38,24 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
   return res.send(userBeer);
 });
 
+// Delete user beer / Un try beer
+userbeerRoutes.delete('/api/userbeers/:beer_id', async (req: Request, res: Response) => {
+  try {
+    const userBeer = await prismaCtx.prisma.user_beers.delete({
+      where: {
+        user_id_beer_id: {
+          user_id: parseInt(res.locals.user.id),
+          beer_id: parseInt(req.params.beer_id),
+        },
+      },
+    });
+    return res.send(userBeer);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
 // Get liked and tried user beers by user
 userbeerRoutes.get('/api/userbeers/count', async (req: Request, res: Response) => {
   try {
