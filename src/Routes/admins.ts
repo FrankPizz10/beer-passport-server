@@ -5,7 +5,7 @@ import {
   deleteUser,
   getAllUsers,
   getUserByUid,
-  updateOrCreateUserBeers,
+  updateUserBadgeProgressForNewCollectionBeer,
 } from '../DBclient/userclient';
 const adminRoutes: Express = express();
 
@@ -209,20 +209,12 @@ adminRoutes.post('/admin/collections/addBeer', async (req: Request, res: Respons
         beer_id: parseInt(req.body.beer_id),
       },
     });
-    const relatedUserBeers = await prismaCtx.prisma.user_beers.findMany({
-      where: {
-        beer_id: parseInt(req.body.beer_id),
-      },
-    });
-    for (const beer of relatedUserBeers) {
-      updateOrCreateUserBeers(
-        beer.user_id,
-        beer.beer_id,
-        beer.liked,
-        parseInt(req.body.collection_id),
-        prismaCtx,
-      );
-    }
+    await updateUserBadgeProgressForNewCollectionBeer(
+      parseInt(req.body.beer_id),
+      parseInt(req.body.collection_id),
+      prismaCtx,
+    );
+
     return res.send(collectionBeer);
   } catch (e) {
     console.log(e);
