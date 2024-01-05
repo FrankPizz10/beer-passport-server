@@ -155,8 +155,7 @@ userbeerRoutes.get('/api/toplikedbeers/', async (req: Request, res: Response) =>
       res.statusCode = 400;
       return res.json({ Error: 'Limit is too high' });
     }
-  }
-  catch (err) {
+  } catch (err) {
     res.statusCode = 400;
     return res.json({ Error: 'Invalid limit' });
   }
