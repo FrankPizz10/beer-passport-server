@@ -41,7 +41,7 @@ notificationsRoutes.post('/api/notifications/view', async (req, res) => {
     return res.json({ Error: 'Missing or malformed notificationIds' });
   }
   if (req.body.notificationIds.length === 0) {
-    res.statusCode = 204;
+    res.statusCode = 404;
     return res.json({ Error: 'No notificationIds provided' });
   }
   const invalidIds = req.body.notificationIds.filter((id: string) => isNaN(parseInt(id)));
