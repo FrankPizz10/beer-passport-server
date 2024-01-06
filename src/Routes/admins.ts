@@ -262,4 +262,221 @@ adminRoutes.delete('/admin/collections/:id', async (req: Request, res: Response)
   }
 });
 
+// Add a new category
+adminRoutes.post('/admin/categories', async (req: Request, res: Response) => {
+  if (!req.body.cat_name) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Missing required fields' });
+  }
+  try {
+    const category = await prismaCtx.prisma.categories.create({
+      data: {
+        cat_name: req.body.cat_name,
+      },
+    });
+    return res.send(category);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.json({ Error: 'Error adding category' });
+  }
+});
+
+// Update a category
+adminRoutes.put('/admin/categories/:id', async (req: Request, res: Response) => {
+  if (!req.body.cat_name || !req.params.id || !parseInt(req.params.id)) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Missing required fields' });
+  }
+  try {
+    const category = await prismaCtx.prisma.categories.update({
+      where: {
+        id: parseInt(req.params.id),
+      },
+      data: {
+        cat_name: req.body.cat_name,
+      },
+    });
+    return res.send(category);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.json({ Error: 'Error updating category' });
+  }
+});
+
+// Delete a category
+adminRoutes.delete('/admin/categories/:id', async (req: Request, res: Response) => {
+  try {
+    const category = await prismaCtx.prisma.categories.delete({
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    return res.send(category);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.json({ Error: 'Error deleting category' });
+  }
+});
+
+// Add a new style
+adminRoutes.post('/admin/styles', async (req: Request, res: Response) => {
+  if (!req.body.style_name || !req.body.cat_id || !parseInt(req.body.cat_id)) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Missing required fields' });
+  }
+  try {
+    const style = await prismaCtx.prisma.styles.create({
+      data: {
+        style_name: req.body.style_name,
+        cat_id: parseInt(req.body.cat_id),
+      },
+    });
+    return res.send(style);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.json({ Error: 'Error adding style' });
+  }
+});
+
+// Update a style
+adminRoutes.put('/admin/styles/:id', async (req: Request, res: Response) => {
+  if (!req.body.style_name || !req.body.cat_id || !parseInt(req.body.cat_id)) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Missing required fields' });
+  }
+  try {
+    const style = await prismaCtx.prisma.styles.update({
+      where: {
+        id: parseInt(req.params.id),
+      },
+      data: {
+        style_name: req.body.style_name,
+        cat_id: parseInt(req.body.cat_id),
+      },
+    });
+    return res.send(style);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.json({ Error: 'Error updating style' });
+  }
+});
+
+// Delete a style
+adminRoutes.delete('/admin/styles/:id', async (req: Request, res: Response) => {
+  try {
+    const style = await prismaCtx.prisma.styles.delete({
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    return res.send(style);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.json({ Error: 'Error deleting style' });
+  }
+});
+
+// Add a new brewery
+adminRoutes.post('/admin/breweries', async (req: Request, res: Response) => {
+  if (
+    !req.body.name ||
+    !req.body.address1 ||
+    !req.body.city ||
+    !req.body.state ||
+    !req.body.code ||
+    !req.body.country ||
+    !req.body.phone ||
+    !req.body.website ||
+    !req.body.descript
+  ) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Missing required fields' });
+  }
+  try {
+    const brewery = await prismaCtx.prisma.breweries.create({
+      data: {
+        name: req.body.name,
+        address1: req.body.address1,
+        address2: req.body.address2,
+        city: req.body.city,
+        state: req.body.state,
+        code: req.body.code,
+        country: req.body.country,
+        phone: req.body.phone,
+        website: req.body.website,
+        descript: req.body.descript,
+      },
+    });
+    return res.send(brewery);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.json({ Error: 'Error adding brewery' });
+  }
+});
+
+// Update a brewery
+adminRoutes.put('/admin/breweries/:id', async (req: Request, res: Response) => {
+  if (
+    !req.body.name ||
+    !req.body.address1 ||
+    !req.body.city ||
+    !req.body.state ||
+    !req.body.code ||
+    !req.body.country ||
+    !req.body.phone ||
+    !req.body.website ||
+    !req.body.descript
+  ) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Missing required fields' });
+  }
+  try {
+    const brewery = await prismaCtx.prisma.breweries.update({
+      where: {
+        id: parseInt(req.params.id),
+      },
+      data: {
+        name: req.body.name,
+        address1: req.body.address1,
+        address2: req.body.address2,
+        city: req.body.city,
+        state: req.body.state,
+        code: req.body.code,
+        country: req.body.country,
+        phone: req.body.phone,
+        website: req.body.website,
+        descript: req.body.descript,
+      },
+    });
+    return res.send(brewery);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.json({ Error: 'Error updating brewery' });
+  }
+});
+
+// Delete a brewery
+adminRoutes.delete('/admin/breweries/:id', async (req: Request, res: Response) => {
+  try {
+    const brewery = await prismaCtx.prisma.breweries.delete({
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    return res.send(brewery);
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 503;
+    return res.json({ Error: 'Error deleting brewery' });
+  }
+});
+
 export default adminRoutes;

@@ -28,8 +28,8 @@ export const seedDatabase = async () => {
     await prismaCtx.prisma.$transaction(
       async prisma => {
         await seedBreweries(prisma);
-        await seedStyles(prisma);
         await seedCategories(prisma);
+        await seedStyles(prisma);
         await seedBeers(prisma);
         await seedUsers(prisma);
         await seedCollections(prisma);
