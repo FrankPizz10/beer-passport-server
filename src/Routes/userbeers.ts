@@ -1,12 +1,14 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
 import {
+  calcUserBadgeProgress,
   getLikedBeersByUserId,
   getTriedBeersByUserId,
   getUserBeerByUserIdAndBeerId,
   getUserBeersByUserId,
   getUserById,
   updateOrCreateUserBeer,
+  updateUserBadge,
 } from '../DBclient/userclient';
 import { getBeerById } from '../DBclient/beerclient';
 
@@ -32,9 +34,18 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
     res.locals.user.id,
     parseInt(req.body.beer_id),
     req.body.liked,
-    parseInt(req.body.collection_id),
     prismaCtx,
   );
+  const collectionBeers = await prismaCtx.prisma.collection_beers.findMany({
+    where: {
+      beer_id: parseInt(req.body.beer_id),
+    },
+  });
+  for (const collectionBeer of collectionBeers) {
+    const badgeProgress = await calcUserBadgeProgress(res.locals.user.id, collectionBeer.collection_id);
+    const earned = Math.abs(1 - badgeProgress) < 0.001 ? true : false;
+    await updateUserBadge(res.locals.user.id, collectionBeer.collection_id, earned, badgeProgress, prismaCtx);
+  }
   return res.send(userBeer);
 });
 
@@ -49,6 +60,27 @@ userbeerRoutes.delete('/api/userbeers/:beer_id', async (req: Request, res: Respo
         },
       },
     });
+    // Update badge progress
+    // Get collection beers that contain the beer
+    const collectionBeers = await prismaCtx.prisma.collection_beers.findMany({
+      where: {
+        beer_id: parseInt(req.params.beer_id),
+      },
+    });
+    // Update badge progress for each collection
+    for (const collectionBeer of collectionBeers) {
+      const userBadgeProgress = await calcUserBadgeProgress(
+        parseInt(res.locals.user.id),
+        collectionBeer.collection_id,
+      );
+      await updateUserBadge(
+        parseInt(res.locals.user.id),
+        collectionBeer.collection_id,
+        Math.abs(1 - userBadgeProgress) < 0.001 ? true : false,
+        userBadgeProgress,
+        prismaCtx,
+      );
+    }
     return res.send(userBeer);
   } catch (err) {
     res.statusCode = 500;
