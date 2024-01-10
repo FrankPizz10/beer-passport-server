@@ -205,7 +205,7 @@ const updateBadgeProgress = async (beer_id: string, user_id: string) => {
       collectionBeer.collection_id,
     );
     if (userBadgeProgress === 0) {
-      const badge = await prismaCtx.prisma.user_badges.delete({
+      await prismaCtx.prisma.user_badges.delete({
         where: {
           user_id_collection_id: {
             user_id: parseInt(user_id),
@@ -213,8 +213,7 @@ const updateBadgeProgress = async (beer_id: string, user_id: string) => {
           },
         },
       });
-    }
-    else {
+    } else {
       await updateUserBadge(
         parseInt(user_id),
         collectionBeer.collection_id,
@@ -224,7 +223,6 @@ const updateBadgeProgress = async (beer_id: string, user_id: string) => {
       );
     }
   }
-}
-
+};
 
 export default userbeerRoutes;
