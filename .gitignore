@@ -10,4 +10,5 @@ dist
 Secrets
 # Sentry Config File
 .sentryclirc
+.env.database
 
