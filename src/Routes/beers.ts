@@ -53,7 +53,7 @@ beerRoutes.get('/api/beers/newest', async (req: Request, res: Response) => {
       },
     });
     if (!beer) {
-      res.statusCode = 204;
+      res.statusCode = 404;
       console.log('No beers found');
       return res.json({ Error: 'No beers found' });
     }
@@ -75,7 +75,7 @@ beerRoutes.get('/api/beers/:id', async (req, res) => {
       req.query.includeStyle === 'true' ? true : false,
     );
     if (!beer) {
-      res.statusCode = 204;
+      res.statusCode = 404;
       return res.json({ Error: 'Beer not found' });
     }
     return res.send(beer);
@@ -94,7 +94,7 @@ beerRoutes.get('/api/beers/name/:name', async (req: Request, res: Response) => {
       },
     });
     if (!beer) {
-      res.statusCode = 204;
+      res.statusCode = 404;
       return res.json({ Error: 'Beer not found' });
     }
     return res.send(beer);
@@ -109,7 +109,7 @@ beerRoutes.get('/api/beers/:id/collections', async (req: Request, res: Response)
   try {
     const collections = await getCollectionsByBeerId(parseInt(req.params.id));
     if (!collections) {
-      res.statusCode = 204;
+      res.statusCode = 404;
       return res.json({ Error: 'Beer does notbelong to any collections' });
     }
     return res.send(collections);

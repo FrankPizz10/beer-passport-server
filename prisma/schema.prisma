@@ -60,14 +60,18 @@ model categories {
   cat_name String   @default("") @db.VarChar(255)
   last_mod DateTime @default(now()) @db.Timestamp(0)
   beers    beers[]
+  styles   styles[]
 }
 
 model styles {
-  id         Int      @id @default(autoincrement())
-  cat_id     Int      @default(0)
-  style_name String   @default("") @db.VarChar(255)
-  last_mod   DateTime @default(now()) @db.Timestamp(0)
+  id         Int         @id @default(autoincrement())
+  cat_id     Int?        @default(11)
+  style_name String      @default("") @db.VarChar(255)
+  last_mod   DateTime    @default(now()) @db.Timestamp(0)
+  category   categories? @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_styles_cat_id")
   beers      beers[]
+
+  @@index([cat_id], map: "fk_styles_cat_id")
 }
 
 model user_beers {

@@ -16,7 +16,7 @@ collectionRoutes.get('/api/collections/:id', async (req: Request, res: Response)
   try {
     const collection = await getCollectionById(parseInt(req.params.id));
     if (!collection) {
-      res.statusCode = 204;
+      res.statusCode = 404;
       return res.json({ Error: 'Collection not found' });
     }
     return res.send(collection);
@@ -35,7 +35,7 @@ collectionRoutes.get('/api/collections/name/:name', async (req: Request, res: Re
       },
     });
     if (!collection) {
-      res.statusCode = 204;
+      res.statusCode = 404;
       return res.json({ Error: 'Collection not found' });
     }
     return res.send(collection);
@@ -50,7 +50,7 @@ collectionRoutes.get('/api/collections/:id/beers', async (req: Request, res: Res
   try {
     const beers = await getBeersByCollectionId(parseInt(req.params.id));
     if (!beers) {
-      res.statusCode = 204;
+      res.statusCode = 404;
       return res.json({ Error: 'Collection not found' });
     }
     return res.send(beers);

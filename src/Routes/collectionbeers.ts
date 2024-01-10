@@ -13,7 +13,7 @@ collectionbeerRoutes.get(
         parseInt(req.params.beer_id),
       );
       if (!collectionBeer) {
-        res.statusCode = 204;
+        res.statusCode = 404;
         return res.json({ Error: 'CollectionBeer not found' });
       }
       return res.send(collectionBeer);
