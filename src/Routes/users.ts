@@ -65,6 +65,38 @@ userRoutes.get('/api/userbyuid/', async (req: Request, res: Response) => {
   return res.send(user);
 });
 
+// Check if a user or email exists
+userRoutes.post('/userexists/', async (req: Request, res: Response) => {
+  if (!req.body.user_name || !req.body.email) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Missing user_name or email' });
+  }
+  try {
+    const userName = await prismaCtx.prisma.users.findUnique({
+      where: {
+        user_name: req.body.user_name,
+      },
+    });
+    if (userName) {
+      res.statusCode = 200;
+      return res.json({ exists: true, type: 'user_name' });
+    }
+    const email = await prismaCtx.prisma.users.findUnique({
+      where: {
+        email: req.body.email,
+      },
+    });
+    if (email) {
+      res.statusCode = 200;
+      return res.json({ exists: true, type: 'email' });
+    }
+    return res.send({ exists: false });
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
 // Add user
 userRoutes.post('/api/users', async (req: Request, res: Response) => {
   if (!req.body.uid || !req.body.email || !req.body.age || !req.body.user_name) {

@@ -9,7 +9,7 @@ userbadgeRoutes.get('/api/userbadges/', async (req: Request, res: Response) => {
   try {
     const userBadges = await getUserBadgesByUserId(parseInt(res.locals.user.id));
     if (!userBadges) {
-      res.statusCode = 204;
+      res.statusCode = 404;
       return res.json({ Error: 'UserBadges not found' });
     }
     return res.send(userBadges);
@@ -39,7 +39,7 @@ userbadgeRoutes.get('/api/userbadges/:id', async (req: Request, res: Response) =
   try {
     const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
     if (!userBadges) {
-      res.statusCode = 204;
+      res.statusCode = 404;
       return res.json({ Error: 'UserBadges not found' });
     }
     return res.send(userBadges);
