@@ -36,25 +36,7 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
     req.body.liked,
     prismaCtx,
   );
-  const collectionBeers = await prismaCtx.prisma.collection_beers.findMany({
-    where: {
-      beer_id: parseInt(req.body.beer_id),
-    },
-  });
-  for (const collectionBeer of collectionBeers) {
-    const badgeProgress = await calcUserBadgeProgress(
-      res.locals.user.id,
-      collectionBeer.collection_id,
-    );
-    const earned = Math.abs(1 - badgeProgress) < 0.001 ? true : false;
-    await updateUserBadge(
-      res.locals.user.id,
-      collectionBeer.collection_id,
-      earned,
-      badgeProgress,
-      prismaCtx,
-    );
-  }
+  await updateBadgeProgress(req.body.beer_id, res.locals.user.id);
   return res.send(userBeer);
 });
 
@@ -69,27 +51,7 @@ userbeerRoutes.delete('/api/userbeers/:beer_id', async (req: Request, res: Respo
         },
       },
     });
-    // Update badge progress
-    // Get collection beers that contain the beer
-    const collectionBeers = await prismaCtx.prisma.collection_beers.findMany({
-      where: {
-        beer_id: parseInt(req.params.beer_id),
-      },
-    });
-    // Update badge progress for each collection
-    for (const collectionBeer of collectionBeers) {
-      const userBadgeProgress = await calcUserBadgeProgress(
-        parseInt(res.locals.user.id),
-        collectionBeer.collection_id,
-      );
-      await updateUserBadge(
-        parseInt(res.locals.user.id),
-        collectionBeer.collection_id,
-        Math.abs(1 - userBadgeProgress) < 0.001 ? true : false,
-        userBadgeProgress,
-        prismaCtx,
-      );
-    }
+    await updateBadgeProgress(req.params.beer_id, res.locals.user.id);
     return res.send(userBeer);
   } catch (err) {
     res.statusCode = 500;
@@ -228,5 +190,39 @@ userbeerRoutes.get('/api/toplikedbeers/', async (req: Request, res: Response) =>
     return res.json({ Error: 'Something went wrong' });
   }
 });
+
+const updateBadgeProgress = async (beer_id: string, user_id: string) => {
+  // Get collection beers that contain the beer
+  const collectionBeers = await prismaCtx.prisma.collection_beers.findMany({
+    where: {
+      beer_id: parseInt(beer_id),
+    },
+  });
+  // Update badge progress for each collection
+  for (const collectionBeer of collectionBeers) {
+    const userBadgeProgress = await calcUserBadgeProgress(
+      parseInt(user_id),
+      collectionBeer.collection_id,
+    );
+    if (userBadgeProgress === 0) {
+      await prismaCtx.prisma.user_badges.delete({
+        where: {
+          user_id_collection_id: {
+            user_id: parseInt(user_id),
+            collection_id: collectionBeer.collection_id,
+          },
+        },
+      });
+    } else {
+      await updateUserBadge(
+        parseInt(user_id),
+        collectionBeer.collection_id,
+        Math.abs(1 - userBadgeProgress) < 0.001 ? true : false,
+        userBadgeProgress,
+        prismaCtx,
+      );
+    }
+  }
+};
 
 export default userbeerRoutes;
