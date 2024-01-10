@@ -42,9 +42,18 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
     },
   });
   for (const collectionBeer of collectionBeers) {
-    const badgeProgress = await calcUserBadgeProgress(res.locals.user.id, collectionBeer.collection_id);
+    const badgeProgress = await calcUserBadgeProgress(
+      res.locals.user.id,
+      collectionBeer.collection_id,
+    );
     const earned = Math.abs(1 - badgeProgress) < 0.001 ? true : false;
-    await updateUserBadge(res.locals.user.id, collectionBeer.collection_id, earned, badgeProgress, prismaCtx);
+    await updateUserBadge(
+      res.locals.user.id,
+      collectionBeer.collection_id,
+      earned,
+      badgeProgress,
+      prismaCtx,
+    );
   }
   return res.send(userBeer);
 });
