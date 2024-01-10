@@ -40,7 +40,6 @@ export const updateOrCreateUserBeer = async (
   user_id: number,
   beer_id: number,
   liked: boolean,
-  collection_id: number | undefined,
   ctx: Context,
 ) => {
   const newUserBeer = await ctx.prisma.user_beers.upsert({
@@ -59,11 +58,6 @@ export const updateOrCreateUserBeer = async (
       liked: liked,
     },
   });
-  if (collection_id) {
-    const badgeProgress = await calcUserBadgeProgress(user_id, collection_id);
-    const earned = Math.abs(1 - badgeProgress) < 0.001 ? true : false;
-    await updateUserBadge(user_id, collection_id, earned, badgeProgress, ctx);
-  }
   return newUserBeer;
 };
 
@@ -134,7 +128,7 @@ export const getLikedBeersByUserId = async (id: number) => {
 };
 
 // Returns the progress of a user's badge for a given collection
-const calcUserBadgeProgress = async (user_id: number, collection_id: number) => {
+export const calcUserBadgeProgress = async (user_id: number, collection_id: number) => {
   const collectionProgress = await getCollectionProgress(user_id, collection_id);
   const collectionSize = await getCollectionSize(collection_id);
   if (collectionSize === 0) {
@@ -143,7 +137,7 @@ const calcUserBadgeProgress = async (user_id: number, collection_id: number) => 
   return parseFloat((collectionProgress / collectionSize).toFixed(2));
 };
 
-const updateUserBadge = async (
+export const updateUserBadge = async (
   user_id: number,
   collection_id: number,
   earned: boolean,

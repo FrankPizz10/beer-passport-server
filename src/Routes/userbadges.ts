@@ -20,11 +20,12 @@ userbadgeRoutes.get('/api/userbadges/', async (req: Request, res: Response) => {
 });
 
 // Get badge count
-userbadgeRoutes.get('/api/userbadges/count', async (req: Request, res: Response) => {
+userbadgeRoutes.get('/api/userbadges/completedcount', async (req: Request, res: Response) => {
   try {
     const badgeCount = await prismaCtx.prisma.user_badges.count({
       where: {
         user_id: parseInt(res.locals.user.id),
+        earned: true,
       },
     });
     return res.send({ badgeCount: badgeCount });
