@@ -51,6 +51,7 @@ export const updateOrCreateUserBeer = async (
     },
     update: {
       liked: liked,
+      updated_at: new Date(),
     },
     create: {
       user_id: user_id,
@@ -81,7 +82,11 @@ export const updateUserBadgeProgressForNewCollectionBeer = async (
       if (collection_id) {
         const badgeProgress = await calcUserBadgeProgress(userID, collection_id);
         const earned = Math.abs(1 - badgeProgress) < 0.001;
-        await updateUserBadge(userID, collection_id, earned, badgeProgress, ctx);
+        try {
+          await updateUserBadge(userID, collection_id, earned, badgeProgress, ctx);
+        } catch (e) {
+          console.log(e);
+        }
       }
     }),
   );
@@ -144,37 +149,55 @@ export const updateUserBadge = async (
   progress: number,
   ctx: Context,
 ) => {
-  await ctx.prisma.user_badges.upsert({
-    where: {
-      user_id_collection_id: {
+  try {
+    await ctx.prisma.user_badges.upsert({
+      where: {
+        user_id_collection_id: {
+          user_id: user_id,
+          collection_id: collection_id,
+        },
+      },
+      update: {
+        earned: earned,
+        progress: progress,
+        updated_at: new Date(),
+      },
+      create: {
         user_id: user_id,
         collection_id: collection_id,
+        earned: earned,
+        progress: progress,
       },
-    },
-    update: {
-      earned: earned,
-      progress: progress,
-    },
-    create: {
-      user_id: user_id,
-      collection_id: collection_id,
-      earned: earned,
-      progress: progress,
-    },
-  });
+    });
+  } catch (e) {
+    throw new Error('Error updating user badge');
+  }
   if (earned) {
     const collection = await ctx.prisma.collections.findUnique({
       where: {
         id: collection_id,
       },
     });
-    await ctx.prisma.notifications.create({
-      data: {
-        user_id: user_id,
-        type: 'BADGE_EARNED',
-        message: `You earned the ${collection?.name} badge!`,
-      },
-    });
+    try {
+      await ctx.prisma.notifications.upsert({
+        where: {
+          user_id_message: {
+            user_id: user_id,
+            message: `You earned the ${collection?.name} badge!`,
+          },
+        },
+        update: {
+          updated_at: new Date(),
+        },
+        create: {
+          user_id: user_id,
+          type: 'BADGE_EARNED',
+          message: `You earned the ${collection?.name} badge!`,
+        },
+      });
+    } catch (e) {
+      throw new Error('Error creating notification');
+    }
   }
 };
 
