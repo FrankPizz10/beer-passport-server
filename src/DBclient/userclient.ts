@@ -19,21 +19,29 @@ export const getAllUserBasicInfo = async () => {
 };
 
 export const getUserByUid = async (id: string) => {
-  const user = await prismaCtx.prisma.users.findUnique({
-    where: {
-      uid: id,
-    },
-  });
-  return user;
+  try {
+    const user = await prismaCtx.prisma.users.findUnique({
+      where: {
+        uid: id,
+      },
+    });
+    return user;
+  } catch (e) {
+    throw new Error('Error fetching user');
+  }
 };
 
 export const getUserById = async (id: number) => {
-  const user = await prismaCtx.prisma.users.findUnique({
-    where: {
-      id: id,
-    },
-  });
-  return user;
+  try {
+    const user = await prismaCtx.prisma.users.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    return user;
+  } catch (e) {
+    throw new Error('Error fetching user');
+  }
 };
 
 export const updateOrCreateUserBeer = async (
@@ -118,6 +126,9 @@ export const getTriedBeersByUserId = async (id: number) => {
     where: {
       user_id: id,
     },
+    include: {
+      beers: true,
+    },  
   });
   return triedBeers;
 };
@@ -127,6 +138,9 @@ export const getLikedBeersByUserId = async (id: number) => {
     where: {
       user_id: id,
       liked: true,
+    },
+    include: {
+      beers: true,
     },
   });
   return likedBeers;
