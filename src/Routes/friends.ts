@@ -63,8 +63,17 @@ firendRoutes.post('/api/friends/:user2', async (req: Request, res: Response) => 
   }
   try {
     const friend = await addFriend(parseInt(res.locals.user.id), parseInt(req.params.user2));
-    await prismaCtx.prisma.notifications.create({
-      data: {
+    await prismaCtx.prisma.notifications.upsert({
+      where: {
+        user_id_message: {
+          user_id: parseInt(req.params.user2),
+          message: `${res.locals.user.user_name} added you as a friend`,
+        },
+      },
+      update: {
+        updated_at: new Date(),
+      },
+      create: {
         user_id: parseInt(req.params.user2),
         type: 'NEW_FRIEND',
         message: `${res.locals.user.user_name} added you as a friend`,

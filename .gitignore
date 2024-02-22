@@ -12,5 +12,7 @@ dist
 Secrets
 # Sentry Config File
 .sentryclirc
-.env.database
+.env.sentry
+
+.DS_Store
 
