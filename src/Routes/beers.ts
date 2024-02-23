@@ -44,6 +44,12 @@ beerRoutes.get('/api/categories', async (req: Request, res: Response) => {
   return res.send(categories);
 });
 
+// Get categories with api key
+beerRoutes.get('/apikey/categories/', async (req: Request, res: Response) => {
+  const categories = await getCategories();
+  return res.send(categories);
+});
+
 // Get newest beer
 beerRoutes.get('/api/beers/newest', async (req: Request, res: Response) => {
   try {

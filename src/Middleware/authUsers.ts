@@ -2,6 +2,8 @@ import { getUserByUid } from '../DBclient/userclient';
 import { admin } from '../Firebase/firebase';
 import { Request, Response, NextFunction } from 'express';
 import { captureException } from '@sentry/node';
+import { timingSafeEqual, scryptSync } from 'crypto';
+import { getApiKeys } from '../DBclient/apikeysclient';
 
 export const decodeUserToken = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.headers.authorization) {
@@ -40,3 +42,24 @@ export const decodeAdminToken = async (req: Request, res: Response, next: NextFu
     return res.json({ message: 'Auth Admin Internal Error' });
   }
 };
+
+export const decodeAPIKey = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.headers.authorization) {
+    return res.json({ message: 'Unauthorized' });
+  }
+  const token = req.headers.authorization.split(' ')[1];
+  if (compareAPIKeys(await getApiKeys(), token))
+    return next();
+  return res.json({ message: 'Unauthorized' });
+}
+
+const compareAPIKeys = (storedKeys: string[], suppliedKey: string) => {
+  for (const storedKey of storedKeys) {
+    const [hashedPassword, salt] = storedKey.split('.');
+    const buffer = scryptSync(suppliedKey, salt, 64) as Buffer;
+    if (timingSafeEqual(Buffer.from(hashedPassword, 'hex'), buffer)) {
+      return true; // If a match is found, return true
+    }
+  }
+  return false; // If no match is found, return false
+}

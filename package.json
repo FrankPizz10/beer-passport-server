@@ -33,6 +33,7 @@
     "@sentry/profiling-node": "^1.2.6",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.0.3",
     "expo-server-sdk": "^3.7.0",
