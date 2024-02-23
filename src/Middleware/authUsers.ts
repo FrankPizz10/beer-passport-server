@@ -44,13 +44,21 @@ export const decodeAdminToken = async (req: Request, res: Response, next: NextFu
 };
 
 export const decodeAPIKey = async (req: Request, res: Response, next: NextFunction) => {
+  console.log('Decoding Api Key');
   if (!req.headers.authorization) {
     return res.json({ message: 'Unauthorized' });
   }
-  const token = req.headers.authorization.split(' ')[1];
-  if (compareAPIKeys(await getApiKeys(), token))
-    return next();
-  return res.json({ message: 'Unauthorized' });
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    if (!token) {
+      return res.json({ message: 'Unauthorized' });
+    }
+    if (compareAPIKeys(await getApiKeys(), token))
+      return next();
+    return res.json({ message: 'Unauthorized' });
+  } catch (e) {
+    return res.json({ message: 'Auth Admin Internal Error' });
+  }
 }
 
 const compareAPIKeys = (storedKeys: string[], suppliedKey: string) => {

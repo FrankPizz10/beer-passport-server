@@ -45,7 +45,7 @@ beerRoutes.get('/api/categories', async (req: Request, res: Response) => {
 });
 
 // Get categories with api key
-beerRoutes.get('/apikey/categories/', async (req: Request, res: Response) => {
+beerRoutes.get('/secure/api/categories/', async (req: Request, res: Response) => {
   const categories = await getCategories();
   return res.send(categories);
 });

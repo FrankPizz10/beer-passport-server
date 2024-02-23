@@ -3,7 +3,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import { createContext } from '../context';
-import { decodeUserToken } from './Middleware/authUsers';
+import { decodeAPIKey, decodeUserToken } from './Middleware/authUsers';
 import adminRoutes from './Routes/admins';
 import userRoutes from './Routes/users';
 import beerRoutes from './Routes/beers';
@@ -57,6 +57,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use('/api', decodeUserToken);
+app.use('/secure', decodeAPIKey);
 app.use(adminRoutes);
 app.use(userRoutes);
 app.use(beerRoutes);
