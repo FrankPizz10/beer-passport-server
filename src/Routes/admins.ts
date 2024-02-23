@@ -7,6 +7,7 @@ import {
   getUserByUid,
   updateUserBadgeProgressForNewCollectionBeer,
 } from '../DBclient/userclient';
+import { generateKey, generateSecretHash } from '../Middleware/apiKeys';
 const adminRoutes: Express = express();
 
 adminRoutes.use('/admin', decodeAdminToken);
@@ -476,6 +477,23 @@ adminRoutes.delete('/admin/breweries/:id', async (req: Request, res: Response) =
     console.log(e);
     res.statusCode = 503;
     return res.json({ Error: 'Error deleting brewery' });
+  }
+});
+
+// Generate API Key
+adminRoutes.post('/admin/apikey/', async (req: Request, res: Response) => {
+  const key = generateKey();
+  const secretHash = generateSecretHash(key);
+  try {
+    await prismaCtx.prisma.api_keys.create({
+      data: {
+        key: secretHash,
+      },
+    });
+    return res.send({ message: 'API Key generated', apiKey: key });
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
   }
 });
 

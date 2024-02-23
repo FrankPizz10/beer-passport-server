@@ -17,6 +17,7 @@ import { seedDatabase } from './DBclient/seedDatabase';
 import * as Sentry from '@sentry/node';
 import { ProfilingIntegration } from '@sentry/profiling-node';
 import { Expo } from 'expo-server-sdk';
+import secureRoutes from './Routes/secure';
 
 dotenv.config();
 
@@ -67,6 +68,7 @@ app.use(collectionRoutes);
 app.use(collectionbeerRoutes);
 app.use(friendRoutes);
 app.use(notificationsRoutes);
+app.use(secureRoutes);
 
 export const prismaCtx = createContext();
 

@@ -2,7 +2,6 @@ import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
 import { deleteUser, getAllUserBasicInfo } from '../DBclient/userclient';
 import { Prisma } from '@prisma/client';
-import { generateKey, generateSecretHash } from '../Middleware/apiKeys';
 
 const userRoutes: Express = express();
 
@@ -129,23 +128,6 @@ userRoutes.delete('/api/users/', async (req: Request, res: Response) => {
   try {
     const user = await deleteUser(res.locals.user.uid, prismaCtx);
     return res.send(user);
-  } catch (err) {
-    res.statusCode = 500;
-    return res.json({ Error: 'Something went wrong' });
-  }
-});
-
-// Generate API Key
-userRoutes.post('/apikey/', async (req: Request, res: Response) => {
-  const key = generateKey(); 
-  const secretHash = generateSecretHash(key);
-  try {
-    await prismaCtx.prisma.api_keys.create({
-      data: {
-        key: secretHash,
-      },
-    });
-    return res.send({ message: 'API Key generated', apiKey: key });
   } catch (err) {
     res.statusCode = 500;
     return res.json({ Error: 'Something went wrong' });
