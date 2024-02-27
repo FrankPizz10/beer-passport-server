@@ -15,7 +15,7 @@ notificationsRoutes.get('/api/notifications', async (req, res) => {
           viewed: 'asc', // Sort by viewed in ascending order (unviewed first)
         },
         {
-          created_at: 'desc', // Then sort by created_at in descending order
+          updated_at: 'desc', // Then sort by created_at in descending order
         },
       ],
     });
