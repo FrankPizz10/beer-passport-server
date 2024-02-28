@@ -10,6 +10,14 @@ notificationsRoutes.get('/api/notifications', async (req, res) => {
       where: {
         user_id: parseInt(res.locals.user.id),
       },
+      orderBy: [
+        {
+          viewed: 'asc', // Sort by viewed in ascending order (unviewed first)
+        },
+        {
+          updated_at: 'desc', // Then sort by created_at in descending order
+        },
+      ],
     });
     return res.send(notifications);
   } catch (err) {

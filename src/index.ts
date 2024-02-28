@@ -3,7 +3,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import { createContext } from '../context';
-import { decodeUserToken } from './Middleware/authUsers';
+import { decodeAPIKey, decodeUserToken } from './Middleware/authUsers';
 import adminRoutes from './Routes/admins';
 import userRoutes from './Routes/users';
 import beerRoutes from './Routes/beers';
@@ -17,6 +17,7 @@ import { seedDatabase } from './DBclient/seedDatabase';
 import * as Sentry from '@sentry/node';
 import { ProfilingIntegration } from '@sentry/profiling-node';
 import { Expo } from 'expo-server-sdk';
+import secureRoutes from './Routes/secure';
 
 dotenv.config();
 
@@ -57,6 +58,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use('/api', decodeUserToken);
+app.use('/secure', decodeAPIKey);
 app.use(adminRoutes);
 app.use(userRoutes);
 app.use(beerRoutes);
@@ -66,6 +68,7 @@ app.use(collectionRoutes);
 app.use(collectionbeerRoutes);
 app.use(friendRoutes);
 app.use(notificationsRoutes);
+app.use(secureRoutes);
 
 export const prismaCtx = createContext();
 

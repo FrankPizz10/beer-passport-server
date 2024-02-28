@@ -128,7 +128,7 @@ export const getTriedBeersByUserId = async (id: number) => {
     },
     include: {
       beers: true,
-    },  
+    },
   });
   return triedBeers;
 };
