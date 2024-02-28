@@ -174,3 +174,9 @@ enum NotificationType {
   NEW_FRIEND
   BADGE_EARNED
 }
+
+model api_keys {
+  id        Int      @id @default(autoincrement())
+  key       String   @default("") @db.VarChar(255)
+  last_mod  DateTime @default(now()) @db.Timestamp(0)
+}
