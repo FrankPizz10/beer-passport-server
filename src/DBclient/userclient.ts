@@ -224,6 +224,10 @@ export const getUserBadgesByUserId = async (user_id: number) => {
       collections: true,
     },
   });
+  for (const badge of userBadges) {
+    badge.progress = await calcUserBadgeProgress(user_id, badge.collection_id);
+    badge.earned = Math.abs(1 - badge.progress) < 0.001 ? true : false;
+  }
   return userBadges;
 };
 
