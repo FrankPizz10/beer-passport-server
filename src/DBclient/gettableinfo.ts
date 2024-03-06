@@ -6,7 +6,11 @@ export const getCategories = async () => {
 };
 
 export const getCollections = async () => {
-  const collections = await prismaCtx.prisma.collections.findMany();
+  const collections = await prismaCtx.prisma.collections.findMany({
+    orderBy: {
+      updated_at: 'desc',
+    },
+  });
   return collections;
 };
 
