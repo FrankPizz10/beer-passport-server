@@ -1,13 +1,14 @@
 import express, { Express, Request, Response } from 'express';
 import { getUserBadgesByUserId } from '../DBclient/userclient';
 import { prismaCtx } from '..';
+import { calculateCollectionProgress } from '../DBclient/userBadgeClient';
 
 const userbadgeRoutes: Express = express();
 
 // Get user badges by user id
 userbadgeRoutes.get('/api/userbadges/', async (req: Request, res: Response) => {
   try {
-    const userBadges = await getUserBadgesByUserId(parseInt(res.locals.user.id));
+    const userBadges = await calculateCollectionProgress(parseInt(res.locals.user.id));
     if (!userBadges) {
       res.statusCode = 404;
       return res.json({ Error: 'UserBadges not found' });
