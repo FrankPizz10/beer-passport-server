@@ -107,36 +107,6 @@ export const updateOrCreateUserBeer = async (
   return newUserBeer;
 };
 
-export const updateUserBadgeProgressForNewCollectionBeer = async (
-  beer_id: number,
-  collection_id: number | undefined,
-  ctx: Context,
-) => {
-  const userBeers = await ctx.prisma.user_beers.findMany({
-    where: {
-      beer_id: beer_id,
-    },
-  });
-
-  // Consider chunking this array in the future to avoid overloading the DB
-  const userIDs = userBeers.map(userBeer => userBeer.user_id);
-
-  // Fetch badge progress for each user and update badges
-  await Promise.all(
-    userIDs.map(async userID => {
-      if (collection_id) {
-        const badgeProgress = await calcUserBadgeProgress(userID, collection_id);
-        const earned = Math.abs(1 - badgeProgress) < 0.001;
-        try {
-          await updateUserBadge(userID, collection_id, earned, badgeProgress, ctx);
-        } catch (e) {
-          console.log(e);
-        }
-      }
-    }),
-  );
-};
-
 export const getUserBeersByUserId = async (id: number) => {
   const userBeers = await prismaCtx.prisma.user_beers.findMany({
     where: {
