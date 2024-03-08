@@ -45,7 +45,16 @@ export const calculateCollectionProgress = async (userId: number): Promise<UserB
     })
     .filter(Boolean) as UserBadge[];
 
-  return collectionProgress;
+    //sort by earned and then by progress
+  return collectionProgress.sort((a, b) => {
+    if (a.earned && !b.earned) {
+        return 1;
+    }
+    if (!a.earned && b.earned) {
+        return -1;
+    }
+    return b.progress - a.progress;
+    });
 };
 
 export const calcCollectionProgressionForUserBeer = async (
@@ -117,16 +126,23 @@ export const getUserBadgeCount = async (userId: number): Promise<number> => {
 
 const getCollectionsAndUserBeers = async (
   userId: number,
-): Promise<[typeof collections, user_beers[]]> => {
+): Promise<[typeof collections, typeof userBeers]> => {
   const [collections, userBeers] = await Promise.all([
     prismaCtx.prisma.collections.findMany({
       include: {
-        collection_beers: true,
+        collection_beers: {
+            select: {
+                beer_id: true,
+            },
+        }
       },
     }),
     prismaCtx.prisma.user_beers.findMany({
       where: {
         user_id: userId,
+      },
+      select: {
+        beer_id: true,
       },
     }),
   ]);
