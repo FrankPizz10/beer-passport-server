@@ -1,7 +1,7 @@
 import { Context } from '../../context';
 import { prismaCtx } from '..';
 import { getCollectionSize } from './gettableinfo';
-import { calcCollectionProgressionForUserBeer, calculateCollectionProgress } from './userBadgeClient';
+import { calcCollectionProgressionForUserBeer } from './userBadgeClient';
 
 export const getAllUsers = async () => {
   const users = await prismaCtx.prisma.users.findMany();
@@ -69,16 +69,18 @@ export const updateOrCreateUserBeer = async (
     },
   });
   const sendNotifications = async () => {
-    const newCompletedBadges = (await calcCollectionProgressionForUserBeer(user_id, beer_id)).filter(
-      badge => badge.earned,
-    );
+    const newCompletedBadges = (
+      await calcCollectionProgressionForUserBeer(user_id, beer_id)
+    ).filter(badge => badge.earned);
     newCompletedBadges.forEach(async badge => {
       try {
-        const collectionName = (await ctx.prisma.collections.findUnique({
-          where: {
-            id: badge.collection.id,
-          },
-        }))?.name;
+        const collectionName = (
+          await ctx.prisma.collections.findUnique({
+            where: {
+              id: badge.collection.id,
+            },
+          })
+        )?.name;
         await ctx.prisma.notifications.upsert({
           where: {
             user_id_message: {
@@ -100,7 +102,7 @@ export const updateOrCreateUserBeer = async (
         throw new Error('Error creating notification');
       }
     });
-  }
+  };
   sendNotifications();
   return newUserBeer;
 };
