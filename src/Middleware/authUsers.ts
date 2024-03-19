@@ -61,7 +61,7 @@ export const decodeAPIKey = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-const compareAPIKeys = (storedKeys: {key: string, lastMod: Date}[], suppliedKey: string) => {
+const compareAPIKeys = (storedKeys: { key: string; lastMod: Date }[], suppliedKey: string) => {
   for (const storedKey of storedKeys) {
     if (!isStillValidApiKey(storedKey.lastMod, VALID_API_DURATION)) continue;
     const [hashedPassword, salt] = storedKey.key.split('.');
