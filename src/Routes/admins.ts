@@ -1,12 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
 import { decodeAdminToken } from '../Middleware/authUsers';
-import {
-  deleteUser,
-  getAllUsers,
-  getUserByUid,
-  updateUserBadgeProgressForNewCollectionBeer,
-} from '../DBclient/userclient';
+import { deleteUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
 import { generateKey, generateSecretHash } from '../Middleware/apiKeys';
 const adminRoutes: Express = express();
 
@@ -118,6 +113,7 @@ adminRoutes.put('/admin/beers/:id', async (req: Request, res: Response) => {
         srm: req.body.srm != null ? parseInt(req.body.srm) : null,
         upc: req.body.upc != null ? parseInt(req.body.upc) : null,
         descript: req.body.descript,
+        last_mod: new Date(),
       },
     });
     return res.send(beer);
@@ -187,6 +183,7 @@ adminRoutes.put('/admin/collections/:id', async (req: Request, res: Response) =>
         name: req.body.name,
         difficulty: parseInt(req.body.difficulty),
         description: req.body.description,
+        updated_at: new Date(),
       },
     });
     return res.send(collection);
@@ -204,17 +201,22 @@ adminRoutes.post('/admin/collections/addBeer', async (req: Request, res: Respons
     return res.json({ Error: 'Missing required fields' });
   }
   try {
+    // Add beer to collection
     const collectionBeer = await prismaCtx.prisma.collection_beers.create({
       data: {
         collection_id: parseInt(req.body.collection_id),
         beer_id: parseInt(req.body.beer_id),
       },
     });
-    await updateUserBadgeProgressForNewCollectionBeer(
-      parseInt(req.body.beer_id),
-      parseInt(req.body.collection_id),
-      prismaCtx,
-    );
+    // Update the updated_at field in the collections table
+    await prismaCtx.prisma.collections.update({
+      where: {
+        id: parseInt(req.body.collection_id),
+      },
+      data: {
+        updated_at: new Date(),
+      },
+    });
 
     return res.send(collectionBeer);
   } catch (e) {
@@ -296,6 +298,7 @@ adminRoutes.put('/admin/categories/:id', async (req: Request, res: Response) => 
       },
       data: {
         cat_name: req.body.cat_name,
+        last_mod: new Date(),
       },
     });
     return res.send(category);
@@ -357,6 +360,7 @@ adminRoutes.put('/admin/styles/:id', async (req: Request, res: Response) => {
       data: {
         style_name: req.body.style_name,
         cat_id: parseInt(req.body.cat_id),
+        last_mod: new Date(),
       },
     });
     return res.send(style);
@@ -454,6 +458,7 @@ adminRoutes.put('/admin/breweries/:id', async (req: Request, res: Response) => {
         phone: req.body.phone,
         website: req.body.website,
         descript: req.body.descript,
+        last_mod: new Date(),
       },
     });
     return res.send(brewery);
