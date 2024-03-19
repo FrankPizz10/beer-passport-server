@@ -1,6 +1,5 @@
 import { createHash } from 'crypto';
 import { prismaCtx } from '..';
-import { user_beers } from '@prisma/client';
 
 interface UserBadge {
   id: string;
@@ -45,16 +44,16 @@ export const calculateCollectionProgress = async (userId: number): Promise<UserB
     })
     .filter(Boolean) as UserBadge[];
 
-    //sort by earned and then by progress
+  //sort by earned and then by progress
   return collectionProgress.sort((a, b) => {
     if (a.earned && !b.earned) {
-        return 1;
+      return 1;
     }
     if (!a.earned && b.earned) {
-        return -1;
+      return -1;
     }
     return b.progress - a.progress;
-    });
+  });
 };
 
 export const calcCollectionProgressionForUserBeer = async (
@@ -81,33 +80,10 @@ export const calcCollectionProgressionForUserBeer = async (
       },
     }),
   ]);
-  // const collectionProgress: UserBadge[] = collections
-  //   .map(collection => {
-  //     const collectionBeers = collection.collection_beers;
-  //     const collectinsWithUserBeer =
-  //       userBeer &&
-  //       collectionBeers.some(collectionBeer => collectionBeer.beer_id === userBeer.beer_id);
-  //     const progress = userBeersInCollection.length / collectionBeers.length;
-  //     if (progress > 0) {
-  //       return {
-  //         id: createHash('sha256').update(`${user_id}-${collection.id}`).digest('hex'),
-  //         user_id,
-  //         earned: true,
-  //         progress,
-  //         updated_at: new Date(),
-  //         collection: {
-  //           id: collection.id,
-  //           name: collection.name,
-  //           difficulty: collection.difficulty,
-  //           description: collection.description,
-  //         },
-  //       };
-  //     }
-  //     return null;
-  //   })
-  //   .filter(Boolean) as UserBadge[];
   const collectionsWithUserBeer = collections.filter(collection =>
-    collection.collection_beers.some(collectionBeer => collectionBeer.beer_id === userBeer?.beer_id),
+    collection.collection_beers.some(
+      collectionBeer => collectionBeer.beer_id === userBeer?.beer_id,
+    ),
   );
   const collectionProgress = collectionsWithUserBeer.map(collection => {
     const collectionBeers = collection.collection_beers;
@@ -162,10 +138,10 @@ const getCollectionsAndUserBeers = async (
     prismaCtx.prisma.collections.findMany({
       include: {
         collection_beers: {
-            select: {
-                beer_id: true,
-            },
-        }
+          select: {
+            beer_id: true,
+          },
+        },
       },
     }),
     prismaCtx.prisma.user_beers.findMany({
