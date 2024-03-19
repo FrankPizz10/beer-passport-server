@@ -61,7 +61,7 @@ export const calcCollectionProgressionForUserBeer = async (
   user_id: number,
   beer_id: number,
 ): Promise<UserBadge[]> => {
-  const [collections, userBeer] = await Promise.all([
+  const [collections, userBeer, userBeers] = await Promise.all([
     prismaCtx.prisma.collections.findMany({
       include: {
         collection_beers: true,
@@ -75,33 +75,64 @@ export const calcCollectionProgressionForUserBeer = async (
         },
       },
     }),
+    prismaCtx.prisma.user_beers.findMany({
+      where: {
+        user_id,
+      },
+    }),
   ]);
-  const collectionProgress: UserBadge[] = collections
-    .map(collection => {
-      const collectionBeers = collection.collection_beers;
-      const userBeerInCollection =
-        userBeer &&
-        collectionBeers.some(collectionBeer => collectionBeer.beer_id === userBeer.beer_id);
-      const progress = userBeerInCollection ? 1 : 0;
-      if (progress > 0) {
-        return {
-          id: createHash('sha256').update(`${user_id}-${collection.id}`).digest('hex'),
-          user_id,
-          earned: true,
-          progress,
-          updated_at: new Date(),
-          collection: {
-            id: collection.id,
-            name: collection.name,
-            difficulty: collection.difficulty,
-            description: collection.description,
-          },
-        };
-      }
-      return null;
-    })
-    .filter(Boolean) as UserBadge[];
-  return collectionProgress;
+  // const collectionProgress: UserBadge[] = collections
+  //   .map(collection => {
+  //     const collectionBeers = collection.collection_beers;
+  //     const collectinsWithUserBeer =
+  //       userBeer &&
+  //       collectionBeers.some(collectionBeer => collectionBeer.beer_id === userBeer.beer_id);
+  //     const progress = userBeersInCollection.length / collectionBeers.length;
+  //     if (progress > 0) {
+  //       return {
+  //         id: createHash('sha256').update(`${user_id}-${collection.id}`).digest('hex'),
+  //         user_id,
+  //         earned: true,
+  //         progress,
+  //         updated_at: new Date(),
+  //         collection: {
+  //           id: collection.id,
+  //           name: collection.name,
+  //           difficulty: collection.difficulty,
+  //           description: collection.description,
+  //         },
+  //       };
+  //     }
+  //     return null;
+  //   })
+  //   .filter(Boolean) as UserBadge[];
+  const collectionsWithUserBeer = collections.filter(collection =>
+    collection.collection_beers.some(collectionBeer => collectionBeer.beer_id === userBeer?.beer_id),
+  );
+  const collectionProgress = collectionsWithUserBeer.map(collection => {
+    const collectionBeers = collection.collection_beers;
+    const userBeersInCollection = userBeers.filter(userBeer =>
+      collectionBeers.some(collectionBeer => collectionBeer.beer_id === userBeer.beer_id),
+    );
+    const progress = userBeersInCollection.length / collectionBeers.length;
+    if (Math.abs(progress - 1) < 0.0001) {
+      return {
+        id: createHash('sha256').update(`${user_id}-${collection.id}`).digest('hex'),
+        user_id,
+        earned: true,
+        progress,
+        updated_at: new Date(),
+        collection: {
+          id: collection.id,
+          name: collection.name,
+          difficulty: collection.difficulty,
+          description: collection.description,
+        },
+      };
+    }
+    return null;
+  });
+  return collectionProgress.filter(Boolean) as UserBadge[];
 };
 
 export const getUserBadgeCount = async (userId: number): Promise<number> => {
