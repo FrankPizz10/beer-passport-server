@@ -33,7 +33,7 @@ userbadgeRoutes.get('/api/userbadges/completedcount', async (req: Request, res: 
 // Used to get friends badges
 userbadgeRoutes.get('/api/userbadges/:id', async (req: Request, res: Response) => {
   try {
-    const userBadges = await getUserBadgesByUserId(parseInt(req.params.id));
+    const userBadges = await calculateCollectionProgress(parseInt(req.params.id));
     if (!userBadges) {
       res.statusCode = 404;
       return res.json({ Error: 'UserBadges not found' });
