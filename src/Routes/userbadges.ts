@@ -1,5 +1,4 @@
 import express, { Express, Request, Response } from 'express';
-import { getUserBadgesByUserId } from '../DBclient/userclient';
 import { calculateCollectionProgress, getUserBadgeCount } from '../DBclient/userBadgeClient';
 
 const userbadgeRoutes: Express = express();
