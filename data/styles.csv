@@ -44,7 +44,6 @@ id,cat_id,style_name,last_mod
 43,3,American-Style Imperial Stout,6/15/2010 19:25
 44,3,Specialty Stouts,6/15/2010 19:25
 45,3,American-Style Imperial Porter,6/15/2010 19:25
-46,3,Porter,6/15/2010 19:25
 47,4,German-Style Kolsch,6/15/2010 20:43
 48,4,Berliner-Style Weisse,6/15/2010 19:29
 49,4,Leipzig-Style Gose,6/15/2010 19:29
@@ -96,7 +95,6 @@ id,cat_id,style_name,last_mod
 95,8,American-Style Lager,6/15/2010 19:40
 96,8,American-Style Light Lager,6/15/2010 19:40
 97,8,American-Style Low-Carb Light Lager,6/15/2010 19:41
-98,8,American-Style Amber Lager,6/15/2010 19:41
 99,8,American-Style Premium Lager,6/15/2010 19:41
 100,8,American-Style Pilsener,6/15/2010 19:41
 101,8,American-Style Ice Lager,6/15/2010 19:41
