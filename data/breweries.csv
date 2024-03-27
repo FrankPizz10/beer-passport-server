@@ -418,7 +418,7 @@ id,name,address1,address2,city,state,code,country,phone,website,filepath,descrip
 421,Cugino Brewing Company,1501 East Wilson,,Batavia,Illinois,60510,United States,1-630-761-8888,,,,7/22/2010 20:00
 422,Cumberland Brewery,1576 Bardstown Rd,,Louisville,Kentucky,40205,United States,(502) 458-8727,,,"Giving new meaning to the term microbrewery, Cumberland Brews may be one of the smallest eateries in town, with a half-dozen four-top tables and a short bar with nine stools making tight quarters of what used to be the White Mountain Creamery. (Techically, it's not a microbrewery but a brewpub - a restaurant that makes its own beer on the premises - but I'm not one to quibble in the face of a good pun.) It's usually packed, too, earning its crowds the old-fashioned way by providing very good food, friendly service, and the sine qua non for a brewpub: extremely high-quality hand-crafted artisan beers. Hand-crafted offerings are produced by Head Brewer Cameron Finnis.",7/22/2010 20:00
 423,D.L. Geary Brewing Company,38 Evergreen Drive,,Portland,Maine,4103,United States,,http://www.gearybrewing.com,,"The D.L. Geary Brewing Company was incorporated in October, 1983 by David and Karen Geary who shared the vision of producing world class products on a small scale for local and regional consumption. At that time, there were only 13 so-called microbreweries in the United States, almost all of them in California and the Pacific Northwest. In the winter of 1984, David Geary began a period of training and research in Scotland and England. With the help of Peter Maxwell Stuart, a Scottish nobleman and brewer who arranged introductions and itineraries, he worked in a half-dozen small commercial breweries from the highlands of Scotland to the south coast of England.",7/22/2010 20:00
-424,Daas,,,Tournai,,,Belgium,4.42033E+11,http://www.daasbeer.com/,,Daas beers are organically brewed Belgium beer produced in Hainaut the famous Belgian province known for its fine hand crafted beers.,7/22/2010 20:00
+424,Daas,,,Tournai,,,Belgium,4.42E+11,http://www.daasbeer.com/,,Daas beers are organically brewed Belgium beer produced in Hainaut the famous Belgian province known for its fine hand crafted beers.,7/22/2010 20:00
 425,Daleside Brewery,Camwal Road,,Harrogate,North Yorkshire,,United Kingdom,44-(01423)-880022,,,,7/22/2010 20:00
 426,Dark Horse Brewing Co.,511 S. Kalamazoo Ave.,,Marshall,Michigan,49068,United States,269-781-9940,http://www.darkhorsebrewery.com/,,,7/22/2010 20:00
 427,Day Brewing,,,Marrero,Louisiana,,United States,,,,,7/22/2010 20:00
@@ -678,7 +678,7 @@ id,name,address1,address2,city,state,code,country,phone,website,filepath,descrip
 682,Hubcap Brewery and Kitchen,,,Vail,Colorado,,United States,,,,,7/22/2010 20:00
 683,Hudepohl-Schoenling Brewing,"10921 Reed Hartman Highway, Suite 329",,Cincinnati,Ohio,45242,United States,1-513-984-6910,,,,7/22/2010 20:00
 684,Hue Brewery,Hue,,Hue,,,Viet Nam,,,,,7/22/2010 20:00
-1419,Uehara Shuzou Co. Ltd. / Echigo Beer Pub,Niigata-ken Nishikanbara-gun,,,, 953-0076,Japan,+81 0256-72-0640,http://www.echigo-beer.jp/,echigo.png,,7/23/2011 20:36
+1419,Uehara Shuzou Co. Ltd. / Echigo Beer Pub,Niigata-ken Nishikanbara-gun,,,,953-0076,Japan,+81 0256-72-0640,http://www.echigo-beer.jp/,echigo.png,,7/23/2011 20:36
 686,Humboldt Brewing,856 10th Street,,Arcata,California,95521,United States,1-707-826-2739,http://www.humboldtbrews.com/,,,7/22/2010 20:00
 687,ICOBES b.v.b.a.,Durmakker 23,,Evergem,Oost-Vlaanderen,,Belgium,32-(0)9-/-253-61-82,,,,7/22/2010 20:00
 688,Idaho Brewing,,,Idaho Falls,Idaho,,United States,,,,,7/22/2010 20:00
@@ -1391,7 +1391,7 @@ id,name,address1,address2,city,state,code,country,phone,website,filepath,descrip
 1396,Aspen Brewing Company,555 North Mill Street,,Aspen,Colorado,81611,United States,,http://aspenbrewingcompany.com,,,11/8/2010 8:40
 1397,Tallgrass Brewing Co.,8845 Quail Lane,,Manhattan,KS,66502,United States,785-537-1131,http://www.tallgrassbeer.com,,,11/11/2010 19:21
 1398,Half Acre Beer Company,4257 North Lincoln Avenue,,Chicago,IL,60618,United States,,http://inyourguts.blogspot.com/,,,11/14/2010 11:17
-1399,New Jersey Beer Company,4201 Tonnelle Avenue,,North Bergen,NJ,07047,United States,,http://www.njbeerco.com,NJBClogo1.jpg,"New Jersey Beer Co. is dedicated to crafting quality beer for all; from the occasional beer drinker to the beer aficionado. We believe that good products come from good people, and strive to do our very best for our community and our customers. We believe we can provide happiness through doing what we love, and that a good beer can make the good times great.",11/17/2010 14:11
+1399,New Jersey Beer Company,4201 Tonnelle Avenue,,North Bergen,NJ,7047,United States,,http://www.njbeerco.com,NJBClogo1.jpg,"New Jersey Beer Co. is dedicated to crafting quality beer for all; from the occasional beer drinker to the beer aficionado. We believe that good products come from good people, and strive to do our very best for our community and our customers. We believe we can provide happiness through doing what we love, and that a good beer can make the good times great.",11/17/2010 14:11
 1400,FINNEGANS,619 10th St. South,Suite 100,Minneapolis,Minnesota,55404,United States,,http://www.finnegans.org,finn_dlyc.jpg,"FINNEGANS was founded in 2000 in Minneapolis, Minnesota, from the belief that each and every one of us can make a difference in our community. And that true passion in that belief can move mountains and make magical things happen.
 
 When we created our first product, FINNEGANS Irish Amber, we made the decision to donate 100 percent of the profits back to the community where it's sold to help alleviate poverty. And we knew it was going to take hard work, unwavering passion, and even a little magic along the way to make it a sustainable effort.
@@ -1410,21 +1410,14 @@ FINNEGANS Irish Amber is now sold throughout Minnesota, Wisconsin, and North Dak
 * Product is exported to 42 countries
 * 10 breweries: 2 factories in St. Petersburg and factories in Rostov-on-Don, Tula, Samara, Khabarovsk, Yaroslavl, Voronezh, Chelyabinsk, and Krasnoyarsk.
 * Around 12,000 employees",2/15/2011 19:35
-1406,Baltika Breweries,"6 Verkhny per., d. 3",,St. Petersburg,,194292,Russia,(812)325-93-25,http://baltikabeer.com/,baltika_logo1.gif,"* The leader on the Russian beer market
-* One of the leading European producers of beer
-* The Baltika brand is Europe's second largest in terms of sales
-* The Company accounts for more than 80% of all Russian beer exports
-* Product is exported to 42 countries
-* 10 breweries: 2 factories in St. Petersburg and factories in Rostov-on-Don, Tula, Samara, Khabarovsk, Yaroslavl, Voronezh, Chelyabinsk, and Krasnoyarsk.
-* Around 12,000 employees",2/15/2011 19:35
 1407,Catawba Valley Brewing Company,P.O. Box 1154,,Glen Alpine,NC,28628,United States,828-430-6883,http://www.catawbavalleybrewingcompany.com/,catawba-valley-logo.jpg,"The Catawba Valley Brewing Company grew out of a simple gift, and the love of good beer.  A beginner's home brewing kit given years ago began a passion for brewing that could only culminate with production on a larger scale.  It seemed natural to take production from a few gallons to a few barrels and beyond. During the summer of 1999 the business that is now Catawba Valley Brewing Company was born.
 
 In April of 2007 the brewery relocated from Glen Alpine, NC to downtown Morganton, NC.  In the process we didn't lose a customer or miss a delivery.  In fact we achieved record spring sales.  In addition to relocating we've also opened our taproom to the public.  We encourage those interested in finely crafted beers to stop by and try our selection of beers.  Getting a fresher beer is a near impossibility.",2/16/2011 12:36
 1408,Walnut Brewery,1123 Walnut Street,,Boulder,Colorado,80302,United States,(303) 447-1345,http://www.walnutbrewery.com/,,,3/1/2011 13:26
 1409,Columbus Brewing Company,525 Short St.,,Columbus,OH,43215,United States,614-464-2739,www.columbusbrewingco.com,columbus_brewing_company.jpg,"Located just south of downtown Columbus, Ohio, adjacent to German Village in the historic Brewery District, Columbus Brewing Company Restaurant features award-winning food and beer in an upscale-casual setting. ",3/8/2011 12:19
 1410,Oso,1812 Post Road,,Plover,WI,54467,United States,715-254-2163,http://www.osobrewing.com/Home.php,,,3/16/2011 9:05
-1411,Element Brewing Company,30 Bridge St,,Millers Falls,MA,01349,United States,413-835-6340,http://www.elementbeer.com,,Nano Brewery specializing in bottle conditioned ales.,4/18/2011 5:17
-1412,Cains,Robert Cain Brewery,Stanhope St,Liverpool,Merseyside,L8 5XJ,United Kingdom,01517098734,http://www.cains.co.uk/,cains.jpg,"Cains is a brewery in Liverpool, England, founded in 1858 by Irish immigrant Robert Cain. 
+1411,Element Brewing Company,30 Bridge St,,Millers Falls,MA,1349,United States,413-835-6340,http://www.elementbeer.com,,Nano Brewery specializing in bottle conditioned ales.,4/18/2011 5:17
+1412,Cains,Robert Cain Brewery,Stanhope St,Liverpool,Merseyside,L8 5XJ,United Kingdom,1517098734,http://www.cains.co.uk/,cains.jpg,"Cains is a brewery in Liverpool, England, founded in 1858 by Irish immigrant Robert Cain. 
 
 Cain had begun his brewing career aged 24 when he purchased a pub and brewed his own ales. Within 25 years of founding his brewery, Cain had established over 200 pubs. Robert Cain passed away in 1907 and the brewery still lives on to this day. 
 
@@ -1447,7 +1440,6 @@ Visitors can sample the beer at cellar temperature, the way it was enjoyed in th
    2. Devotion to using local sources for ingredients and running our business according to the three pillars of sustainability; Environmental Integrity, Social Equity, and Economic Viability
    3. Sharing the experience of how beer and food can be paired to uplift the enjoyment of both
 ",6/22/2011 12:19
-1417,Oakshire,,,Eugene,Or,,United States,,,,,7/7/2011 7:42
 1418,Oakshire,,,Eugene,Or,,United States,,,,,7/7/2011 7:44
 1422,Abhi Brewery,,,,,,India,,,,,9/27/2011 0:35
 1423,Brasserie du Bouffay,54 Rue des Monceaux,,Carquefou,,44470,France,,,,La Brasserie du Bouffay est situ,10/4/2011 0:24
