@@ -84,3 +84,22 @@ export const getCollectionBeerByCollectionIdAndBeerId = async (
   });
   return collectionBeer;
 };
+
+export const getBeersByBrewery = async (breweryId: number) => {
+  const beers = await prismaCtx.prisma.beers.findMany({
+    where: {
+      brewery_id: breweryId,
+    },
+  });
+  return beers;
+};
+
+export const getBeerGroupsByBrewery = async () => {
+  const beers = await prismaCtx.prisma.beers.groupBy({
+    by: ['brewery_id'],
+    _count: {
+      id: true,
+    },
+  });
+  return beers;
+}
