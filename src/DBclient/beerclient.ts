@@ -102,4 +102,4 @@ export const getBeerGroupsByBrewery = async () => {
     },
   });
   return beers;
-}
+};

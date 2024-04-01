@@ -8,17 +8,17 @@ const brewereyRoutes: Express = express();
 brewereyRoutes.get('/api/breweries/basic', async (req, res) => {
   try {
     const breweries = await prismaCtx.prisma.breweries.findMany({
-        select: {
-            id: true,
-            name: true,
-            last_mod: true,
-        },
+      select: {
+        id: true,
+        name: true,
+        last_mod: true,
+      },
     });
     return res.send(breweries);
-    } catch (err) {
+  } catch (err) {
     res.statusCode = 500;
     return res.json({ Error: 'Something went wrong getting breweries' });
-    }
+  }
 });
 
 // Get all breweries
@@ -26,40 +26,40 @@ brewereyRoutes.get('/api/breweries', async (req, res) => {
   try {
     const breweries = await prismaCtx.prisma.breweries.findMany();
     return res.send(breweries);
-    } catch (err) {
+  } catch (err) {
     res.statusCode = 500;
     return res.json({ Error: 'Something went wrong getting breweries' });
-    }
+  }
 });
 
 // Get brewery by id
 brewereyRoutes.get('/api/breweries/:id', async (req, res) => {
   try {
     const brewery = await prismaCtx.prisma.breweries.findUnique({
-        where: {
-            id: parseInt(req.params.id),
-        },
+      where: {
+        id: parseInt(req.params.id),
+      },
     });
     if (!brewery) {
-        res.statusCode = 404;
-        return res.json({ Error: 'Brewery not found' });
+      res.statusCode = 404;
+      return res.json({ Error: 'Brewery not found' });
     }
     return res.send(brewery);
-    } catch (err) {
+  } catch (err) {
     res.statusCode = 500;
     return res.json({ Error: 'Something went wrong getting brewery' });
-    }
+  }
 });
 
 // Get beers by brewery
-brewereyRoutes.get('/api/breweries/:id', async (req, res) => {
+brewereyRoutes.get('/api/breweries/:id/beers', async (req, res) => {
   try {
     const beers = await getBeersByBrewery(parseInt(req.params.id));
     return res.send(beers);
-    } catch (err) {
+  } catch (err) {
     res.statusCode = 500;
     return res.json({ Error: 'Something went wrong getting beers by brewery' });
-    }
+  }
 });
 
 // Get beers group by brewery
@@ -67,10 +67,10 @@ brewereyRoutes.get('/api/breweries', async (req, res) => {
   try {
     const beerGroups = await getBeerGroupsByBrewery();
     return res.send(beerGroups);
-    } catch (err) {
+  } catch (err) {
     res.statusCode = 500;
     return res.json({ Error: 'Something went wrong getting beers by brewery' });
-    }
+  }
 });
 
 export default brewereyRoutes;
