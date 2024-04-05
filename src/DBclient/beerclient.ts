@@ -112,3 +112,33 @@ export const getBeerGroupsByBrewery = async () => {
   });
   return beers;
 };
+
+export const getTopLikedBeers = async (beerQuantity: number, catId?: number) => {
+  const topLikedBeers = await prismaCtx.prisma.user_beers.groupBy({
+    by: ['beer_id'],
+    where: {
+      liked: true,
+    },
+    orderBy: {
+      _count: {
+        liked: 'desc',
+      },
+    },
+    take: beerQuantity,
+  });
+
+  if (!topLikedBeers) {
+    return [];
+  }
+
+  const beers = [];
+
+  for (const beer of topLikedBeers) {
+    const beerInfo = await getBeerById(beer.beer_id, false, false, false);
+    if (!catId || beerInfo?.cat_id === catId) {
+      beers.push(beerInfo);
+    }
+  }
+
+  return beers;
+};

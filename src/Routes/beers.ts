@@ -2,8 +2,8 @@ import express, { Express, Request, Response } from 'express';
 import {
   getBeerByCategory,
   getBeerById,
-  getBeersByCategory,
   getCollectionsByBeerId,
+  getTopLikedBeers,
 } from '../DBclient/beerclient';
 import { getCategories } from '../DBclient/gettableinfo';
 import { prismaCtx } from '..';
@@ -70,8 +70,19 @@ beerRoutes.get('/api/categories/:id', async (req: Request, res: Response) => {
 
 // Get beers by category
 beerRoutes.get('/api/categories/:id/beers', async (req, res) => {
+  let beerQuantity;
   try {
-    const beers = await getBeersByCategory(parseInt(req.params.id));
+    beerQuantity = req.query.limit ? parseInt(req.query.limit.toString()) : 20;
+    if (beerQuantity > 100) {
+      res.statusCode = 400;
+      return res.json({ Error: 'Limit is too high' });
+    }
+  } catch (err) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Invalid limit' });
+  }
+  try {
+    const beers = await getTopLikedBeers(beerQuantity, parseInt(req.params.id));
     return res.send(beers);
   } catch (err) {
     res.statusCode = 500;
