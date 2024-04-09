@@ -94,11 +94,17 @@ export const getBeersByBrewery = async (breweryId: number) => {
   return beers;
 };
 
-export const getBeersByCategory = async (catId: number) => {
+export const getBeersByCategory = async (catId: number, limit?: number) => {
   const beers = await prismaCtx.prisma.beers.findMany({
     where: {
       cat_id: catId,
     },
+    select: {
+      id: true,
+      name: true,
+      cat_id: true,
+    },
+    take: limit,
   });
   return beers;
 };
@@ -127,18 +133,57 @@ export const getTopLikedBeers = async (beerQuantity: number, catId?: number) => 
     take: beerQuantity,
   });
 
-  if (!topLikedBeers) {
-    return [];
+  if (catId && (!topLikedBeers || topLikedBeers.length === 0)) {
+    return getBeersByCategory(catId!, beerQuantity);
+  }
+
+  if (!catId && (!topLikedBeers || topLikedBeers.length === 0)) {
+    return await prismaCtx.prisma.beers.findMany({
+      select: {
+        id: true,
+        name: true,
+        last_mod: true,
+        cat_id: true,
+      },
+      take: beerQuantity,
+    });
+  }
+
+  let extraBeers: {id: number, name: string, cat_id: number | null}[] = [];
+  if (catId && topLikedBeers.length < beerQuantity) {
+    extraBeers = await getBeersByCategory(catId, beerQuantity - topLikedBeers.length);
+  }
+
+  if (!catId && topLikedBeers.length < beerQuantity) {
+    const allBeers = await prismaCtx.prisma.beers.findMany({
+      select: {
+        id: true,
+        name: true,
+        last_mod: true,
+        cat_id: true,
+      },
+      take: beerQuantity - topLikedBeers.length,
+    });
+    extraBeers = allBeers;
   }
 
   const beers = [];
 
   for (const beer of topLikedBeers) {
-    const beerInfo = await getBeerById(beer.beer_id, false, false, false);
+    const beerInfo = await prismaCtx.prisma.beers.findUnique({
+      where: {
+        id: beer.beer_id,
+      },
+      select: {
+        id: true,
+        name: true,
+        cat_id: true,
+      },
+    });
     if (!catId || beerInfo?.cat_id === catId) {
       beers.push(beerInfo);
     }
   }
 
-  return beers;
+  return [...beers, ...extraBeers];
 };
