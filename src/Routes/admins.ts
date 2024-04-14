@@ -3,6 +3,7 @@ import { prismaCtx } from '../index';
 import { decodeAdminToken } from '../Middleware/authUsers';
 import { deleteUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
 import { generateKey, generateSecretHash } from '../Middleware/apiKeys';
+import { admin } from '../Firebase/firebase';
 const adminRoutes: Express = express();
 
 adminRoutes.use('/admin', decodeAdminToken);
@@ -15,6 +16,23 @@ adminRoutes.get('/admin', (req: Request, res: Response) => {
 adminRoutes.get('/admin/users', async (req: Request, res: Response) => {
   const users = await getAllUsers();
   return res.send(users);
+});
+
+// Get Firebase auth users
+adminRoutes.get('/admin/firebaseusers', async (req: Request, res: Response) => {
+  try {
+    const listUsers = await admin.auth().listUsers();
+    const users = listUsers.users.map(userRecord => ({
+      uid: userRecord.uid,
+      email: userRecord.email,
+      createdAt: userRecord.metadata.creationTime,
+      lastSignedInAt: userRecord.metadata.lastSignInTime
+    }));
+    res.json(users);
+  } catch (error) {
+    console.error('Error listing users:', error);
+    res.status(500).send('Error listing users');
+  }
 });
 
 // Get user by id
