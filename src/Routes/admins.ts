@@ -26,7 +26,7 @@ adminRoutes.get('/admin/firebaseusers', async (req: Request, res: Response) => {
       uid: userRecord.uid,
       email: userRecord.email,
       createdAt: userRecord.metadata.creationTime,
-      lastSignedInAt: userRecord.metadata.lastSignInTime
+      lastSignedInAt: userRecord.metadata.lastSignInTime,
     }));
     res.json(users);
   } catch (error) {

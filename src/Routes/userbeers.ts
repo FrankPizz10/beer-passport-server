@@ -8,7 +8,7 @@ import {
   getUserById,
   updateOrCreateUserBeer,
 } from '../DBclient/userclient';
-import { getBeerById, getTopLikedBeers } from '../DBclient/beerclient';
+import { getBeerById, getTrendingBeers } from '../DBclient/beerclient';
 
 const userbeerRoutes: Express = express();
 
@@ -159,7 +159,7 @@ userbeerRoutes.get('/api/toplikedbeers/', async (req: Request, res: Response) =>
     return res.json({ Error: 'Invalid limit' });
   }
   try {
-    const beers = await getTopLikedBeers(beerQuantity);
+    const beers = await getTrendingBeers(beerQuantity);
     if (!beers || beers.length === 0) {
       res.statusCode = 404;
       return res.json({ Error: 'Beers not found' });

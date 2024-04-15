@@ -3,7 +3,7 @@ import {
   getBeerByCategory,
   getBeerById,
   getCollectionsByBeerId,
-  getTopLikedBeers,
+  getTrendingBeers,
 } from '../DBclient/beerclient';
 import { getCategories } from '../DBclient/gettableinfo';
 import { prismaCtx } from '..';
@@ -82,7 +82,7 @@ beerRoutes.get('/api/categories/:id/beers', async (req, res) => {
     return res.json({ Error: 'Invalid limit' });
   }
   try {
-    const beers = await getTopLikedBeers(beerQuantity, parseInt(req.params.id));
+    const beers = await getTrendingBeers(beerQuantity, parseInt(req.params.id));
     return res.send(beers);
   } catch (err) {
     res.statusCode = 500;
