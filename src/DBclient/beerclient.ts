@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { prismaCtx } from '../index';
+import { get } from 'http';
 
 export const getBeerByCategory = async (cat: string) => {
   // Get category that contains cat
@@ -139,10 +140,14 @@ export const getTopLikedBeers = async (beerQuantity: number, catId?: number) => 
 
 // Get trending beers that were liked and updated in the last week
 export const getTrendingBeers = async (beerQuantity: number, catId?: number) => {
+  // Get top trending beers
   const topTrendingBeers = await prismaCtx.prisma.user_beers.groupBy({
     by: ['beer_id'],
     where: {
       liked: true,
+      updated_at: {
+        gte: new Date(new Date().getDate() - 7), // Filter updated_at within the last 7 days
+      },
     },
     orderBy: {
       _count: {
@@ -151,8 +156,33 @@ export const getTrendingBeers = async (beerQuantity: number, catId?: number) => 
     },
     take: beerQuantity,
   });
-
-  return getTopBeersHelper(topTrendingBeers, beerQuantity, catId);
+  // If there are not enough top trending beers, get top liked beers
+  let topLikedBeers;
+  if (!topTrendingBeers || topTrendingBeers.length < beerQuantity) {
+    topLikedBeers = await prismaCtx.prisma.user_beers.groupBy({
+        by: ['beer_id'],
+        where: {
+          liked: true,
+        },
+        orderBy: {
+          _count: {
+            liked: 'desc',
+          },
+        },
+        take: beerQuantity,
+      });
+  }
+  let combinedBeers;
+  // Add topliked beers to top trending beers if they are not already there
+  if (topLikedBeers) {
+    combinedBeers = topTrendingBeers.concat(
+      topLikedBeers.filter((beer) => !topTrendingBeers.some((trendingBeer) => trendingBeer.beer_id === beer.beer_id)),
+    );
+  }
+  if (!combinedBeers) {
+    return getTopBeersHelper([], beerQuantity, catId);
+  }
+  return getTopBeersHelper(combinedBeers, beerQuantity, catId);
 };
 
 const getTopBeersHelper = async (
@@ -160,42 +190,8 @@ const getTopBeersHelper = async (
   beerQuantity: number,
   catId?: number,
 ) => {
-  if (catId && (!topBeers || topBeers.length === 0)) {
-    return getBeersByCategory(catId, beerQuantity);
-  }
-
-  if (!catId && (!topBeers || topBeers.length === 0)) {
-    return await prismaCtx.prisma.beers.findMany({
-      select: {
-        id: true,
-        name: true,
-        last_mod: true,
-        cat_id: true,
-      },
-      take: beerQuantity,
-    });
-  }
-
-  let extraBeers: { id: number; name: string; cat_id: number | null }[] = [];
-  if (catId && topBeers.length < beerQuantity) {
-    extraBeers = await getBeersByCategory(catId, beerQuantity - topBeers.length);
-  }
-
-  if (!catId && topBeers.length < beerQuantity) {
-    const allBeers = await prismaCtx.prisma.beers.findMany({
-      select: {
-        id: true,
-        name: true,
-        last_mod: true,
-        cat_id: true,
-      },
-      take: beerQuantity - topBeers.length,
-    });
-    extraBeers = allBeers;
-  }
-
-  const beers = [];
-
+  // First get the top liked beers
+  const beers: { id: number; name: string; cat_id: number | null }[] = [];
   for (const beer of topBeers) {
     const beerInfo = await prismaCtx.prisma.beers.findUnique({
       where: {
@@ -207,10 +203,55 @@ const getTopBeersHelper = async (
         cat_id: true,
       },
     });
-    if (!catId || beerInfo?.cat_id === catId) {
+    if (beerInfo && (!catId || beerInfo.cat_id === catId)) {
       beers.push(beerInfo);
     }
   }
-
+  // If there are not enough top liked beers, get extra beers
+  const extraBeers: { id: number; name: string; cat_id: number | null }[] = [];
+  if (!catId) {
+    if (beers.length < beerQuantity) {
+      const allBeers = await prismaCtx.prisma.beers.findMany({
+        select: {
+          id: true,
+          name: true,
+          last_mod: true,
+          cat_id: true,
+        },
+        where: {
+          NOT: {
+            id: {
+              in: beers.map((beer) => beer.id),
+            },
+          },
+        },
+        take: beerQuantity - beers.length,
+      });
+      extraBeers.push(...allBeers);
+    }
+  }
+  else {
+    if (beers.length < beerQuantity) {
+      // const extra = await getBeersByCategory(catId, beerQuantity - beers.length);
+      const extra = await prismaCtx.prisma.beers.findMany({
+        select: {
+          id: true,
+          name: true,
+          last_mod: true,
+          cat_id: true,
+        },
+        where: {
+          cat_id: catId,
+          NOT: {
+            id: {
+              in: beers.map((beer) => beer.id),
+            },
+          },
+        },
+        take: beerQuantity - beers.length,
+      });
+      extraBeers.push(...extra);
+    }
+  }
   return [...beers, ...extraBeers];
 };

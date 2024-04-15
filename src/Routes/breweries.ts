@@ -35,6 +35,14 @@ brewereyRoutes.get('/api/breweries', async (req, res) => {
 // Get most popular breweries by liked beers count from users
 brewereyRoutes.get('/api/breweries/popular', async (req, res) => {
   try {
+    let breweryQuantity = 20; // Default value if quantity is not provided or invalid
+    if (req.query.quantity) {
+      const parsedQuantity = parseInt(req.query.quantity as string, 10);
+      if (!isNaN(parsedQuantity) && parsedQuantity > 0 && parsedQuantity < 100) {
+        // Set breweryQuantity to the parsed value if it's a valid positive integer
+        breweryQuantity = parsedQuantity;
+      }
+    }
     const breweriesWithMostLikedBeers = await prismaCtx.prisma.$queryRaw`
       SELECT breweries.id, breweries.name, COUNT(user_beers.id) as liked_beers_count
           FROM breweries
@@ -43,7 +51,7 @@ brewereyRoutes.get('/api/breweries/popular', async (req, res) => {
           WHERE user_beers.liked = true
           GROUP BY breweries.id
           ORDER BY liked_beers_count DESC
-          LIMIT 20;
+          LIMIT ${breweryQuantity};
       `;
     const basicBreweries = (
       breweriesWithMostLikedBeers as { id: number; name: string; liked_beers_count: number }[]
@@ -53,6 +61,27 @@ brewereyRoutes.get('/api/breweries/popular', async (req, res) => {
         name: brewery.name,
       };
     });
+    if (!basicBreweries) {
+      res.statusCode = 404;
+      return res.json({ Error: 'Popular breweries not found' });
+    }
+    if (basicBreweries.length < breweryQuantity) {
+      const extraBreweries = await prismaCtx.prisma.breweries.findMany({
+        select: {
+          id: true,
+          name: true,
+        },
+        where: {
+          NOT: {
+            id: {
+              in: basicBreweries.map(brewery => brewery.id),
+            },
+          },
+        },
+        take: breweryQuantity - basicBreweries.length,
+      });
+      basicBreweries.push(...extraBreweries);
+    }
     return res.send(basicBreweries);
   } catch (err) {
     res.statusCode = 500;
