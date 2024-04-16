@@ -1,6 +1,5 @@
 import { Prisma } from '@prisma/client';
 import { prismaCtx } from '../index';
-import { get } from 'http';
 
 export const getBeerByCategory = async (cat: string) => {
   // Get category that contains cat
@@ -160,23 +159,25 @@ export const getTrendingBeers = async (beerQuantity: number, catId?: number) => 
   let topLikedBeers;
   if (!topTrendingBeers || topTrendingBeers.length < beerQuantity) {
     topLikedBeers = await prismaCtx.prisma.user_beers.groupBy({
-        by: ['beer_id'],
-        where: {
-          liked: true,
+      by: ['beer_id'],
+      where: {
+        liked: true,
+      },
+      orderBy: {
+        _count: {
+          liked: 'desc',
         },
-        orderBy: {
-          _count: {
-            liked: 'desc',
-          },
-        },
-        take: beerQuantity,
-      });
+      },
+      take: beerQuantity,
+    });
   }
   let combinedBeers;
   // Add topliked beers to top trending beers if they are not already there
   if (topLikedBeers) {
     combinedBeers = topTrendingBeers.concat(
-      topLikedBeers.filter((beer) => !topTrendingBeers.some((trendingBeer) => trendingBeer.beer_id === beer.beer_id)),
+      topLikedBeers.filter(
+        beer => !topTrendingBeers.some(trendingBeer => trendingBeer.beer_id === beer.beer_id),
+      ),
     );
   }
   if (!combinedBeers) {
@@ -221,7 +222,7 @@ const getTopBeersHelper = async (
         where: {
           NOT: {
             id: {
-              in: beers.map((beer) => beer.id),
+              in: beers.map(beer => beer.id),
             },
           },
         },
@@ -229,8 +230,7 @@ const getTopBeersHelper = async (
       });
       extraBeers.push(...allBeers);
     }
-  }
-  else {
+  } else {
     if (beers.length < beerQuantity) {
       // const extra = await getBeersByCategory(catId, beerQuantity - beers.length);
       const extra = await prismaCtx.prisma.beers.findMany({
@@ -244,7 +244,7 @@ const getTopBeersHelper = async (
           cat_id: catId,
           NOT: {
             id: {
-              in: beers.map((beer) => beer.id),
+              in: beers.map(beer => beer.id),
             },
           },
         },
