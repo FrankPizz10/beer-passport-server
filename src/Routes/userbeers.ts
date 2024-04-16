@@ -8,7 +8,7 @@ import {
   getUserById,
   updateOrCreateUserBeer,
 } from '../DBclient/userclient';
-import { getBeerById } from '../DBclient/beerclient';
+import { getBeerById, getTrendingBeers } from '../DBclient/beerclient';
 
 const userbeerRoutes: Express = express();
 
@@ -159,26 +159,10 @@ userbeerRoutes.get('/api/toplikedbeers/', async (req: Request, res: Response) =>
     return res.json({ Error: 'Invalid limit' });
   }
   try {
-    const topLikedBeers = await prismaCtx.prisma.user_beers.groupBy({
-      by: ['beer_id'],
-      where: {
-        liked: true,
-      },
-      orderBy: {
-        _count: {
-          liked: 'desc',
-        },
-      },
-      take: beerQuantity,
-    });
-    if (!topLikedBeers) {
+    const beers = await getTrendingBeers(beerQuantity);
+    if (!beers || beers.length === 0) {
       res.statusCode = 404;
       return res.json({ Error: 'Beers not found' });
-    }
-    const beers = [];
-    for (const beer of topLikedBeers) {
-      const beerInfo = await getBeerById(beer.beer_id, true, true, true);
-      beers.push(beerInfo);
     }
     return res.send(beers);
   } catch (err) {

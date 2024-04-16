@@ -1,5 +1,10 @@
 import express, { Express, Request, Response } from 'express';
-import { getBeerByCategory, getBeerById, getCollectionsByBeerId } from '../DBclient/beerclient';
+import {
+  getBeerByCategory,
+  getBeerById,
+  getCollectionsByBeerId,
+  getTrendingBeers,
+} from '../DBclient/beerclient';
 import { getCategories } from '../DBclient/gettableinfo';
 import { prismaCtx } from '..';
 
@@ -42,6 +47,47 @@ beerRoutes.post('/api/beers/cat', async (req: Request, res: Response) => {
 beerRoutes.get('/api/categories', async (req: Request, res: Response) => {
   const categories = await getCategories();
   return res.send(categories);
+});
+
+// Get category by id
+beerRoutes.get('/api/categories/:id', async (req: Request, res: Response) => {
+  try {
+    const category = await prismaCtx.prisma.categories.findUnique({
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    if (!category) {
+      res.statusCode = 404;
+      return res.json({ Error: 'Category not found' });
+    }
+    return res.send(category);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
+  }
+});
+
+// Get beers by category
+beerRoutes.get('/api/categories/:id/beers', async (req, res) => {
+  let beerQuantity;
+  try {
+    beerQuantity = req.query.limit ? parseInt(req.query.limit.toString()) : 20;
+    if (beerQuantity > 100) {
+      res.statusCode = 400;
+      return res.json({ Error: 'Limit is too high' });
+    }
+  } catch (err) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Invalid limit' });
+  }
+  try {
+    const beers = await getTrendingBeers(beerQuantity, parseInt(req.params.id));
+    return res.send(beers);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong getting beers by brewery' });
+  }
 });
 
 // Get newest beer
