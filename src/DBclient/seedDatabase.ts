@@ -2,6 +2,9 @@ import { prismaCtx } from '..';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 const getDataFromProd = async (filepath: string) => {
+  if (process.env.ENVIRONMENT == 'PROD') {
+    return {};
+  }
   const url = process.env.PROD_API_URL + filepath;
   const response = await fetch(url, {
     headers: {
