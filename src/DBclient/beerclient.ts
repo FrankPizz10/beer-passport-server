@@ -182,8 +182,7 @@ export const getTrendingBeers = async (beerQuantity: number, catId?: number) => 
   }
   if (!combinedBeers && topTrendingBeers && topTrendingBeers.length == 0) {
     return getTopBeersHelper([], beerQuantity, catId);
-  }
-  else if (combinedBeers) {
+  } else if (combinedBeers) {
     return getTopBeersHelper(combinedBeers, beerQuantity, catId);
   }
   return getTopBeersHelper(topTrendingBeers, beerQuantity, catId);
