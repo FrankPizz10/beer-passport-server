@@ -1,25 +1,18 @@
-import csvParser from 'csv-parser';
-import fs from 'fs';
 import { prismaCtx } from '..';
 import { Prisma, PrismaClient } from '@prisma/client';
 
-const readCSVData = async (filepath: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const beers: any[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return new Promise<any[]>((resolve, reject) => {
-    fs.createReadStream('../beer-passport-server/data' + filepath)
-      .pipe(csvParser())
-      .on('data', row => {
-        beers.push(row);
-      })
-      .on('end', () => {
-        resolve(beers);
-      })
-      .on('error', err => {
-        reject(err);
-      });
+const getDataFromProd = async (filepath: string) => {
+  if (process.env.ENVIRONMENT == 'PROD') {
+    return {};
+  }
+  const url = process.env.PROD_API_URL + filepath;
+  const response = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + process.env.PROD_API_KEY,
+    },
   });
+  return await response.json();
 };
 
 export const seedDatabase = async () => {
@@ -59,23 +52,37 @@ const seedBeers = async (
   if ((await prisma.beers.count()) > 0) {
     return;
   }
-  const beers = await readCSVData('/beers.csv');
+  const beers = await getDataFromProd('/beers');
   console.log('Beers read....');
   try {
     await prisma.beers.createMany({
-      data: beers.map(beer => ({
-        id: parseInt(beer.id),
-        name: beer.name,
-        brewery_id: parseId(beer.brewery_id),
-        style_id: parseId(beer.style_id),
-        cat_id: parseId(beer.cat_id),
-        abv: beer.abv != undefined ? parseFloat(beer.abv) : undefined,
-        ibu: beer.ibu != undefined ? parseFloat(beer.ibu) : undefined,
-        srm: beer.srm != undefined ? parseFloat(beer.srm) : undefined,
-        upc: beer.upc != undefined ? parseInt(beer.upc) : undefined,
-        descript: beer.descript,
-        last_mod: tryParseDate(beer.last_mod),
-      })),
+      data: beers.map(
+        (beer: {
+          id: string;
+          name: string;
+          brewery_id: string;
+          style_id: string;
+          cat_id: string;
+          abv: string | undefined;
+          ibu: string | undefined;
+          srm: string | undefined;
+          upc: string | undefined;
+          descript: string;
+          last_mod: string;
+        }) => ({
+          id: parseInt(beer.id),
+          name: beer.name,
+          brewery_id: parseId(beer.brewery_id),
+          style_id: parseId(beer.style_id),
+          cat_id: parseId(beer.cat_id),
+          abv: beer.abv != undefined ? parseFloat(beer.abv) : undefined,
+          ibu: beer.ibu != undefined ? parseFloat(beer.ibu) : undefined,
+          srm: beer.srm != undefined ? parseFloat(beer.srm) : undefined,
+          upc: beer.upc != undefined ? parseInt(beer.upc) : undefined,
+          descript: beer.descript,
+          last_mod: tryParseDate(beer.last_mod),
+        }),
+      ),
     });
     console.log('Beers seeded...');
   } catch (err) {
@@ -96,23 +103,38 @@ const seedBreweries = async (
   if ((await prisma.breweries.count()) > 0) {
     return;
   }
-  const breweries = await readCSVData('/breweries.csv');
+  const breweries = await getDataFromProd('/breweries');
   console.log('Breweries read...');
   await prisma.breweries.createMany({
-    data: breweries.map(brewery => ({
-      id: parseInt(brewery.id),
-      name: brewery.name,
-      address1: brewery.address1,
-      address2: brewery.address2,
-      city: brewery.city,
-      state: brewery.state,
-      code: brewery.code,
-      country: brewery.country,
-      phone: brewery.phone,
-      website: brewery.website,
-      descript: brewery.descript,
-      last_mod: new Date(brewery.last_mod),
-    })),
+    data: breweries.map(
+      (brewery: {
+        id: string;
+        name: string;
+        address1: string;
+        address2: string;
+        city: string;
+        state: string;
+        code: string;
+        country: string;
+        phone: string;
+        website: string;
+        descript: string;
+        last_mod: string | number | Date;
+      }) => ({
+        id: parseInt(brewery.id),
+        name: brewery.name,
+        address1: brewery.address1,
+        address2: brewery.address2,
+        city: brewery.city,
+        state: brewery.state,
+        code: brewery.code,
+        country: brewery.country,
+        phone: brewery.phone,
+        website: brewery.website,
+        descript: brewery.descript,
+        last_mod: new Date(brewery.last_mod),
+      }),
+    ),
   });
   console.log('Breweries seeded...');
 };
@@ -130,15 +152,22 @@ const seedStyles = async (
   if ((await prisma.styles.count()) > 0) {
     return;
   }
-  const styles = await readCSVData('/styles.csv');
+  const styles = await getDataFromProd('/styles');
   console.log('Styles read...');
   await prisma.styles.createMany({
-    data: styles.map(style => ({
-      id: parseInt(style.id),
-      cat_id: parseInt(style.cat_id),
-      style_name: style.style_name,
-      last_mod: new Date(style.last_mod),
-    })),
+    data: styles.map(
+      (style: {
+        id: string;
+        cat_id: string;
+        style_name: string;
+        last_mod: string | number | Date;
+      }) => ({
+        id: parseInt(style.id),
+        cat_id: parseInt(style.cat_id),
+        style_name: style.style_name,
+        last_mod: new Date(style.last_mod),
+      }),
+    ),
   });
   console.log('Styles seeded...');
 };
@@ -156,14 +185,16 @@ const seedCategories = async (
   if ((await prisma.categories.count()) > 0) {
     return;
   }
-  const categories = await readCSVData('/categories.csv');
+  const categories = await getDataFromProd('/categories');
   console.log('Categories read...');
   await prisma.categories.createMany({
-    data: categories.map(category => ({
-      id: parseInt(category.id),
-      cat_name: category.cat_name,
-      last_mod: new Date(category.last_mod),
-    })),
+    data: categories.map(
+      (category: { id: string; cat_name: string; last_mod: string | number | Date }) => ({
+        id: parseInt(category.id),
+        cat_name: category.cat_name,
+        last_mod: new Date(category.last_mod),
+      }),
+    ),
   });
   console.log('Categories seeded...');
 };
