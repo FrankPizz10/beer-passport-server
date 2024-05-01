@@ -1,9 +1,9 @@
 import { Prisma } from '@prisma/client';
-import { prismaCtx } from '../index';
+import prisma from '../../client';
 
 export const getBeerByCategory = async (cat: string) => {
   // Get category that contains cat
-  const category = await prismaCtx.prisma.categories.findFirst({
+  const category = await prisma.categories.findFirst({
     where: {
       cat_name: {
         contains: cat,
@@ -11,7 +11,7 @@ export const getBeerByCategory = async (cat: string) => {
     },
   });
   const id = category?.id;
-  const beers = await prismaCtx.prisma.beers.findMany({
+  const beers = await prisma.beers.findMany({
     where: {
       cat_id: {
         equals: id,
@@ -31,7 +31,7 @@ export const getBeerById = async (
   includeBrewery: boolean,
   includeStyle: boolean,
 ) => {
-  const beer = await prismaCtx.prisma.beers.findUnique({
+  const beer = await prisma.beers.findUnique({
     where: {
       id: id,
     },
@@ -45,7 +45,7 @@ export const getBeerById = async (
 };
 
 export const getCollectionById = async (collectionId: number) => {
-  const collections = await prismaCtx.prisma.collections.findUnique({
+  const collections = await prisma.collections.findUnique({
     where: {
       id: collectionId,
     },
@@ -54,7 +54,7 @@ export const getCollectionById = async (collectionId: number) => {
 };
 
 export const getBeersByCollectionId = async (collectionId: number) => {
-  const beers = await prismaCtx.prisma.collection_beers.findMany({
+  const beers = await prisma.collection_beers.findMany({
     where: {
       collection_id: collectionId,
     },
@@ -63,7 +63,7 @@ export const getBeersByCollectionId = async (collectionId: number) => {
 };
 
 export const getCollectionsByBeerId = async (beerId: number) => {
-  const collections = await prismaCtx.prisma.collection_beers.findMany({
+  const collections = await prisma.collection_beers.findMany({
     where: {
       beer_id: beerId,
     },
@@ -75,7 +75,7 @@ export const getCollectionBeerByCollectionIdAndBeerId = async (
   collection_id: number,
   beer_id: number,
 ) => {
-  const collectionBeer = await prismaCtx.prisma.collection_beers.findUnique({
+  const collectionBeer = await prisma.collection_beers.findUnique({
     where: {
       collection_id_beer_id: {
         collection_id: collection_id,
@@ -87,7 +87,7 @@ export const getCollectionBeerByCollectionIdAndBeerId = async (
 };
 
 export const getBeersByBrewery = async (breweryId: number) => {
-  const beers = await prismaCtx.prisma.beers.findMany({
+  const beers = await prisma.beers.findMany({
     where: {
       brewery_id: breweryId,
     },
@@ -96,7 +96,7 @@ export const getBeersByBrewery = async (breweryId: number) => {
 };
 
 export const getBeersByCategory = async (catId: number, limit?: number) => {
-  const beers = await prismaCtx.prisma.beers.findMany({
+  const beers = await prisma.beers.findMany({
     where: {
       cat_id: catId,
     },
@@ -111,7 +111,7 @@ export const getBeersByCategory = async (catId: number, limit?: number) => {
 };
 
 export const getBeerGroupsByBrewery = async () => {
-  const beers = await prismaCtx.prisma.beers.groupBy({
+  const beers = await prisma.beers.groupBy({
     by: ['brewery_id'],
     _count: {
       id: true,
@@ -121,7 +121,7 @@ export const getBeerGroupsByBrewery = async () => {
 };
 
 export const getTopLikedBeers = async (beerQuantity: number, catId?: number) => {
-  const topLikedBeers = await prismaCtx.prisma.user_beers.groupBy({
+  const topLikedBeers = await prisma.user_beers.groupBy({
     by: ['beer_id'],
     where: {
       liked: true,
@@ -140,7 +140,7 @@ export const getTopLikedBeers = async (beerQuantity: number, catId?: number) => 
 // Get trending beers that were liked and updated in the last week
 export const getTrendingBeers = async (beerQuantity: number, catId?: number) => {
   // Get top trending beers
-  const topTrendingBeers = await prismaCtx.prisma.user_beers.groupBy({
+  const topTrendingBeers = await prisma.user_beers.groupBy({
     by: ['beer_id'],
     where: {
       liked: true,
@@ -158,7 +158,7 @@ export const getTrendingBeers = async (beerQuantity: number, catId?: number) => 
   // If there are not enough top trending beers, get top liked beers
   let topLikedBeers;
   if (!topTrendingBeers || topTrendingBeers.length < beerQuantity) {
-    topLikedBeers = await prismaCtx.prisma.user_beers.groupBy({
+    topLikedBeers = await prisma.user_beers.groupBy({
       by: ['beer_id'],
       where: {
         liked: true,
@@ -196,7 +196,7 @@ const getTopBeersHelper = async (
   // First get the top liked beers
   const beers: { id: number; name: string; cat_id: number | null }[] = [];
   for (const beer of topBeers) {
-    const beerInfo = await prismaCtx.prisma.beers.findUnique({
+    const beerInfo = await prisma.beers.findUnique({
       where: {
         id: beer.beer_id,
       },
@@ -214,7 +214,7 @@ const getTopBeersHelper = async (
   const extraBeers: { id: number; name: string; cat_id: number | null }[] = [];
   if (!catId) {
     if (beers.length < beerQuantity) {
-      const allBeers = await prismaCtx.prisma.beers.findMany({
+      const allBeers = await prisma.beers.findMany({
         select: {
           id: true,
           name: true,
@@ -235,7 +235,7 @@ const getTopBeersHelper = async (
   } else {
     if (beers.length < beerQuantity) {
       // const extra = await getBeersByCategory(catId, beerQuantity - beers.length);
-      const extra = await prismaCtx.prisma.beers.findMany({
+      const extra = await prisma.beers.findMany({
         select: {
           id: true,
           name: true,

@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import { getCollections } from '../DBclient/gettableinfo';
 import { getBeersByCollectionId, getCollectionById } from '../DBclient/beerclient';
-import { prismaCtx } from '..';
+import prisma from '../../client';
 
 const collectionRoutes: Express = express();
 
@@ -29,7 +29,7 @@ collectionRoutes.get('/api/collections/:id', async (req: Request, res: Response)
 // Get collection by name
 collectionRoutes.get('/api/collections/name/:name', async (req: Request, res: Response) => {
   try {
-    const collection = await prismaCtx.prisma.collections.findFirst({
+    const collection = await prisma.collections.findFirst({
       where: {
         name: req.params.name,
       },

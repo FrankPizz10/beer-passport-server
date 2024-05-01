@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from 'express';
-import { prismaCtx } from '../index';
+import prisma from '../../client';
 import { decodeAdminToken } from '../Middleware/authUsers';
 import { deleteUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
 import { generateKey, generateSecretHash } from '../Middleware/apiKeys';
@@ -38,7 +38,7 @@ adminRoutes.get('/admin/firebaseusers', async (req: Request, res: Response) => {
 // Get user by id
 adminRoutes.get('/admin/users/:id', async (req: Request, res: Response) => {
   try {
-    const user = await prismaCtx.prisma.users.findUnique({
+    const user = await prisma.users.findUnique({
       where: {
         id: parseInt(req.params.id),
       },
@@ -74,7 +74,7 @@ adminRoutes.get('/admin/userbyuid/:uid', async (req: Request, res: Response) => 
 // Delete user
 adminRoutes.delete('/admin/users/:uid', async (req: Request, res: Response) => {
   try {
-    const user = await deleteUser(req.params.uid, prismaCtx);
+    const user = await deleteUser(req.params.uid);
     return res.send(user);
   } catch (err) {
     res.statusCode = 500;
@@ -89,7 +89,7 @@ adminRoutes.post('/admin/beers', async (req: Request, res: Response) => {
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const beer = await prismaCtx.prisma.beers.create({
+    const beer = await prisma.beers.create({
       data: {
         brewery_id: req.body.brewery_id != null ? parseInt(req.body.brewery_id) : null,
         name: req.body.name,
@@ -117,7 +117,7 @@ adminRoutes.put('/admin/beers/:id', async (req: Request, res: Response) => {
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const beer = await prismaCtx.prisma.beers.update({
+    const beer = await prisma.beers.update({
       where: {
         id: parseInt(req.params.id),
       },
@@ -145,7 +145,7 @@ adminRoutes.put('/admin/beers/:id', async (req: Request, res: Response) => {
 // Delete a beer
 adminRoutes.delete('/admin/beers/:id', async (req: Request, res: Response) => {
   try {
-    const beer = await prismaCtx.prisma.beers.delete({
+    const beer = await prisma.beers.delete({
       where: {
         id: parseInt(req.params.id),
       },
@@ -165,7 +165,7 @@ adminRoutes.post('/admin/collections', async (req: Request, res: Response) => {
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const collection = await prismaCtx.prisma.collections.create({
+    const collection = await prisma.collections.create({
       data: {
         name: req.body.name,
         difficulty: parseInt(req.body.difficulty),
@@ -193,7 +193,7 @@ adminRoutes.put('/admin/collections/:id', async (req: Request, res: Response) =>
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const collection = await prismaCtx.prisma.collections.update({
+    const collection = await prisma.collections.update({
       where: {
         id: parseInt(req.params.id),
       },
@@ -220,14 +220,14 @@ adminRoutes.post('/admin/collections/addBeer', async (req: Request, res: Respons
   }
   try {
     // Add beer to collection
-    const collectionBeer = await prismaCtx.prisma.collection_beers.create({
+    const collectionBeer = await prisma.collection_beers.create({
       data: {
         collection_id: parseInt(req.body.collection_id),
         beer_id: parseInt(req.body.beer_id),
       },
     });
     // Update the updated_at field in the collections table
-    await prismaCtx.prisma.collections.update({
+    await prisma.collections.update({
       where: {
         id: parseInt(req.body.collection_id),
       },
@@ -251,7 +251,7 @@ adminRoutes.delete('/admin/collections/deleteBeer', async (req: Request, res: Re
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const collectionBeer = await prismaCtx.prisma.collection_beers.delete({
+    const collectionBeer = await prisma.collection_beers.delete({
       where: {
         collection_id_beer_id: {
           collection_id: parseInt(req.body.collection_id),
@@ -270,7 +270,7 @@ adminRoutes.delete('/admin/collections/deleteBeer', async (req: Request, res: Re
 // Delete a collection
 adminRoutes.delete('/admin/collections/:id', async (req: Request, res: Response) => {
   try {
-    const collection = await prismaCtx.prisma.collections.delete({
+    const collection = await prisma.collections.delete({
       where: {
         id: parseInt(req.params.id),
       },
@@ -290,7 +290,7 @@ adminRoutes.post('/admin/categories', async (req: Request, res: Response) => {
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const category = await prismaCtx.prisma.categories.create({
+    const category = await prisma.categories.create({
       data: {
         cat_name: req.body.cat_name,
       },
@@ -310,7 +310,7 @@ adminRoutes.put('/admin/categories/:id', async (req: Request, res: Response) => 
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const category = await prismaCtx.prisma.categories.update({
+    const category = await prisma.categories.update({
       where: {
         id: parseInt(req.params.id),
       },
@@ -330,7 +330,7 @@ adminRoutes.put('/admin/categories/:id', async (req: Request, res: Response) => 
 // Delete a category
 adminRoutes.delete('/admin/categories/:id', async (req: Request, res: Response) => {
   try {
-    const category = await prismaCtx.prisma.categories.delete({
+    const category = await prisma.categories.delete({
       where: {
         id: parseInt(req.params.id),
       },
@@ -350,7 +350,7 @@ adminRoutes.post('/admin/styles', async (req: Request, res: Response) => {
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const style = await prismaCtx.prisma.styles.create({
+    const style = await prisma.styles.create({
       data: {
         style_name: req.body.style_name,
         cat_id: parseInt(req.body.cat_id),
@@ -371,7 +371,7 @@ adminRoutes.put('/admin/styles/:id', async (req: Request, res: Response) => {
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const style = await prismaCtx.prisma.styles.update({
+    const style = await prisma.styles.update({
       where: {
         id: parseInt(req.params.id),
       },
@@ -392,7 +392,7 @@ adminRoutes.put('/admin/styles/:id', async (req: Request, res: Response) => {
 // Delete a style
 adminRoutes.delete('/admin/styles/:id', async (req: Request, res: Response) => {
   try {
-    const style = await prismaCtx.prisma.styles.delete({
+    const style = await prisma.styles.delete({
       where: {
         id: parseInt(req.params.id),
       },
@@ -422,7 +422,7 @@ adminRoutes.post('/admin/breweries', async (req: Request, res: Response) => {
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const brewery = await prismaCtx.prisma.breweries.create({
+    const brewery = await prisma.breweries.create({
       data: {
         name: req.body.name,
         address1: req.body.address1,
@@ -461,7 +461,7 @@ adminRoutes.put('/admin/breweries/:id', async (req: Request, res: Response) => {
     return res.json({ Error: 'Missing required fields' });
   }
   try {
-    const brewery = await prismaCtx.prisma.breweries.update({
+    const brewery = await prisma.breweries.update({
       where: {
         id: parseInt(req.params.id),
       },
@@ -490,7 +490,7 @@ adminRoutes.put('/admin/breweries/:id', async (req: Request, res: Response) => {
 // Delete a brewery
 adminRoutes.delete('/admin/breweries/:id', async (req: Request, res: Response) => {
   try {
-    const brewery = await prismaCtx.prisma.breweries.delete({
+    const brewery = await prisma.breweries.delete({
       where: {
         id: parseInt(req.params.id),
       },
@@ -508,7 +508,7 @@ adminRoutes.post('/admin/apikey/', async (req: Request, res: Response) => {
   const key = generateKey();
   const secretHash = generateSecretHash(key);
   try {
-    await prismaCtx.prisma.api_keys.create({
+    await prisma.api_keys.create({
       data: {
         key: secretHash,
       },

@@ -2,7 +2,6 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import { createContext } from '../context';
 import { decodeAPIKey, decodeUserToken } from './Middleware/authUsers';
 import adminRoutes from './Routes/admins';
 import userRoutes from './Routes/users';
@@ -71,8 +70,6 @@ app.use(collectionbeerRoutes);
 app.use(friendRoutes);
 app.use(notificationsRoutes);
 app.use(secureRoutes);
-
-export const prismaCtx = createContext();
 
 seedDatabase();
 

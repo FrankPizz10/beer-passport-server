@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from 'express';
-import { prismaCtx } from '../index';
+import prisma from '../../client';
 import {
   getLikedBeersByUserId,
   getTriedBeersByUserId,
@@ -32,7 +32,6 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
     res.locals.user.id,
     parseInt(req.body.beer_id),
     req.body.liked,
-    prismaCtx,
   );
   return res.send(userBeer);
 });
@@ -40,7 +39,7 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
 // Delete user beer / Un try beer
 userbeerRoutes.delete('/api/userbeers/:beer_id', async (req: Request, res: Response) => {
   try {
-    const userBeer = await prismaCtx.prisma.user_beers.delete({
+    const userBeer = await prisma.user_beers.delete({
       where: {
         user_id_beer_id: {
           user_id: parseInt(res.locals.user.id),
@@ -58,13 +57,13 @@ userbeerRoutes.delete('/api/userbeers/:beer_id', async (req: Request, res: Respo
 // Get liked and tried user beers by user
 userbeerRoutes.get('/api/userbeers/count', async (req: Request, res: Response) => {
   try {
-    const likedBeersCount = await prismaCtx.prisma.user_beers.count({
+    const likedBeersCount = await prisma.user_beers.count({
       where: {
         user_id: parseInt(res.locals.user.id),
         liked: true,
       },
     });
-    const triedBeersCount = await prismaCtx.prisma.user_beers.count({
+    const triedBeersCount = await prisma.user_beers.count({
       where: {
         user_id: parseInt(res.locals.user.id),
       },

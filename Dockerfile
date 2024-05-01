@@ -10,6 +10,8 @@ COPY tsconfig.json ./
 COPY context.ts ./
 COPY .babelrc ./
 COPY .env ./
+COPY client.ts ./
+COPY singleton.ts ./
 
 # Copy local directories to the current local directory of our docker image (/app)
 COPY ./src ./src

@@ -1,5 +1,5 @@
 import { createHash } from 'crypto';
-import { prismaCtx } from '..';
+import prisma from '../../client';
 
 interface UserBadge {
   id: string;
@@ -61,12 +61,12 @@ export const calcCollectionProgressionForUserBeer = async (
   beer_id: number,
 ): Promise<UserBadge[]> => {
   const [collections, userBeer, userBeers] = await Promise.all([
-    prismaCtx.prisma.collections.findMany({
+    prisma.collections.findMany({
       include: {
         collection_beers: true,
       },
     }),
-    prismaCtx.prisma.user_beers.findUnique({
+    prisma.user_beers.findUnique({
       where: {
         user_id_beer_id: {
           beer_id,
@@ -74,7 +74,7 @@ export const calcCollectionProgressionForUserBeer = async (
         },
       },
     }),
-    prismaCtx.prisma.user_beers.findMany({
+    prisma.user_beers.findMany({
       where: {
         user_id,
       },
@@ -135,7 +135,7 @@ const getCollectionsAndUserBeers = async (
   userId: number,
 ): Promise<[typeof collections, typeof userBeers]> => {
   const [collections, userBeers] = await Promise.all([
-    prismaCtx.prisma.collections.findMany({
+    prisma.collections.findMany({
       include: {
         collection_beers: {
           select: {
@@ -144,7 +144,7 @@ const getCollectionsAndUserBeers = async (
         },
       },
     }),
-    prismaCtx.prisma.user_beers.findMany({
+    prisma.user_beers.findMany({
       where: {
         user_id: userId,
       },

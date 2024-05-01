@@ -1,13 +1,13 @@
 import express, { Express } from 'express';
 import { getBeersByBrewery } from '../DBclient/beerclient';
-import { prismaCtx } from '..';
+import prisma from '../../client';
 
 const brewereyRoutes: Express = express();
 
 // Get all breweries basic info
 brewereyRoutes.get('/api/breweries/basic', async (req, res) => {
   try {
-    const breweries = await prismaCtx.prisma.breweries.findMany({
+    const breweries = await prisma.breweries.findMany({
       select: {
         id: true,
         name: true,
@@ -24,7 +24,7 @@ brewereyRoutes.get('/api/breweries/basic', async (req, res) => {
 // Get all breweries
 brewereyRoutes.get('/api/breweries', async (req, res) => {
   try {
-    const breweries = await prismaCtx.prisma.breweries.findMany();
+    const breweries = await prisma.breweries.findMany();
     return res.send(breweries);
   } catch (err) {
     res.statusCode = 500;
@@ -43,7 +43,7 @@ brewereyRoutes.get('/api/breweries/popular', async (req, res) => {
         breweryQuantity = parsedQuantity;
       }
     }
-    const breweriesWithMostLikedBeers = await prismaCtx.prisma.$queryRaw`
+    const breweriesWithMostLikedBeers = await prisma.$queryRaw`
       SELECT breweries.id, breweries.name, COUNT(user_beers.id) as liked_beers_count
           FROM breweries
           LEFT JOIN beers ON breweries.id = beers.brewery_id
@@ -66,7 +66,7 @@ brewereyRoutes.get('/api/breweries/popular', async (req, res) => {
       return res.json({ Error: 'Popular breweries not found' });
     }
     if (basicBreweries.length < breweryQuantity) {
-      const extraBreweries = await prismaCtx.prisma.breweries.findMany({
+      const extraBreweries = await prisma.breweries.findMany({
         select: {
           id: true,
           name: true,
@@ -92,7 +92,7 @@ brewereyRoutes.get('/api/breweries/popular', async (req, res) => {
 // Get brewery by id
 brewereyRoutes.get('/api/breweries/:id', async (req, res) => {
   try {
-    const brewery = await prismaCtx.prisma.breweries.findUnique({
+    const brewery = await prisma.breweries.findUnique({
       where: {
         id: parseInt(req.params.id),
       },

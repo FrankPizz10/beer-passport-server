@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from 'express';
-import { prismaCtx } from '../index';
+import prisma from '../../client';
 import { deleteUser, getAllUserBasicInfo } from '../DBclient/userclient';
 import { Prisma } from '@prisma/client';
 
@@ -17,7 +17,7 @@ userRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
     res.statusCode = 400;
     return res.json({ Error: 'Invalid id' });
   }
-  const user = await prismaCtx.prisma.users.findUnique({
+  const user = await prisma.users.findUnique({
     where: {
       id: parseInt(req.params.id),
     },
@@ -34,7 +34,7 @@ userRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
 
 // Get basic info for user by user name
 userRoutes.get('/api/userbyname/:user_name', async (req: Request, res: Response) => {
-  const user = await prismaCtx.prisma.users.findUnique({
+  const user = await prisma.users.findUnique({
     where: {
       user_name: req.params.user_name,
     },
@@ -53,7 +53,7 @@ userRoutes.get('/api/userbyname/:user_name', async (req: Request, res: Response)
 
 // Get user by uid
 userRoutes.get('/api/userbyuid/', async (req: Request, res: Response) => {
-  const user = await prismaCtx.prisma.users.findUnique({
+  const user = await prisma.users.findUnique({
     where: {
       uid: res.locals.user.uid,
     },
@@ -72,7 +72,7 @@ userRoutes.post('/userexists/', async (req: Request, res: Response) => {
     return res.json({ Error: 'Missing user_name or email' });
   }
   try {
-    const userName = await prismaCtx.prisma.users.findUnique({
+    const userName = await prisma.users.findUnique({
       where: {
         user_name: req.body.user_name,
       },
@@ -81,7 +81,7 @@ userRoutes.post('/userexists/', async (req: Request, res: Response) => {
       res.statusCode = 200;
       return res.json({ exists: true, type: 'user_name' });
     }
-    const email = await prismaCtx.prisma.users.findUnique({
+    const email = await prisma.users.findUnique({
       where: {
         email: req.body.email,
       },
@@ -104,7 +104,7 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
     return res.json({ Error: 'Missing uid, email, age, or user_name' });
   }
   try {
-    const user = await prismaCtx.prisma.users.create({
+    const user = await prisma.users.create({
       data: {
         uid: req.body.uid,
         email: req.body.email,
@@ -126,7 +126,7 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
 // Delete user
 userRoutes.delete('/api/users/', async (req: Request, res: Response) => {
   try {
-    const user = await deleteUser(res.locals.user.uid, prismaCtx);
+    const user = await deleteUser(res.locals.user.uid);
     return res.send(user);
   } catch (err) {
     res.statusCode = 500;

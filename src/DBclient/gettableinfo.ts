@@ -1,12 +1,12 @@
-import { prismaCtx } from '..';
+import prisma from '../../client';
 
 export const getCategories = async () => {
-  const categories = await prismaCtx.prisma.categories.findMany();
+  const categories = await prisma.categories.findMany();
   return categories;
 };
 
 export const getCollections = async () => {
-  const collections = await prismaCtx.prisma.collections.findMany({
+  const collections = await prisma.collections.findMany({
     orderBy: {
       updated_at: 'desc',
     },
@@ -15,7 +15,7 @@ export const getCollections = async () => {
 };
 
 export const getCollectionSize = async (collection_id: number) => {
-  const collectionSize = await prismaCtx.prisma.collection_beers.count({
+  const collectionSize = await prisma.collection_beers.count({
     where: {
       collection_id: collection_id,
     },

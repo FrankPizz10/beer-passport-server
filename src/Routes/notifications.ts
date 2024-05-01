@@ -1,12 +1,12 @@
 import express, { Express } from 'express';
-import { prismaCtx } from '..';
+import prisma from '../../client';
 
 const notificationsRoutes: Express = express();
 
 // Get notifications by user id
 notificationsRoutes.get('/api/notifications', async (req, res) => {
   try {
-    const notifications = await prismaCtx.prisma.notifications.findMany({
+    const notifications = await prisma.notifications.findMany({
       where: {
         user_id: parseInt(res.locals.user.id),
       },
@@ -29,7 +29,7 @@ notificationsRoutes.get('/api/notifications', async (req, res) => {
 // Get number of unviewed notifications and list of ids
 notificationsRoutes.get('/api/notifications/unviewed', async (req, res) => {
   try {
-    const unViewed = await prismaCtx.prisma.notifications.findMany({
+    const unViewed = await prisma.notifications.findMany({
       where: {
         user_id: parseInt(res.locals.user.id),
         viewed: false,
@@ -58,7 +58,7 @@ notificationsRoutes.post('/api/notifications/view', async (req, res) => {
     return res.json({ Error: 'Invalid notificationIds' });
   }
   try {
-    await prismaCtx.prisma.notifications.updateMany({
+    await prisma.notifications.updateMany({
       where: {
         id: {
           in: req.body.notificationIds,
@@ -86,7 +86,7 @@ notificationsRoutes.post('/api/notification-token', async (req, res) => {
     return res.json({ Error: 'Missing pushToken' });
   }
   try {
-    await prismaCtx.prisma.users.update({
+    await prisma.users.update({
       where: {
         id: parseInt(res.locals.user.id),
       },

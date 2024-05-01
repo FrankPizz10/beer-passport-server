@@ -1,4 +1,4 @@
-import { prismaCtx } from '..';
+import prisma from '../../client';
 import { Prisma, PrismaClient } from '@prisma/client';
 
 const getDataFromProd = async (filepath: string) => {
@@ -18,7 +18,7 @@ const getDataFromProd = async (filepath: string) => {
 export const seedDatabase = async () => {
   console.log('Seeding database...');
   try {
-    await prismaCtx.prisma.$transaction(
+    await prisma.$transaction(
       async prisma => {
         await seedBreweries(prisma);
         await seedCategories(prisma);

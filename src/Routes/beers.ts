@@ -6,19 +6,19 @@ import {
   getTrendingBeers,
 } from '../DBclient/beerclient';
 import { getCategories } from '../DBclient/gettableinfo';
-import { prismaCtx } from '..';
+import prisma from '../../client';
 
 const beerRoutes: Express = express();
 
 // Get all beers
 beerRoutes.get('/api/beers', async (req: Request, res: Response) => {
-  const beers = await prismaCtx.prisma.beers.findMany();
+  const beers = await prisma.beers.findMany();
   return res.send(beers);
 });
 
 // Get all basic beer info
 beerRoutes.get('/api/beers/basic', async (req: Request, res: Response) => {
-  const beers = await prismaCtx.prisma.beers.findMany({
+  const beers = await prisma.beers.findMany({
     select: {
       id: true,
       name: true,
@@ -52,7 +52,7 @@ beerRoutes.get('/api/categories', async (req: Request, res: Response) => {
 // Get category by id
 beerRoutes.get('/api/categories/:id', async (req: Request, res: Response) => {
   try {
-    const category = await prismaCtx.prisma.categories.findUnique({
+    const category = await prisma.categories.findUnique({
       where: {
         id: parseInt(req.params.id),
       },
@@ -93,7 +93,7 @@ beerRoutes.get('/api/categories/:id/beers', async (req, res) => {
 // Get newest beer
 beerRoutes.get('/api/beers/newest', async (req: Request, res: Response) => {
   try {
-    const beer = await prismaCtx.prisma.beers.findFirst({
+    const beer = await prisma.beers.findFirst({
       orderBy: {
         last_mod: 'desc',
       },
@@ -134,7 +134,7 @@ beerRoutes.get('/api/beers/:id', async (req, res) => {
 // Get Beer by name
 beerRoutes.get('/api/beers/name/:name', async (req: Request, res: Response) => {
   try {
-    const beer = await prismaCtx.prisma.beers.findFirst({
+    const beer = await prisma.beers.findFirst({
       where: {
         name: req.params.name,
       },

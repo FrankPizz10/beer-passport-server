@@ -17,6 +17,6 @@
     // This improves issue grouping in Sentry.
     "sourceRoot": "/"
   },
-  "include": ["src", "test", "jest.config.cjs"],
+  "include": ["src", "test", "jest.config.cjs", "client.ts", "singleton.ts"],
   "exclude": ["node_modules"]
 }
