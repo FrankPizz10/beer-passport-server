@@ -22,7 +22,7 @@ export const getBeerByCategory = async (cat: string) => {
       name: true,
     },
   });
-  return beers.splice(0, 20);
+  return beers != null ? beers.splice(0, 20) : [];
 };
 
 export const getBeerById = async (
@@ -188,27 +188,44 @@ export const getTrendingBeers = async (beerQuantity: number, catId?: number) => 
   return getTopBeersHelper(topTrendingBeers, beerQuantity, catId);
 };
 
-const getTopBeersHelper = async (
+export const getTopBeersHelper = async (
   topBeers: Prisma.PickArray<Prisma.User_beersGroupByOutputType, 'beer_id'[]>[],
   beerQuantity: number,
   catId?: number,
 ) => {
   // First get the top liked beers
   const beers: { id: number; name: string; cat_id: number | null }[] = [];
-  for (const beer of topBeers) {
-    const beerInfo = await prisma.beers.findUnique({
-      where: {
-        id: beer.beer_id,
-      },
-      select: {
-        id: true,
-        name: true,
-        cat_id: true,
-      },
-    });
-    if (beerInfo && (!catId || beerInfo.cat_id === catId)) {
-      beers.push(beerInfo);
-    }
+  if (!catId) {
+    beers.push(
+      ...(await prisma.beers.findMany({
+        where: {
+          id: {
+            in: topBeers.map(beer => beer.beer_id),
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          cat_id: true,
+        },
+      })),
+    );
+  } else {
+    beers.push(
+      ...(await prisma.beers.findMany({
+        where: {
+          id: {
+            in: topBeers.map(beer => beer.beer_id),
+          },
+          cat_id: catId,
+        },
+        select: {
+          id: true,
+          name: true,
+          cat_id: true,
+        },
+      })),
+    );
   }
   // If there are not enough top liked beers, get extra beers
   const extraBeers: { id: number; name: string; cat_id: number | null }[] = [];
@@ -234,7 +251,6 @@ const getTopBeersHelper = async (
     }
   } else {
     if (beers.length < beerQuantity) {
-      // const extra = await getBeersByCategory(catId, beerQuantity - beers.length);
       const extra = await prisma.beers.findMany({
         select: {
           id: true,
