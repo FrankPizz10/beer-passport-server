@@ -63,43 +63,44 @@ export const updateOrCreateUserBeer = async (user_id: number, beer_id: number, l
       liked: liked,
     },
   });
-  const sendNotifications = async () => {
-    const newCompletedBadges = (
-      await calcCollectionProgressionForUserBeer(user_id, beer_id)
-    ).filter(badge => badge.earned);
-    newCompletedBadges.forEach(async badge => {
-      try {
-        const collectionName = (
-          await prisma.collections.findUnique({
-            where: {
-              id: badge.collection.id,
-            },
-          })
-        )?.name;
-        await prisma.notifications.upsert({
+  sendNotifications(user_id, beer_id);
+  return newUserBeer;
+};
+
+export const sendNotifications = async (user_id: number, beer_id: number) => {
+  const newCompletedBadges = (await calcCollectionProgressionForUserBeer(user_id, beer_id)).filter(
+    badge => badge.earned,
+  );
+  newCompletedBadges.forEach(async badge => {
+    try {
+      const collectionName = (
+        await prisma.collections.findUnique({
           where: {
-            user_id_message: {
-              user_id: user_id,
-              message: `You earned the ${collectionName} badge!`,
-            },
+            id: badge.collection.id,
           },
-          update: {
-            updated_at: new Date(),
-            viewed: false,
-          },
-          create: {
+        })
+      )?.name;
+      await prisma.notifications.upsert({
+        where: {
+          user_id_message: {
             user_id: user_id,
-            type: 'BADGE_EARNED',
             message: `You earned the ${collectionName} badge!`,
           },
-        });
-      } catch (e) {
-        throw new Error('Error creating notification');
-      }
-    });
-  };
-  sendNotifications();
-  return newUserBeer;
+        },
+        update: {
+          updated_at: new Date(),
+          viewed: false,
+        },
+        create: {
+          user_id: user_id,
+          type: 'BADGE_EARNED',
+          message: `You earned the ${collectionName} badge!`,
+        },
+      });
+    } catch (e) {
+      throw new Error('Error creating notification');
+    }
+  });
 };
 
 export const getUserBeersByUserId = async (id: number) => {
@@ -229,7 +230,7 @@ export const getUserBadgesByUserId = async (user_id: number) => {
   return userBadges;
 };
 
-const getCollectionProgress = async (user_id: number, collection_id: number) => {
+export const getCollectionProgress = async (user_id: number, collection_id: number) => {
   const collectionBeers = await prisma.collection_beers.findMany({
     where: {
       collection_id: collection_id,

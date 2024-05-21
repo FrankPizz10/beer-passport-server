@@ -7,23 +7,10 @@ describe('beerclient Test', () => {
     cat_name: 'test',
     last_mod: new Date(),
   };
-  const testBeer = {
-    id: 1,
-    name: 'test',
-    brewery_id: 1,
-    cat_id: testCategory.id,
-    style_id: 1,
-    abv: 1,
-    ibu: 1,
-    srm: 1,
-    upc: 1,
-    descript: 'test',
-    last_mod: new Date(),
-  };
   const generateBeers = (length: number, categoryId: number) =>
     Array.from({ length }, (_, i) => ({
-      id: i,
-      name: 'test',
+      id: i + 1,
+      name: `Test${i + 1}`,
       brewery_id: 1,
       cat_id: categoryId,
       style_id: 1,
@@ -35,14 +22,15 @@ describe('beerclient Test', () => {
       last_mod: new Date(),
     }));
   test('getBeerByCategory', async () => {
+    const beers = generateBeers(3, testCategory.id);
     prismaMock.categories.findFirst.mockResolvedValue(testCategory);
-    prismaMock.beers.findMany.mockResolvedValue([testBeer]);
-
-    await expect(beerclient.getBeerByCategory('test')).resolves.toEqual([testBeer]);
+    prismaMock.beers.findMany.mockResolvedValue([...beers]);
+    const result = await beerclient.getBeerByCategory(testCategory.cat_name);
+    expect(result).toEqual([...beers]);
     expect(prismaMock.categories.findFirst).toHaveBeenCalledWith({
       where: {
         cat_name: {
-          contains: 'test',
+          contains: testCategory.cat_name,
         },
       },
     });
@@ -61,24 +49,22 @@ describe('beerclient Test', () => {
 
   // test that it returns only the first 20 beers
   test('getBeersByCategory returns twenty beers', async () => {
-    const category = {
-      id: 1,
-      cat_name: 'test',
-      last_mod: new Date(),
-    };
-    const beers = generateBeers(21, category.id);
+    const beers = generateBeers(21, testCategory.id);
 
     prismaMock.beers.findMany.mockResolvedValue(beers);
-    await expect(beerclient.getBeerByCategory('test')).resolves.toEqual(beers.slice(0, 20));
+    await expect(beerclient.getBeerByCategory(testCategory.cat_name)).resolves.toEqual(
+      beers.slice(0, 20),
+    );
   });
 
   // test that it returns an empty array when no beers are found
   test('getBeersByCategory returns empty array', async () => {
     prismaMock.categories.findFirst.mockResolvedValue(null);
-    await expect(beerclient.getBeerByCategory('test')).resolves.toEqual([]);
+    await expect(beerclient.getBeerByCategory(testCategory.cat_name)).resolves.toEqual([]);
   });
 
   test('getBeerById', async () => {
+    const testBeer = generateBeers(1, 1)[0];
     prismaMock.beers.findUnique.mockResolvedValue(testBeer);
 
     await expect(beerclient.getBeerById(1, true, true, true)).resolves.toEqual(testBeer);
@@ -95,6 +81,7 @@ describe('beerclient Test', () => {
   });
 
   test('getBeerById without includes', async () => {
+    const testBeer = generateBeers(1, testCategory.id)[0];
     prismaMock.beers.findUnique.mockResolvedValue(testBeer);
 
     await expect(beerclient.getBeerById(1, false, false, false)).resolves.toEqual(testBeer);
@@ -189,7 +176,7 @@ describe('beerclient Test', () => {
   });
 
   test('getBeersByBrewery', async () => {
-    const beers = generateBeers(10, 1);
+    const beers = generateBeers(10, testCategory.id);
     prismaMock.beers.findMany.mockResolvedValue(beers);
 
     await expect(beerclient.getBeersByBrewery(1)).resolves.toEqual(beers);
@@ -201,10 +188,9 @@ describe('beerclient Test', () => {
   });
 
   test('getBeersByCategory', async () => {
-    const beers = generateBeers(10, 1);
+    const beers = generateBeers(10, testCategory.id);
     prismaMock.beers.findMany.mockResolvedValue(beers);
-
-    await expect(beerclient.getBeersByCategory(1)).resolves.toEqual(beers);
+    await expect(beerclient.getBeersByCategory(testCategory.id)).resolves.toEqual(beers);
     expect(prismaMock.beers.findMany).toHaveBeenCalledWith({
       where: {
         cat_id: 1,
@@ -218,7 +204,7 @@ describe('beerclient Test', () => {
   });
 
   test('getBeersByCategory with limit', async () => {
-    const beers = generateBeers(10, 1);
+    const beers = generateBeers(10, testCategory.id);
     prismaMock.beers.findMany.mockResolvedValue(beers.slice(0, 5));
     await expect(beerclient.getBeersByCategory(1, 5)).resolves.toEqual(beers.slice(0, 5));
     expect(prismaMock.beers.findMany).toHaveBeenCalledWith({
@@ -235,7 +221,7 @@ describe('beerclient Test', () => {
   });
 
   test('getBeersByCategory with limit greater than number of beers', async () => {
-    const beers = generateBeers(10, 1);
+    const beers = generateBeers(10, testCategory.id);
     prismaMock.beers.findMany.mockResolvedValue(beers);
 
     await expect(beerclient.getBeersByCategory(1, 20)).resolves.toEqual(beers);
@@ -297,7 +283,7 @@ describe('beerclient Test', () => {
       { beer_id: 3, liked: true },
     ];
     (prismaMock.user_beers.groupBy as jest.Mock).mockResolvedValue(userBeers);
-    const result = await beerclient.getTopLikedBeers(3, 1);
+    const result = await beerclient.getTopLikedBeers(3, testCategory.id);
     expect(result).toEqual(topLikedBeers);
     expect(prismaMock.user_beers.groupBy).toHaveBeenCalledWith({
       by: ['beer_id'],
@@ -311,7 +297,7 @@ describe('beerclient Test', () => {
       },
       take: 3,
     });
-    expect(getTopBeersHelperMock).toHaveBeenCalledWith(userBeers, 3, 1);
+    expect(getTopBeersHelperMock).toHaveBeenCalledWith(userBeers, 3, testCategory.id);
     getTopBeersHelperMock.mockRestore();
   });
 
@@ -335,9 +321,9 @@ describe('beerclient Test', () => {
 
   test('getTopTrendingBeers', async () => {
     const topTrendingBeers = [
-      { id: 1, name: 'Test1', cat_id: 1 },
-      { id: 2, name: 'Test2', cat_id: 1 },
-      { id: 3, name: 'Test3', cat_id: 1 },
+      { id: 1, name: 'Test1', cat_id: testCategory.id },
+      { id: 2, name: 'Test2', cat_id: testCategory.id },
+      { id: 3, name: 'Test3', cat_id: testCategory.id },
     ];
 
     // Mocking the helper function
@@ -350,7 +336,7 @@ describe('beerclient Test', () => {
       { beer_id: 3, liked: true },
     ];
     (prismaMock.user_beers.groupBy as jest.Mock).mockResolvedValue(userBeers);
-    const result = await beerclient.getTopLikedBeers(3, 1);
+    const result = await beerclient.getTopLikedBeers(3, testCategory.id);
     expect(result).toEqual(topTrendingBeers);
     expect(prismaMock.user_beers.groupBy).toHaveBeenCalledWith({
       by: ['beer_id'],
@@ -364,7 +350,7 @@ describe('beerclient Test', () => {
       },
       take: 3,
     });
-    expect(getTopBeersHelperMock).toHaveBeenCalledWith(userBeers, 3, 1);
+    expect(getTopBeersHelperMock).toHaveBeenCalledWith(userBeers, 3, testCategory.id);
     getTopBeersHelperMock.mockRestore();
   });
 
@@ -372,7 +358,7 @@ describe('beerclient Test', () => {
     const getTopBeersHelperMock = jest.spyOn(beerclient, 'getTopBeersHelper');
     getTopBeersHelperMock.mockResolvedValue([]);
     (prismaMock.user_beers.groupBy as jest.Mock).mockResolvedValue([]);
-    const result = await beerclient.getTopLikedBeers(3, 1);
+    const result = await beerclient.getTopLikedBeers(3, testCategory.id);
     expect(result).toEqual([]);
     getTopBeersHelperMock.mockRestore();
   });
@@ -388,49 +374,8 @@ describe('beerclient Test', () => {
 
   const topBeers = [{ beer_id: 1 }, { beer_id: 2 }, { beer_id: 3 }];
 
-  const beers = [
-    {
-      id: 1,
-      name: 'Test1',
-      cat_id: 1,
-      brewery_id: 1,
-      style_id: 1,
-      abv: 1,
-      ibu: 1,
-      srm: 1,
-      upc: 1,
-      descript: 'Test1',
-      last_mod: new Date(),
-    },
-    {
-      id: 2,
-      name: 'Test2',
-      cat_id: 1,
-      brewery_id: 1,
-      style_id: 1,
-      abv: 1,
-      ibu: 1,
-      srm: 1,
-      upc: 1,
-      descript: 'Test2',
-      last_mod: new Date(),
-    },
-    {
-      id: 3,
-      name: 'Test3',
-      cat_id: 1,
-      brewery_id: 1,
-      style_id: 1,
-      abv: 1,
-      ibu: 1,
-      srm: 1,
-      upc: 1,
-      descript: 'Test3',
-      last_mod: new Date(),
-    },
-  ];
-
   test('getTopBeersHelper no cat id enough beers', async () => {
+    const beers = generateBeers(3, 1);
     prismaMock.beers.findMany.mockResolvedValue(beers);
 
     const result = await beerclient.getTopBeersHelper(topBeers, 3);
@@ -451,9 +396,10 @@ describe('beerclient Test', () => {
   });
 
   test('getTopBeersHelper with cat id enough beers', async () => {
+    const beers = generateBeers(3, testCategory.id);
     prismaMock.beers.findMany.mockResolvedValue(beers);
 
-    const result = await beerclient.getTopBeersHelper(topBeers, 3, 1);
+    const result = await beerclient.getTopBeersHelper(topBeers, 3, testCategory.id);
     expect(result).toEqual(beers);
     expect(prismaMock.beers.findMany).toHaveBeenCalledTimes(1);
     expect(prismaMock.beers.findMany).toHaveBeenCalledWith({
@@ -500,6 +446,7 @@ describe('beerclient Test', () => {
   ];
   test('getTopBeersHelper no cat id not enough beers', async () => {
     const beerQuantity = 5;
+    const beers = generateBeers(3, testCategory.id);
     prismaMock.beers.findMany.mockResolvedValueOnce(beers).mockResolvedValueOnce(extraBeers);
     const result = await beerclient.getTopBeersHelper(topBeers, beerQuantity);
     expect(result).toEqual([...beers, ...extraBeers]);
@@ -524,8 +471,9 @@ describe('beerclient Test', () => {
 
   test('getTopBeersHelper with cat id not enough beers', async () => {
     const beerQuantity = 5;
+    const beers = generateBeers(3, testCategory.id);
     prismaMock.beers.findMany.mockResolvedValueOnce(beers).mockResolvedValueOnce(extraBeers);
-    const result = await beerclient.getTopBeersHelper(topBeers, beerQuantity, 1);
+    const result = await beerclient.getTopBeersHelper(topBeers, beerQuantity, testCategory.id);
     expect(result).toEqual([...beers, ...extraBeers]);
     expect(prismaMock.beers.findMany).toHaveBeenCalledTimes(2);
     expect(prismaMock.beers.findMany).toHaveBeenCalledWith({

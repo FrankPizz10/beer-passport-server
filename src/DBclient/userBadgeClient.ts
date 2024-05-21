@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import prisma from '../../client';
 
-interface UserBadge {
+export interface UserBadge {
   id: string;
   user_id: number;
   earned: boolean;
