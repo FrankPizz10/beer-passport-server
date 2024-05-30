@@ -131,7 +131,7 @@ export const getUserBadgeCount = async (userId: number): Promise<number> => {
   return completedcount;
 };
 
-const getCollectionsAndUserBeers = async (
+export const getCollectionsAndUserBeers = async (
   userId: number,
 ): Promise<[typeof collections, typeof userBeers]> => {
   const [collections, userBeers] = await Promise.all([
