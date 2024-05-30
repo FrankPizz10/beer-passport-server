@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
 import { deleteUser, getAllUserBasicInfo } from '../DBclient/userclient';
 import { Prisma } from '@prisma/client';
+import { checkValidUserName } from '../Utils'
 
 const userRoutes: Express = express();
 
@@ -102,6 +103,10 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
   if (!req.body.uid || !req.body.email || !req.body.age || !req.body.user_name) {
     res.statusCode = 400;
     return res.json({ Error: 'Missing uid, email, age, or user_name' });
+  }
+  if (!checkValidUserName(req.body.user_name)) {
+    res.statusCode = 400;
+    return res.json({ Error: 'Inavlid username!'});
   }
   try {
     const user = await prismaCtx.prisma.users.create({
