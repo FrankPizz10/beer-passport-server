@@ -12,4 +12,5 @@ export const checkValidUserName = (text: string) => {
     if (noSpacesText.length < text.length) return false;
     // Check for profanity
     if (matcher.hasMatch(text)) return false;
+    return true;
 }
