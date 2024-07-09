@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
-import { deleteUser, getAllUserBasicInfo } from '../DBclient/userclient';
+import { deleteUser, getAllUserBasicInfo, updateUserEmail } from '../DBclient/userclient';
 import { Prisma } from '@prisma/client';
 import { checkValidUserName } from '../Utils'
 
@@ -125,6 +125,21 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
     }
     res.statusCode = 500;
     return res.json({ Error: 'Something went wrong' });
+  }
+});
+
+// Update user email
+userRoutes.patch('/api/users/email', async (req: Request, res: Response) => {
+  try {
+    if (!req.body.email || req.body.email.length < 1) {
+      res.statusCode = 400;
+      return res.json({ Error: 'Missing email' });
+    }
+    const user = await updateUserEmail(res.locals.user.uid, req.body.email);
+    return res.send(user);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong updating email' });
   }
 });
 
