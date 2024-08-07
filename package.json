@@ -27,7 +27,7 @@
   "homepage": "https://github.com/FrankPizz10/beer-passport-server#readme",
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.432.0",
-    "@prisma/client": "4.11.0",
+    "@prisma/client": "4.14.0",
     "@sentry/cli": "2.21.2",
     "@sentry/node": "^7.79.0",
     "@sentry/profiling-node": "^1.2.6",

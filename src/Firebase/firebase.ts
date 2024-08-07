@@ -18,5 +18,5 @@ admin.initializeApp({
     universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
   } as admin.ServiceAccount),
 });
-  
+
 export { admin };

@@ -48,14 +48,14 @@ export const getUserById = async (id: number) => {
 export const updateUserEmail = async (uid: string, email: string) => {
   const user = prismaCtx.prisma.users.update({
     where: {
-      uid: uid
+      uid: uid,
     },
     data: {
-      email: email
-    }
-  })
+      email: email,
+    },
+  });
   return user;
-}
+};
 
 export const updateOrCreateUserBeer = async (
   user_id: number,

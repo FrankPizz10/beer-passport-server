@@ -8,7 +8,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-
 const VALID_API_DURATION = 3; // months
 
 export const decodeUserToken = async (req: Request, res: Response, next: NextFunction) => {
