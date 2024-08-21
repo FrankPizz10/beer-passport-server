@@ -1,16 +1,10 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
 import { deleteUser, getAllUserBasicInfo, updateUserEmail } from '../DBclient/userclient';
-import { Prisma } from '@prisma/client';
 import { checkValidUserName } from '../Utils';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 const userRoutes: Express = express();
-
-// Get all user basic info
-userRoutes.get('/api/users', async (req: Request, res: Response) => {
-  const users = await getAllUserBasicInfo();
-  return res.send(users);
-});
 
 // Get user name by id
 userRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
@@ -31,6 +25,12 @@ userRoutes.get('/api/users/:id', async (req: Request, res: Response) => {
     return res.json({ Error: 'User not found' });
   }
   return res.send(user);
+});
+
+// Get all user basic info
+userRoutes.get('/api/users', async (req: Request, res: Response) => {
+  const users = await getAllUserBasicInfo();
+  return res.send(users);
 });
 
 // Get basic info for user by user name
@@ -54,16 +54,21 @@ userRoutes.get('/api/userbyname/:user_name', async (req: Request, res: Response)
 
 // Get user by uid
 userRoutes.get('/api/userbyuid/', async (req: Request, res: Response) => {
-  const user = await prismaCtx.prisma.users.findUnique({
-    where: {
-      uid: res.locals.user.uid,
-    },
-  });
-  if (!user) {
-    res.statusCode = 404;
-    return res.json({ Error: 'User not found' });
+  try {
+    const user = await prismaCtx.prisma.users.findUnique({
+      where: {
+        uid: res.locals.user.uid,
+      },
+    });
+    if (!user) {
+      res.statusCode = 404;
+      return res.json({ Error: 'User not found' });
+    }
+    return res.send(user);
+  } catch (err) {
+    res.statusCode = 500;
+    return res.json({ Error: 'Something went wrong' });
   }
-  return res.send(user);
 });
 
 // Check if a user or email exists
@@ -119,7 +124,7 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
     });
     return res.send(user);
   } catch (err) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    if (err instanceof PrismaClientKnownRequestError) {
       res.statusCode = 400;
       return res.json({ Error: 'User already exists' });
     }

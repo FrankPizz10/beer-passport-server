@@ -21,7 +21,12 @@ export const decodeUserToken = async (req: Request, res: Response, next: NextFun
   try {
     const decodeValue = await admin.auth().verifyIdToken(token);
     if (decodeValue) {
-      res.locals.user = await getUserByUid(decodeValue.user_id);
+      try {
+        res.locals.user = await getUserByUid(decodeValue.user_id);
+      } catch (e) {
+        res.statusCode = 404;
+        return res.json({ message: 'User not in database' });
+      }
       return next();
     }
     return res.json({ message: 'Unauthorized' });
@@ -43,7 +48,12 @@ export const decodeAdminToken = async (req: Request, res: Response, next: NextFu
       return res.json({ message: 'Unauthorized Admin' });
     }
     if (decodeValue.admin) {
-      res.locals.user = await getUserByUid(decodeValue.user_id);
+      try {
+        res.locals.user = await getUserByUid(decodeValue.user_id);
+      } catch (e) {
+        res.statusCode = 404;
+        return res.json({ message: 'User not in database' });
+      }
       return next();
     }
     return res.json({ message: 'Unauthorized Admin' });
