@@ -4,6 +4,9 @@ import { Request, Response, NextFunction } from 'express';
 import { captureException } from '@sentry/node';
 import { timingSafeEqual, scryptSync } from 'crypto';
 import { getApiKeys } from '../DBclient/apikeysclient';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const VALID_API_DURATION = 3; // months
 
@@ -12,15 +15,24 @@ export const decodeUserToken = async (req: Request, res: Response, next: NextFun
     return res.json({ message: 'Unauthorized' });
   }
   const token = req.headers.authorization.split(' ')[1];
+  if (!token || token === 'undefined') {
+    return res.json({ message: 'Unauthorized' });
+  }
   try {
     const decodeValue = await admin.auth().verifyIdToken(token);
     if (decodeValue) {
-      res.locals.user = await getUserByUid(decodeValue.user_id);
+      try {
+        res.locals.user = await getUserByUid(decodeValue.user_id);
+      } catch (e) {
+        res.statusCode = 404;
+        return res.json({ message: 'User not in database' });
+      }
       return next();
     }
     return res.json({ message: 'Unauthorized' });
   } catch (e) {
     captureException(e);
+    console.log('Failed auth', e);
     return res.json({ message: 'Auth Internal Error' });
   }
 };
@@ -36,7 +48,12 @@ export const decodeAdminToken = async (req: Request, res: Response, next: NextFu
       return res.json({ message: 'Unauthorized Admin' });
     }
     if (decodeValue.admin) {
-      res.locals.user = await getUserByUid(decodeValue.user_id);
+      try {
+        res.locals.user = await getUserByUid(decodeValue.user_id);
+      } catch (e) {
+        res.statusCode = 404;
+        return res.json({ message: 'User not in database' });
+      }
       return next();
     }
     return res.json({ message: 'Unauthorized Admin' });
