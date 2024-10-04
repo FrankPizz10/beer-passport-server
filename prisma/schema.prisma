@@ -47,7 +47,7 @@ model breweries {
   last_mod DateTime @default(now()) @db.Timestamp(0)
   beers    beers[]
 
-  @@unique([name], map: "name")
+  @@unique([name, city, state], map: "unique_brewery")
 }
 
 model breweries_geocode {

@@ -409,14 +409,8 @@ adminRoutes.delete('/admin/styles/:id', async (req: Request, res: Response) => {
 adminRoutes.post('/admin/breweries', async (req: Request, res: Response) => {
   if (
     !req.body.name ||
-    !req.body.address1 ||
     !req.body.city ||
-    !req.body.state ||
-    !req.body.code ||
-    !req.body.country ||
-    !req.body.phone ||
-    !req.body.website ||
-    !req.body.descript
+    !req.body.state
   ) {
     res.statusCode = 400;
     return res.json({ Error: 'Missing required fields' });
