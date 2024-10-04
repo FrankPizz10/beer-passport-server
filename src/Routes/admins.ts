@@ -497,6 +497,37 @@ adminRoutes.delete('/admin/breweries/:id', async (req: Request, res: Response) =
   }
 });
 
+// Bulk Add breweries
+adminRoutes.post('/admin/bulk-brewery', async (req: Request, res: Response) => {
+  try {
+    const breweries = req.body.breweries;
+    const result = await prismaCtx.prisma.breweries.createMany({
+      data: breweries,
+      skipDuplicates: true, // Optional: skips entries that violate unique constraints
+    });
+    res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to add beers' });
+  }
+});
+
+// Bulk add beers
+adminRoutes.post('/admin/bulk-beer', async (req: Request, res: Response) => {
+  try {
+    const beers = req.body.beers;
+    const result = await prismaCtx.prisma.beers.createMany({
+      data: beers,
+      skipDuplicates: true, // Optional: skips entries that violate unique constraints
+    });
+    res.status(200).json({ success: true, data: result });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to add beers' });
+  }
+})
+
+
 // Generate API Key
 adminRoutes.post('/admin/apikey/', async (req: Request, res: Response) => {
   const key = generateKey();
