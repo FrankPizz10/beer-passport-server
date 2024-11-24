@@ -4,6 +4,7 @@ import { decodeAdminToken } from '../Middleware/authUsers';
 import { deleteUser, getAllUsers, getUserByUid } from '../DBclient/userclient';
 import { generateKey, generateSecretHash } from '../Middleware/apiKeys';
 import { admin } from '../Firebase/firebase';
+import { parseId, tryParseDate } from '../DBclient/seedDatabase';
 const adminRoutes: Express = express();
 
 adminRoutes.use('/admin', decodeAdminToken);
@@ -502,7 +503,33 @@ adminRoutes.post('/admin/bulk-brewery', async (req: Request, res: Response) => {
   try {
     const breweries = req.body.breweries;
     const result = await prismaCtx.prisma.breweries.createMany({
-      data: breweries,
+      data: breweries.map(
+        (brewery: {
+          name: string;
+          address1?: string;
+          address2?: string;
+          city?: string;
+          state?: string;
+          code?: string;
+          country?: string;
+          phone?: string;
+          website?: string;
+          descript?: string;
+          last_mod?: string | number | Date;
+        }) => ({
+          name: brewery.name,
+          address1: brewery.address1 || "",
+          address2: brewery.address2 || "",
+          city: brewery.city || "",
+          state: brewery.state || "",
+          code: brewery.code || "",
+          country: brewery.country || "",
+          phone: brewery.phone || "",
+          website: brewery.website || "",
+          descript: brewery.descript || "",
+          last_mod: brewery.last_mod ? new Date(brewery.last_mod) : new Date(),
+        })
+      ),
       skipDuplicates: true, // Optional: skips entries that violate unique constraints
     });
     res.status(200).json({ success: true, data: result });
@@ -517,7 +544,31 @@ adminRoutes.post('/admin/bulk-beer', async (req: Request, res: Response) => {
   try {
     const beers = req.body.beers;
     const result = await prismaCtx.prisma.beers.createMany({
-      data: beers,
+      data: beers.map(
+        (beer: {
+          name: string;
+          brewery_id: string;
+          style_id: string;
+          cat_id: string;
+          abv: string | undefined;
+          ibu: string | undefined;
+          srm: string | undefined;
+          upc: string | undefined;
+          descript: string;
+          last_mod: string;
+        }) => ({
+          name: beer.name,
+          brewery_id: parseId(beer.brewery_id),
+          style_id: parseId(beer.style_id),
+          cat_id: parseId(beer.cat_id),
+          abv: beer.abv != undefined ? parseFloat(beer.abv) : undefined,
+          ibu: beer.ibu != undefined ? parseFloat(beer.ibu) : undefined,
+          srm: beer.srm != undefined ? parseFloat(beer.srm) : undefined,
+          upc: beer.upc != undefined ? parseInt(beer.upc) : undefined,
+          descript: beer.descript,
+          last_mod: tryParseDate(beer.last_mod),
+        }),
+      ),
       skipDuplicates: true, // Optional: skips entries that violate unique constraints
     });
     res.status(200).json({ success: true, data: result });

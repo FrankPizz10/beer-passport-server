@@ -276,7 +276,7 @@ const seedCollections = async (
   console.log('Collections seeded...');
 };
 
-function tryParseDate(last_mod: string): Date {
+export function tryParseDate(last_mod: string): Date {
   try {
     const parsedDate = new Date(last_mod);
 
@@ -291,7 +291,7 @@ function tryParseDate(last_mod: string): Date {
   }
 }
 
-function parseId(id: string): number | undefined {
+export function parseId(id: string): number | undefined {
   if (isNaN(parseInt(id))) {
     console.log('NaN');
     return undefined;
