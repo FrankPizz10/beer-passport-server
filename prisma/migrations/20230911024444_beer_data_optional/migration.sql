@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE `beers` MODIFY `brewery_id` INTEGER NULL DEFAULT 0,
-    MODIFY `cat_id` INTEGER NULL DEFAULT 0,
-    MODIFY `style_id` INTEGER NULL DEFAULT 0;
