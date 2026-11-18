@@ -1,9 +1,49 @@
+// BeerPassport PostgreSQL schema.
+//
+// This schema replaced the MySQL schema on 2026-10-27 (provider switch;
+// decision 002 in the beer-passport-project hub). The port was made from
+// the previous version of this file (master at 9b19504c, inventoried in
+// the hub's research/db-schema-audit.md). Model and field names are
+// unchanged so the generated Prisma client API stays identical.
+//
+// Changes versus the MySQL source, each tied to the schema audit:
+// - Datasource provider: mysql -> postgresql. MySQL-only native types
+//   (@db.Float) are dropped; Prisma Float maps to double precision.
+// - F-2: beers.upc is String? (barcodes are identifiers, not quantities).
+// - beers.discontinued added: the catalog cleanup's flag becomes a column.
+// - F-7: beverage_images model added (image provenance for the relaunch).
+// - F-5 (P0): destructive cascades removed. user_beers -> beers and
+//   user_badges -> collections are now Restrict, so deleting a catalog beer
+//   or a collection cannot wipe user history or earned badges. Cascades on
+//   user deletion remain (account deletion should remove personal data).
+// - F-4 (P0): api_keys.key is @unique with no empty-string default; name,
+//   revoked, created_at, last_used_at added for rotation/revocation.
+// - F-11: users gains created_at/updated_at. The @updatedAt fields also
+//   carry @default(now()) so raw SQL loads (the EFS dump import, COPY
+//   jobs) can insert rows without supplying them; the Prisma client
+//   still maintains updated_at on its own writes.
+// - F-13: redundant @unique on users.id removed.
+// - F-9: styles.cat_id loses its magic @default(11); breweries.add_user is
+//   nullable (0 meant "unknown" and now imports as NULL).
+// - F-1 is enforced in the init migration SQL by a CHECK constraint
+//   (user_1 < user_2) that Prisma cannot model; see prisma/migrations/.
+// - The MySQL schema named both the breweries and collections unique
+//   constraints "name"; Postgres index names are schema-global, so they are
+//   renamed to "breweries_name" and "collections_name" here. Likewise, the
+//   MySQL schema reused FK constraint names as index names; the Postgres
+//   indexes carry an "_idx" suffix so both can coexist.
+//
+// Deferred to the Milestone 3 schema pass (audit P1/P2, documented in
+// the hub's db/README.md): F-3 notifications uniqueness, F-6
+// want-to-try state, F-8 breweries_geocode resolution, F-12
+// multi-device push tokens.
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -13,22 +53,43 @@ model beers {
   name             String             @default("") @db.VarChar(255)
   cat_id           Int?
   style_id         Int?
-  abv              Float?             @db.Float
-  ibu              Float?             @db.Float
-  srm              Float?             @db.Float
-  upc              Int?
+  abv              Float?
+  ibu              Float?
+  srm              Float?
+  upc              String?            @db.VarChar(255)
   descript         String?            @db.Text
+  discontinued     Boolean            @default(false)
   last_mod         DateTime           @default(now()) @db.Timestamp(0)
   brewery          breweries?         @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_brewery_id")
   category         categories?        @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_cat_id")
   style            styles?            @relation(fields: [style_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_style_id")
+  beverage_images  beverage_images[]
   collection_beers collection_beers[]
   user_beers       user_beers[]
 
   @@unique([brewery_id, name])
-  @@index([brewery_id], map: "fk_beers_brewery_id")
-  @@index([cat_id], map: "fk_beers_cat_id")
-  @@index([style_id], map: "fk_beers_style_id")
+  @@index([brewery_id], map: "fk_beers_brewery_id_idx")
+  @@index([cat_id], map: "fk_beers_cat_id_idx")
+  @@index([style_id], map: "fk_beers_style_id_idx")
+}
+
+model beverage_images {
+  id           Int       @id @default(autoincrement())
+  beverage_id  Int
+  source_type  String    @default("") @db.VarChar(50)
+  source_url   String    @default("") @db.VarChar(1024)
+  storage_key  String    @default("") @db.VarChar(512)
+  license_type String    @default("") @db.VarChar(100)
+  attribution  String    @default("") @db.VarChar(512)
+  license_url  String    @default("") @db.VarChar(1024)
+  status       String    @default("pending") @db.VarChar(20)
+  verified_at  DateTime? @db.Timestamp(0)
+  created_at   DateTime  @default(now()) @db.Timestamp(0)
+  updated_at   DateTime  @default(now()) @updatedAt @db.Timestamp(0)
+  beers        beers     @relation(fields: [beverage_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_beverage_images_beer_id")
+
+  @@index([beverage_id], map: "fk_beverage_images_beer_id_idx")
+  @@index([status], map: "beverage_images_status")
 }
 
 model breweries {
@@ -43,18 +104,18 @@ model breweries {
   phone    String   @default("") @db.VarChar(50)
   website  String   @default("") @db.VarChar(255)
   descript String   @db.Text
-  add_user Int      @default(0)
+  add_user Int?
   last_mod DateTime @default(now()) @db.Timestamp(0)
   beers    beers[]
 
-  @@unique([name], map: "name")
+  @@unique([name], map: "breweries_name")
 }
 
 model breweries_geocode {
   id         Int    @id @default(autoincrement())
   brewery_id Int    @default(0)
-  latitude   Float  @default(0) @db.Float
-  longitude  Float  @default(0) @db.Float
+  latitude   Float  @default(0)
+  longitude  Float  @default(0)
   accuracy   String @default("") @db.VarChar(255)
 }
 
@@ -70,14 +131,14 @@ model categories {
 
 model styles {
   id         Int         @id @default(autoincrement())
-  cat_id     Int?        @default(11)
+  cat_id     Int?
   style_name String      @default("") @db.VarChar(255)
   last_mod   DateTime    @default(now()) @db.Timestamp(0)
   category   categories? @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_styles_cat_id")
   beers      beers[]
 
   @@unique([style_name], map: "style_name")
-  @@index([cat_id], map: "fk_styles_cat_id")
+  @@index([cat_id], map: "fk_styles_cat_id_idx")
 }
 
 model user_beers {
@@ -88,21 +149,23 @@ model user_beers {
   created_at DateTime? @default(now()) @db.Timestamp(0)
   updated_at DateTime? @default(now()) @db.Timestamp(0)
   users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_beers_user_id")
-  beers      beers     @relation(fields: [beer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_beers_beer_id")
+  beers      beers     @relation(fields: [beer_id], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "fk_user_beers_beer_id")
 
   @@unique([user_id, beer_id])
-  @@index([beer_id], map: "fk_user_beers_beer_id")
-  @@index([user_id], map: "fk_user_beers_user_id")
+  @@index([beer_id], map: "fk_user_beers_beer_id_idx")
+  @@index([user_id], map: "fk_user_beers_user_id_idx")
 }
 
 model users {
-  id                            Int             @id @unique(map: "id") @default(autoincrement())
+  id                            Int             @id @default(autoincrement())
   uid                           String          @unique(map: "uid") @db.VarChar(255)
   notification_token            String?         @unique @db.VarChar(255)
   age                           Int
   email                         String          @unique(map: "email") @db.VarChar(255)
   user_name                     String          @unique(map: "user_name") @db.VarChar(255)
   private                       Boolean         @default(false)
+  created_at                    DateTime        @default(now()) @db.Timestamp(0)
+  updated_at                    DateTime        @default(now()) @updatedAt @db.Timestamp(0)
   friends_friends_user_1Tousers friends[]       @relation("friends_user_1Tousers")
   friends_friends_user_2Tousers friends[]       @relation("friends_user_2Tousers")
   user_badges                   user_badges[]
@@ -120,7 +183,7 @@ model collections {
   collection_beers collection_beers[]
   user_badges      user_badges[]
 
-  @@unique([name], map: "name")
+  @@unique([name], map: "collections_name")
 }
 
 model user_badges {
@@ -128,11 +191,11 @@ model user_badges {
   user_id       Int
   collection_id Int
   earned        Boolean     @default(false)
-  progress      Float       @default(0) @db.Float
+  progress      Float       @default(0)
   created_at    DateTime    @default(now()) @db.Timestamp(0)
   updated_at    DateTime    @default(now()) @db.Timestamp(0)
   users         users       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_badges_user_id")
-  collections   collections @relation(fields: [collection_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_badges_collection_id")
+  collections   collections @relation(fields: [collection_id], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "fk_user_badges_collection_id")
 
   @@unique([user_id, collection_id], map: "user_id_collection_id")
   @@index([collection_id], map: "collection_id")
@@ -175,7 +238,7 @@ model notifications {
   users      users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notifications_user_id")
 
   @@unique([user_id, message], map: "unique_user_id_message")
-  @@index([user_id], map: "fk_notifications_user_id")
+  @@index([user_id], map: "fk_notifications_user_id_idx")
 }
 
 enum NotificationType {
@@ -184,7 +247,11 @@ enum NotificationType {
 }
 
 model api_keys {
-  id        Int      @id @default(autoincrement())
-  key       String   @default("") @db.VarChar(255)
-  last_mod  DateTime @default(now()) @db.Timestamp(0)
+  id           Int       @id @default(autoincrement())
+  key          String    @unique @db.VarChar(255)
+  name         String    @default("") @db.VarChar(255)
+  revoked      Boolean   @default(false)
+  created_at   DateTime  @default(now()) @db.Timestamp(0)
+  last_used_at DateTime? @db.Timestamp(0)
+  last_mod     DateTime  @default(now()) @db.Timestamp(0)
 }
