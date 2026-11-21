@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "npx tsc",
     "build:prod": "npx tsc && npm run sentry:sourcemapsProd",
     "build:dev": "npx tsc && npm run sentry:sourcemapsDev",
     "start:prod": "node dist/src/Environment/environmentVariablesClient.js && node dist/src/Environment/healthcheck.js && npx prisma migrate deploy && node dist/src/index.js",
@@ -59,7 +60,7 @@
     "jest-mock-extended": "^3.0.4",
     "nodemon": "^2.0.22",
     "prettier": "2.8.8",
-    "prisma": "4.11.0",
+    "prisma": "4.14.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
   }

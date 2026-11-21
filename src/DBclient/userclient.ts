@@ -274,7 +274,20 @@ export const getFriendsByUserId = async (user_id: number) => {
       user_1: user_id,
     },
     include: {
-      users_friends_user_2Tousers: true,
+      // Field-limited projection (QA finding F-3): this used to include the
+      // complete users row, leaking every friend's email, Firebase uid, age,
+      // and Expo notification_token to anyone who friended them. The mobile
+      // client (beer-passport, Models/SQLData.ts) defines its User type as
+      // exactly { id, user_name, private }, and FriendScreen reads only id
+      // and user_name from this object, so those three fields are the
+      // approved set. Do not widen without a client need.
+      users_friends_user_2Tousers: {
+        select: {
+          id: true,
+          user_name: true,
+          private: true,
+        },
+      },
     },
   });
   return friends;
@@ -290,11 +303,15 @@ export const deleteUser = async (id: string, ctx: Context) => {
 };
 
 export const addFriend = async (user1: number, user2: number) => {
+  // Normalize pair ordering (QA finding F-6): the PostgreSQL schema carries
+  // the check constraint friends_user_order_check (user_1 < user_2), so the
+  // smaller id must always be stored as user_1. Inserting the raw
+  // (caller, target) pair violated the constraint whenever the target's id
+  // was smaller than the caller's, failing with a generic 400.
+  const ordered =
+    user1 < user2 ? { user_1: user1, user_2: user2 } : { user_1: user2, user_2: user1 };
   const friend = await prismaCtx.prisma.friends.create({
-    data: {
-      user_1: user1,
-      user_2: user2,
-    },
+    data: ordered,
   });
   return friend;
 };
