@@ -23,10 +23,27 @@ migration transaction instead.
 
 ## Rollback
 
-This migration is additive only: one extension, one nullable column, and
-three indexes. It alters no existing column and deletes no data (the
-one-time UPDATE only fills the new column). Prisma migrations have no
-down step, so rollback is manual SQL, run in this order:
+Schema rollback versus data rollback: this migration is additive only, one
+extension, one nullable column, and three indexes. It alters no existing
+column and deletes no data (the one-time UPDATE only fills the new
+column), so there is no data rollback to perform: no pre-migration data
+can be lost by rolling back, and no data restore is needed afterward.
+Rolling back removes the `search_vector` column and its computed values
+(schema rollback only); every catalog row and every other column is
+untouched. The discovery search endpoint depends on the column and the
+indexes, so it stops working until the migration is re-applied.
+
+Prerequisites before rolling back:
+
+- Take a database backup or snapshot first, as with any schema change.
+- Stop or drain the application so nothing queries `search_vector` or the
+  three indexes during the rollback.
+- Connect with a role that owns the `beers` and `breweries` tables.
+- Run the SQL in a single transaction where possible so a failure leaves
+  the schema unchanged.
+
+Prisma migrations have no down step, so rollback is manual SQL, run in
+this order:
 
 ```sql
 DROP INDEX IF EXISTS "beers_search_vector_idx";
@@ -48,3 +65,24 @@ before removing it, because other features may rely on pg_trgm:
 ```sql
 DROP EXTENSION IF EXISTS pg_trgm;
 ```
+
+Post-rollback verification:
+
+- `\d "beers"` shows no `search_vector` column, and the three index names
+  no longer appear in `pg_indexes` for `beers` or `breweries`.
+- Row counts are unchanged (the catalog baseline is 14 categories, 147
+  styles, 1,339 breweries, 5,894 beers).
+- `prisma migrate status` reports the migration as rolled back, matching
+  the resolve step above, and `prisma validate` passes on the schema
+  without the field.
+
+Limitations:
+
+- The rollback is manual; there is no automated down migration, and the
+  steps above are the supported path.
+- Restoring discovery search after a rollback means re-applying the
+  migration and then running `scripts/refresh-search-vector.sql` so every
+  row's `search_vector` is repopulated; the migration's UPDATE alone only
+  covers rows present when it runs.
+- Dropping the indexes removes the fast search paths; while rolled back,
+  the trigram and full-text queries have no index support.
