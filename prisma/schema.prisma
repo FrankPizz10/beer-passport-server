@@ -58,6 +58,11 @@ model beers {
   srm              Float?
   upc              String?            @db.VarChar(255)
   descript         String?            @db.Text
+  // Weighted full-text search vector (beer name A, brewery name B, style
+  // name C), added and populated by migration 20261121000001_discovery_search
+  // for the discovery pilot. Maintained by that migration and, from
+  // Milestone 2 on, by the import pipeline; not writable through Prisma.
+  search_vector    Unsupported("tsvector")?
   discontinued     Boolean            @default(false)
   last_mod         DateTime           @default(now()) @db.Timestamp(0)
   brewery          breweries?         @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_brewery_id")
