@@ -1,0 +1,897 @@
+{
+  "generated_from": "live local catalog (5,894 beers), discovery handlers",
+  "search_90_minute": {
+    "results": [
+      {
+        "id": 3951,
+        "name": "90 Minute IPA",
+        "brewery": {
+          "id": 459,
+          "name": "Dogfish Head Craft Brewery"
+        },
+        "style": {
+          "id": 32,
+          "name": "Imperial or Double India Pale Ale"
+        },
+        "category": {
+          "id": 3,
+          "name": "North American Ale"
+        },
+        "abv": 9,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 3952,
+        "name": "60 Minute IPA",
+        "brewery": {
+          "id": 459,
+          "name": "Dogfish Head Craft Brewery"
+        },
+        "style": {
+          "id": 31,
+          "name": "American-Style India Pale Ale"
+        },
+        "category": {
+          "id": 3,
+          "name": "North American Ale"
+        },
+        "abv": 6,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 5391,
+        "name": "75 Minute IPA",
+        "brewery": {
+          "id": 459,
+          "name": "Dogfish Head Craft Brewery"
+        },
+        "style": {
+          "id": 31,
+          "name": "American-Style India Pale Ale"
+        },
+        "category": {
+          "id": 3,
+          "name": "North American Ale"
+        },
+        "abv": 7.5,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 3950,
+        "name": "120 Minute IPA",
+        "brewery": {
+          "id": 459,
+          "name": "Dogfish Head Craft Brewery"
+        },
+        "style": {
+          "id": 32,
+          "name": "Imperial or Double India Pale Ale"
+        },
+        "category": {
+          "id": 3,
+          "name": "North American Ale"
+        },
+        "abv": 18,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 208,
+        "name": "90 Shilling",
+        "brewery": {
+          "id": 935,
+          "name": "Odell Brewing"
+        },
+        "style": {
+          "id": 7,
+          "name": "Scottish-Style Light Ale"
+        },
+        "category": {
+          "id": 1,
+          "name": "British Ale"
+        },
+        "abv": 5.3,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 3811,
+        "name": "Miller Lite",
+        "brewery": {
+          "id": 863,
+          "name": "Miller Brewing"
+        },
+        "style": {
+          "id": 96,
+          "name": "American-Style Light Lager"
+        },
+        "category": {
+          "id": 8,
+          "name": "North American Lager"
+        },
+        "abv": 4.2,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 1056,
+        "name": "Chocolate Mint Stout",
+        "brewery": {
+          "id": 1169,
+          "name": "South Shore Brewery"
+        },
+        "style": {
+          "id": 142,
+          "name": "Other"
+        },
+        "category": {
+          "id": 11,
+          "name": "Other Style"
+        },
+        "abv": null,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 5634,
+        "name": "Mirror Mirror",
+        "brewery": {
+          "id": 441,
+          "name": "Deschutes Brewery"
+        },
+        "style": {
+          "id": 35,
+          "name": "American-Style Barley Wine Ale"
+        },
+        "category": {
+          "id": 3,
+          "name": "North American Ale"
+        },
+        "abv": 11,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 3445,
+        "name": "Iron Mine Pale Ale",
+        "brewery": {
+          "id": 1276,
+          "name": "Top of the Hill Restaurant and Brewery"
+        },
+        "style": {
+          "id": 26,
+          "name": "American-Style Pale Ale"
+        },
+        "category": {
+          "id": 3,
+          "name": "North American Ale"
+        },
+        "abv": null,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 4044,
+        "name": "Maudite",
+        "brewery": {
+          "id": 1307,
+          "name": "Unibroue"
+        },
+        "style": {
+          "id": 66,
+          "name": "Belgian-Style Dark Strong Ale"
+        },
+        "category": {
+          "id": 5,
+          "name": "Belgian and French Ale"
+        },
+        "abv": 8,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 179,
+        "name": "Beer Geek Breakfast",
+        "brewery": {
+          "id": 859,
+          "name": "Mikkeller"
+        },
+        "style": {
+          "id": 43,
+          "name": "American-Style Imperial Stout"
+        },
+        "category": {
+          "id": 3,
+          "name": "North American Ale"
+        },
+        "abv": 7.5,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 3200,
+        "name": "Ruby Mild",
+        "brewery": {
+          "id": 585,
+          "name": "Goose Island Beer Company - Clybourn"
+        },
+        "style": {
+          "id": 10,
+          "name": "English-Style Pale Mild Ale"
+        },
+        "category": {
+          "id": 1,
+          "name": "British Ale"
+        },
+        "abv": null,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 3745,
+        "name": "Best Mild",
+        "brewery": {
+          "id": 1382,
+          "name": "Yamhill Brewing"
+        },
+        "style": {
+          "id": 10,
+          "name": "English-Style Pale Mild Ale"
+        },
+        "category": {
+          "id": 1,
+          "name": "British Ale"
+        },
+        "abv": null,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 4214,
+        "name": "Dark Mild",
+        "brewery": {
+          "id": 247,
+          "name": "Brewery Creek Brewing"
+        },
+        "style": {
+          "id": 10,
+          "name": "English-Style Pale Mild Ale"
+        },
+        "category": {
+          "id": 1,
+          "name": "British Ale"
+        },
+        "abv": 3.5,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 5824,
+        "name": "Simcoe Single Hop IPA",
+        "brewery": {
+          "id": 859,
+          "name": "Mikkeller"
+        },
+        "style": {
+          "id": 31,
+          "name": "American-Style India Pale Ale"
+        },
+        "category": {
+          "id": 3,
+          "name": "North American Ale"
+        },
+        "abv": 6.9,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 5890,
+        "name": "Dark Mild",
+        "brewery": {
+          "id": 1412,
+          "name": "Cains"
+        },
+        "style": {
+          "id": 11,
+          "name": "English-Style Dark Mild Ale"
+        },
+        "category": {
+          "id": 1,
+          "name": "British Ale"
+        },
+        "abv": 3.2,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 711,
+        "name": "Nebraska Bitter",
+        "brewery": {
+          "id": 842,
+          "name": "McMenamins Mill Creek"
+        },
+        "style": {
+          "id": 142,
+          "name": "Other"
+        },
+        "category": {
+          "id": 11,
+          "name": "Other Style"
+        },
+        "abv": null,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 712,
+        "name": "Irish Stout",
+        "brewery": {
+          "id": 842,
+          "name": "McMenamins Mill Creek"
+        },
+        "style": {
+          "id": 42,
+          "name": "American-Style Stout"
+        },
+        "category": {
+          "id": 3,
+          "name": "North American Ale"
+        },
+        "abv": null,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 713,
+        "name": "I.M. Pale",
+        "brewery": {
+          "id": 842,
+          "name": "McMenamins Mill Creek"
+        },
+        "style": {
+          "id": 26,
+          "name": "American-Style Pale Ale"
+        },
+        "category": {
+          "id": 3,
+          "name": "North American Ale"
+        },
+        "abv": null,
+        "image_url": null,
+        "image_kind": "initials"
+      },
+      {
+        "id": 714,
+        "name": "Wheat Beer",
+        "brewery": {
+          "id": 842,
+          "name": "McMenamins Mill Creek"
+        },
+        "style": {
+          "id": 95,
+          "name": "American-Style Lager"
+        },
+        "category": {
+          "id": 8,
+          "name": "North American Lager"
+        },
+        "abv": null,
+        "image_url": null,
+        "image_kind": "initials"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "page_size": 20,
+      "total_results": 37,
+      "total_pages": 2
+    }
+  },
+  "browse": {
+    "shelves": [
+      {
+        "id": "popular_breweries",
+        "title": "Popular breweries",
+        "kind": "brewery",
+        "items": [
+          {
+            "id": 157,
+            "name": "Boston Beer Company",
+            "beer_count": 75
+          },
+          {
+            "id": 858,
+            "name": "Midnight Sun Brewing Co.",
+            "beer_count": 57
+          },
+          {
+            "id": 1072,
+            "name": "Rogue Ales",
+            "beer_count": 49
+          },
+          {
+            "id": 1286,
+            "name": "Troegs Brewing",
+            "beer_count": 37
+          },
+          {
+            "id": 483,
+            "name": "Egan Brewing",
+            "beer_count": 37
+          },
+          {
+            "id": 44,
+            "name": "Anheuser-Busch",
+            "beer_count": 35
+          },
+          {
+            "id": 1268,
+            "name": "Titletown Brewing",
+            "beer_count": 34
+          },
+          {
+            "id": 512,
+            "name": "F.X. Matt Brewing",
+            "beer_count": 34
+          },
+          {
+            "id": 1142,
+            "name": "Sierra Nevada Brewing Co.",
+            "beer_count": 33
+          },
+          {
+            "id": 1173,
+            "name": "Southern Tier Brewing Co",
+            "beer_count": 31
+          }
+        ]
+      },
+      {
+        "id": "styles_to_explore",
+        "title": "Styles to explore",
+        "kind": "style",
+        "items": [
+          {
+            "id": 142,
+            "name": "Other",
+            "beer_count": 1459
+          },
+          {
+            "id": 26,
+            "name": "American-Style Pale Ale",
+            "beer_count": 511
+          },
+          {
+            "id": 95,
+            "name": "American-Style Lager",
+            "beer_count": 495
+          },
+          {
+            "id": 42,
+            "name": "American-Style Stout",
+            "beer_count": 324
+          },
+          {
+            "id": 33,
+            "name": "American-Style Amber/Red Ale",
+            "beer_count": 295
+          },
+          {
+            "id": 31,
+            "name": "American-Style India Pale Ale",
+            "beer_count": 294
+          },
+          {
+            "id": 25,
+            "name": "Porter",
+            "beer_count": 260
+          },
+          {
+            "id": 38,
+            "name": "American-Style Brown Ale",
+            "beer_count": 240
+          },
+          {
+            "id": 50,
+            "name": "South German-Style Hefeweizen",
+            "beer_count": 178
+          },
+          {
+            "id": 90,
+            "name": "Traditional German-Style Bock",
+            "beer_count": 159
+          }
+        ]
+      },
+      {
+        "id": "by_category",
+        "title": "Browse by category",
+        "kind": "category",
+        "items": [
+          {
+            "id": 5,
+            "name": "Belgian and French Ale",
+            "beer_count": 321
+          },
+          {
+            "id": 1,
+            "name": "British Ale",
+            "beer_count": 310
+          },
+          {
+            "id": 13,
+            "name": "Cider",
+            "beer_count": 2
+          },
+          {
+            "id": 4,
+            "name": "German Ale",
+            "beer_count": 213
+          },
+          {
+            "id": 7,
+            "name": "German Lager",
+            "beer_count": 429
+          },
+          {
+            "id": 14,
+            "name": "Hard Iced Tea",
+            "beer_count": 14
+          },
+          {
+            "id": 6,
+            "name": "International Ale",
+            "beer_count": 0
+          },
+          {
+            "id": 10,
+            "name": "International Lager",
+            "beer_count": 2
+          },
+          {
+            "id": 2,
+            "name": "Irish Ale",
+            "beer_count": 283
+          },
+          {
+            "id": 3,
+            "name": "North American Ale",
+            "beer_count": 1967
+          },
+          {
+            "id": 8,
+            "name": "North American Lager",
+            "beer_count": 551
+          },
+          {
+            "id": 9,
+            "name": "Other Lager",
+            "beer_count": 5
+          },
+          {
+            "id": 11,
+            "name": "Other Style",
+            "beer_count": 1743
+          },
+          {
+            "id": 12,
+            "name": "Seltzer",
+            "beer_count": 54
+          }
+        ]
+      },
+      {
+        "id": "newest_additions",
+        "title": "Newest additions",
+        "kind": "beverage",
+        "items": [
+          {
+            "id": 6055,
+            "name": "Samuel Adams Jack-O Pumpkin",
+            "brewery": {
+              "id": 157,
+              "name": "Boston Beer Company"
+            },
+            "style": {
+              "id": 95,
+              "name": "American-Style Lager"
+            },
+            "category": {
+              "id": 8,
+              "name": "North American Lager"
+            },
+            "abv": 4.4,
+            "image_url": null,
+            "image_kind": "initials"
+          },
+          {
+            "id": 6052,
+            "name": "Busch",
+            "brewery": {
+              "id": 44,
+              "name": "Anheuser-Busch"
+            },
+            "style": {
+              "id": 95,
+              "name": "American-Style Lager"
+            },
+            "category": {
+              "id": 8,
+              "name": "North American Lager"
+            },
+            "abv": 4.3,
+            "image_url": null,
+            "image_kind": "initials"
+          },
+          {
+            "id": 6054,
+            "name": "Busch Light Peach",
+            "brewery": {
+              "id": 44,
+              "name": "Anheuser-Busch"
+            },
+            "style": {
+              "id": 109,
+              "name": "Tropical-Style Light Lager"
+            },
+            "category": {
+              "id": 8,
+              "name": "North American Lager"
+            },
+            "abv": 4.1,
+            "image_url": null,
+            "image_kind": "initials"
+          },
+          {
+            "id": 6053,
+            "name": "Busch Light",
+            "brewery": {
+              "id": 44,
+              "name": "Anheuser-Busch"
+            },
+            "style": {
+              "id": 96,
+              "name": "American-Style Light Lager"
+            },
+            "category": {
+              "id": 8,
+              "name": "North American Lager"
+            },
+            "abv": 4.1,
+            "image_url": null,
+            "image_kind": "initials"
+          },
+          {
+            "id": 6051,
+            "name": "Happy Dad - Fruit Punch",
+            "brewery": {
+              "id": 1438,
+              "name": "Happy Dad"
+            },
+            "style": {
+              "id": 143,
+              "name": "Seltzer"
+            },
+            "category": {
+              "id": 12,
+              "name": "Seltzer"
+            },
+            "abv": 5,
+            "image_url": null,
+            "image_kind": "initials"
+          },
+          {
+            "id": 6050,
+            "name": "Fishers Island Lemonade - Pink Flamgino",
+            "brewery": {
+              "id": 1441,
+              "name": "Fishers Island Lemonade"
+            },
+            "style": {
+              "id": 142,
+              "name": "Other"
+            },
+            "category": {
+              "id": 11,
+              "name": "Other Style"
+            },
+            "abv": 7,
+            "image_url": null,
+            "image_kind": "initials"
+          },
+          {
+            "id": 6049,
+            "name": "Fishers Island Lemonade - Half and Half",
+            "brewery": {
+              "id": 1441,
+              "name": "Fishers Island Lemonade"
+            },
+            "style": {
+              "id": 142,
+              "name": "Other"
+            },
+            "category": {
+              "id": 11,
+              "name": "Other Style"
+            },
+            "abv": 7,
+            "image_url": null,
+            "image_kind": "initials"
+          },
+          {
+            "id": 6043,
+            "name": "Cutwater - Vodka Mule",
+            "brewery": {
+              "id": 1439,
+              "name": "Cutwater"
+            },
+            "style": {
+              "id": 143,
+              "name": "Seltzer"
+            },
+            "category": {
+              "id": 12,
+              "name": "Seltzer"
+            },
+            "abv": 7,
+            "image_url": null,
+            "image_kind": "initials"
+          },
+          {
+            "id": 6042,
+            "name": "Cutwater - Tiki Rum Mai Tai",
+            "brewery": {
+              "id": 1439,
+              "name": "Cutwater"
+            },
+            "style": {
+              "id": 143,
+              "name": "Seltzer"
+            },
+            "category": {
+              "id": 12,
+              "name": "Seltzer"
+            },
+            "abv": 12.5,
+            "image_url": null,
+            "image_kind": "initials"
+          },
+          {
+            "id": 6048,
+            "name": "Fishers Island Lemonade - Nude Peach",
+            "brewery": {
+              "id": 1441,
+              "name": "Fishers Island Lemonade"
+            },
+            "style": {
+              "id": 142,
+              "name": "Other"
+            },
+            "category": {
+              "id": 11,
+              "name": "Other Style"
+            },
+            "abv": 7,
+            "image_url": null,
+            "image_kind": "initials"
+          }
+        ]
+      }
+    ]
+  },
+  "beverage_3951": {
+    "id": 3951,
+    "name": "90 Minute IPA",
+    "brewery": {
+      "id": 459,
+      "name": "Dogfish Head Craft Brewery",
+      "city": "Milton",
+      "state": "Delaware",
+      "country": "United States",
+      "website": "http://www.dogfish.com"
+    },
+    "style": {
+      "id": 32,
+      "name": "Imperial or Double India Pale Ale"
+    },
+    "category": {
+      "id": 3,
+      "name": "North American Ale"
+    },
+    "abv": 9,
+    "ibu": null,
+    "srm": null,
+    "description": "Esquire Magazine calls our 90 Minute .IPA., \\perhaps the best I.P.A. in America.\\\" An Imperial I.P.A. brewed to be savored from a snifter. A big beer with a great malt backbone that stands up to the extreme hopping rate. This beer is an excellent candidate for use with Randall The Enamel Animal!\"",
+    "discontinued": false,
+    "image_url": null,
+    "image_kind": "initials",
+    "image_provenance": null
+  },
+  "beverage_3914": {
+    "id": 3914,
+    "name": "Samuel Adams Boston Lager",
+    "brewery": {
+      "id": 157,
+      "name": "Boston Beer Company",
+      "city": "Boston",
+      "state": "Massachusetts",
+      "country": "United States",
+      "website": "http://www.samueladams.com/"
+    },
+    "style": {
+      "id": 95,
+      "name": "American-Style Lager"
+    },
+    "category": {
+      "id": 8,
+      "name": "North American Lager"
+    },
+    "abv": 4.75,
+    "ibu": null,
+    "srm": null,
+    "description": "Samuel Adams Boston Lager is the best example of the fundamental characteristics of a great beer, offering a full, rich flavor that is both balanced and complex. It is brewed using a decoction mash, a time consuming, traditional four vessel brewing process discarded by many contemporary brewers. This process brings forth a rich sweetness from the malt that makes it well worth the effort. Boston Lager also uses only the finest of ingredients including two row barley, as well as German Noble aroma hops. The exclusive use of two row barley not only imparts a full, smooth body but also gives the beer a wide spectrum of malt flavor ranging from slightly sweet to caramel to slightly roasted. The Noble hops varieties, Hallertau Mittelfruh and Tettnang Tettnanger, add a wide range of floral, piney and citrus notes, which are present from the aroma, through the flavor, to the lingering smooth finish. We take great pride in the Noble hops used in our beers. They are hand selected by Jim Koch and our other brewers from the world's oldest hops growing area. Among the world's most expensive, they cost twenty times as much as other hops.",
+    "discontinued": false,
+    "image_url": null,
+    "image_kind": "initials",
+    "image_provenance": null
+  },
+  "beverage_4271": {
+    "id": 4271,
+    "name": "Sierra Nevada Pale Ale",
+    "brewery": {
+      "id": 1142,
+      "name": "Sierra Nevada Brewing Co.",
+      "city": "Chico",
+      "state": "California",
+      "country": "United States",
+      "website": "http://www.sierranevada.com/"
+    },
+    "style": {
+      "id": 26,
+      "name": "American-Style Pale Ale"
+    },
+    "category": {
+      "id": 3,
+      "name": "North American Ale"
+    },
+    "abv": 5.6,
+    "ibu": null,
+    "srm": null,
+    "description": "From the Sierra Nevada Brewing Co. website:\nOur most popular beer, Sierra Nevada Pale Ale, is a delightful interpretation of a classic style. It has a deep amber color and an exceptionally full-bodied, complex character. Generous quantities of premium Cascade hops give the Pale Ale its fragrant bouquet and spicy flavor. \n\nâ€œSierra Nevada Pale Ale is the flagship beer, the one that made Chico famous. It is a flawless beer that opens with bright, perky high notes of maltiness and orange blossom and segues into a delectable hoppiness.â€\n\nâ€“ Elaine Louie, Premier Beerâ€”A Guide to America's Best Bottled Microbrews\n \n   \n  \nGOLD MEDAL WINNER\nGreat American Beer Festival (American Pale Ale: 1995, 1994, 1993; \nClassic English Pale Ale: 1992; Pale Ale: 1990, 1989, 1987)",
+    "discontinued": false,
+    "image_url": null,
+    "image_kind": "initials",
+    "image_provenance": null
+  },
+  "beverage_412_null_description": {
+    "id": 412,
+    "name": "Organic Belgian Ale",
+    "brewery": {
+      "id": 130,
+      "name": "Bison Brewing",
+      "city": "Berkeley",
+      "state": "California",
+      "country": "United States",
+      "website": null
+    },
+    "style": {
+      "id": 142,
+      "name": "Other"
+    },
+    "category": {
+      "id": 11,
+      "name": "Other Style"
+    },
+    "abv": null,
+    "ibu": null,
+    "srm": null,
+    "description": null,
+    "discontinued": false,
+    "image_url": null,
+    "image_kind": "initials",
+    "image_provenance": null
+  }
+}

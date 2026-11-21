@@ -19,6 +19,7 @@ import * as Sentry from '@sentry/node';
 import { ProfilingIntegration } from '@sentry/profiling-node';
 import { Expo } from 'expo-server-sdk';
 import secureRoutes from './Routes/secure';
+import discoveryRoutes from './Routes/discovery';
 
 dotenv.config();
 
@@ -58,6 +59,11 @@ app.use(Sentry.Handlers.errorHandler());
 app.use(bodyParser.json());
 app.use(cors());
 
+// The /api/v1 discovery router is mounted before the generic /api mount so
+// its routes pass through decodeUserToken exactly once (the /api prefix
+// would otherwise match /api/v1 as well). Unmatched /api/v1 paths fall
+// through to the legacy stack and 404 there.
+app.use('/api/v1', decodeUserToken, discoveryRoutes);
 app.use('/api', decodeUserToken);
 app.use('/secure', decodeAPIKey);
 app.use(adminRoutes);
