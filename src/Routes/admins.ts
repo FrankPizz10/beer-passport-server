@@ -98,7 +98,7 @@ adminRoutes.post('/admin/beers', async (req: Request, res: Response) => {
         abv: req.body.abv != null ? parseFloat(req.body.abv) : null,
         ibu: req.body.ibu != null ? parseInt(req.body.ibu) : null,
         srm: req.body.srm != null ? parseInt(req.body.srm) : null,
-        upc: req.body.upc != null ? parseInt(req.body.upc) : null,
+        upc: req.body.upc != null ? String(req.body.upc) : null,
         descript: req.body.descript,
       },
     });
@@ -129,7 +129,7 @@ adminRoutes.put('/admin/beers/:id', async (req: Request, res: Response) => {
         abv: req.body.abv != null ? parseFloat(req.body.abv) : null,
         ibu: req.body.ibu != null ? parseInt(req.body.ibu) : null,
         srm: req.body.srm != null ? parseInt(req.body.srm) : null,
-        upc: req.body.upc != null ? parseInt(req.body.upc) : null,
+        upc: req.body.upc != null ? String(req.body.upc) : null,
         descript: req.body.descript,
         last_mod: new Date(),
       },
