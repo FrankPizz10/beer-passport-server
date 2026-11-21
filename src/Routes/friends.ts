@@ -25,6 +25,14 @@ firendRoutes.get('/api/friends/:user2', async (req: Request, res: Response) => {
         },
       },
     },
+    // Field-limited projection (QA finding F-3): without a select this
+    // returned complete user rows (email, uid, notification_token). Same
+    // approved field set as getFriendsByUserId.
+    select: {
+      id: true,
+      user_name: true,
+      private: true,
+    },
   });
   return res.send(friends);
 });
@@ -58,7 +66,10 @@ firendRoutes.post('/api/friends/:user2', async (req: Request, res: Response) => 
   if (!req.params.user2 || isNaN(parseInt(req.params.user2))) {
     return res.status(400).json({ Error: 'Invalid user2' });
   }
-  if (res.locals.user.id === req.params.user2) {
+  // Compare as numbers on both sides: res.locals.user.id is a number and
+  // req.params.user2 is a string, so a strict === between them never fired
+  // and the self-add guard was dead code (QA finding F-6).
+  if (Number(res.locals.user.id) === parseInt(req.params.user2)) {
     return res.status(400).json({ Error: 'Cannot add yourself as a friend' });
   }
   try {

@@ -1,2 +1,15 @@
 node_modules
 npm-debug.log
+# Secrets must never enter the build context (P0.2)
+.env
+.env.*
+.git
+.gitignore
+# Build output and local artifacts
+dist
+coverage
+# Tests and docs are not needed inside the runtime image
+test
+*.md
+Dockerfile
+.dockerignore

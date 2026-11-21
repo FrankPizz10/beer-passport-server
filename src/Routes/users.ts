@@ -109,6 +109,18 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
     res.statusCode = 400;
     return res.json({ Error: 'Missing uid, email, age, or user_name' });
   }
+  // Bind the created profile to the caller's verified Firebase token uid
+  // (exposed by decodeUserToken as res.locals.firebaseUid). Without this
+  // check anyone with any valid token could register a profile claiming
+  // someone else's uid (QA finding F-1, uid squatting).
+  if (!res.locals.firebaseUid) {
+    res.statusCode = 401;
+    return res.json({ Error: 'Unauthorized' });
+  }
+  if (req.body.uid !== res.locals.firebaseUid) {
+    res.statusCode = 403;
+    return res.json({ Error: 'uid does not match the authenticated user' });
+  }
   if (!checkValidUserName(req.body.user_name)) {
     res.statusCode = 400;
     return res.json({ Error: 'Inavlid username!' });
@@ -116,7 +128,7 @@ userRoutes.post('/api/users', async (req: Request, res: Response) => {
   try {
     const user = await prismaCtx.prisma.users.create({
       data: {
-        uid: req.body.uid,
+        uid: res.locals.firebaseUid,
         email: req.body.email,
         age: parseInt(req.body.age),
         user_name: req.body.user_name,
