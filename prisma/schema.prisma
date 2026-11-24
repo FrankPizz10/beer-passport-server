@@ -207,6 +207,7 @@ model discovery_candidates {
   pairs_as_candidate        discovery_candidate_pairs[] @relation("discovery_pairs_candidate")
   pairs_as_rival            discovery_candidate_pairs[] @relation("discovery_pairs_rival")
   decisions                 discovery_decisions[] @relation("discovery_decisions_candidate")
+  review_intents            discovery_review_intents[]
   image_fetches             discovery_image_fetches[] @relation("discovery_image_fetches_candidate")
   image_decisions           discovery_image_decisions[] @relation("discovery_image_decisions_candidate")
   image_decision_fetch      discovery_image_fetches? @relation("discovery_candidate_image_decision_fetch", fields: [image_decision_fetch_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_candidates_image_decision_fetch")
@@ -220,6 +221,21 @@ model discovery_candidates {
   @@index([normalized_name], map: "discovery_candidates_normalized_name_idx")
   @@index([image_status_normalized], map: "discovery_candidates_image_status_normalized_idx")
   @@index([source], map: "discovery_candidates_source_idx")
+}
+
+// Append-only snapshots: the source candidate payload is never overwritten.
+model discovery_review_intents {
+  id             Int                  @id @default(autoincrement())
+  candidate_id   Int
+  intent         Json
+  previous_intent Json?
+  decided_by     Int?
+  decided_by_uid String?              @db.VarChar(255)
+  created_at     DateTime             @default(now()) @db.Timestamp(0)
+  candidate      discovery_candidates @relation(fields: [candidate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_review_intents_candidate_id")
+  decider        users?               @relation(fields: [decided_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_review_intents_decided_by")
+
+  @@index([candidate_id, id], map: "discovery_review_intents_candidate_id_id_idx")
 }
 
 model discovery_candidate_pairs {
@@ -470,6 +486,7 @@ model users {
   image_review_events           image_review_events[] @relation("image_review_events_admin_user")
   discovery_pairs_decided       discovery_candidate_pairs[] @relation("discovery_pairs_decided_by")
   discovery_decisions_decided   discovery_decisions[] @relation("discovery_decisions_decided_by")
+  discovery_review_intents_decided discovery_review_intents[]
   discovery_image_fetches       discovery_image_fetches[] @relation("discovery_image_fetches_fetched_by")
   discovery_image_decisions     discovery_image_decisions[] @relation("discovery_image_decisions_decided_by")
   discovery_manifests_built     discovery_import_manifests[] @relation("discovery_manifests_built_by")
