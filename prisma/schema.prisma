@@ -71,6 +71,7 @@ model beers {
   beverage_images  beverage_images[]
   collection_beers collection_beers[]
   user_beers       user_beers[]
+  discovery_matches discovery_candidates[] @relation("discovery_matched_beer")
 
   @@unique([brewery_id, name])
   @@index([brewery_id], map: "fk_beers_brewery_id_idx")
@@ -79,22 +80,311 @@ model beers {
 }
 
 model beverage_images {
-  id           Int       @id @default(autoincrement())
-  beverage_id  Int
-  source_type  String    @default("") @db.VarChar(50)
-  source_url   String    @default("") @db.VarChar(1024)
-  storage_key  String    @default("") @db.VarChar(512)
-  license_type String    @default("") @db.VarChar(100)
-  attribution  String    @default("") @db.VarChar(512)
-  license_url  String    @default("") @db.VarChar(1024)
-  status       String    @default("pending") @db.VarChar(20)
-  verified_at  DateTime? @db.Timestamp(0)
-  created_at   DateTime  @default(now()) @db.Timestamp(0)
-  updated_at   DateTime  @default(now()) @updatedAt @db.Timestamp(0)
-  beers        beers     @relation(fields: [beverage_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_beverage_images_beer_id")
+  id                  Int       @id @default(autoincrement())
+  beverage_id         Int
+  source_type         String    @default("") @db.VarChar(50)
+  source_url          String    @default("") @db.VarChar(1024)
+  storage_key         String    @default("") @db.VarChar(512)
+  license_type        String    @default("") @db.VarChar(100)
+  attribution         String    @default("") @db.VarChar(512)
+  license_url         String    @default("") @db.VarChar(1024)
+  status              String    @default("pending") @db.VarChar(20)
+  verified_at         DateTime? @db.Timestamp(0)
+  // Image approval workflow (migration 001 in server/db/migrations):
+  // who decided this row's status and when, and the candidate loader's
+  // check that a hosted storage_key URL really serves an image
+  // (source_check_status: 'image' | 'not_image' | 'unreachable' |
+  // 'unchecked'). Canonical change lives in beer-passport-server; see
+  // server/db/migrations/001-image-approval.sql.
+  reviewed_by         Int?
+  reviewed_by_uid     String?   @db.VarChar(128)
+  reviewed_at         DateTime? @db.Timestamp(0)
+  source_content_type String?   @db.VarChar(100)
+  source_checked_at   DateTime? @db.Timestamp(0)
+  source_check_status String?   @db.VarChar(20)
+  created_at          DateTime  @default(now()) @db.Timestamp(0)
+  updated_at          DateTime  @default(now()) @updatedAt @db.Timestamp(0)
+  beers               beers     @relation(fields: [beverage_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_beverage_images_beer_id")
+  reviewer            users?    @relation("beverage_images_reviewed_by", fields: [reviewed_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beverage_images_reviewed_by")
+  review_events       image_review_events[]
 
   @@index([beverage_id], map: "fk_beverage_images_beer_id_idx")
   @@index([status], map: "beverage_images_status")
+}
+
+// Append-only audit trail for image approval decisions: one row per
+// approve/reject, written in the same transaction as the status change
+// by the beerpassport_admin_approver role. Created by migration 001 in
+// server/db/migrations; canonical change lives in beer-passport-server.
+model image_review_events {
+  id                Int             @id @default(autoincrement())
+  beverage_image_id Int
+  beverage_id       Int
+  action            String          @db.VarChar(10)
+  from_status       String          @db.VarChar(20)
+  to_status         String          @db.VarChar(20)
+  admin_user_id     Int?
+  admin_uid         String?         @db.VarChar(128)
+  note              String?         @db.Text
+  created_at        DateTime        @default(now()) @db.Timestamp(0)
+  beverage_image    beverage_images @relation(fields: [beverage_image_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_image_review_events_image_id")
+  admin_user        users?          @relation("image_review_events_admin_user", fields: [admin_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_image_review_events_admin_user_id")
+
+  @@index([beverage_image_id], map: "image_review_events_beverage_image_id_idx")
+}
+
+// Catalog discovery hub staging (migration 002 in server/db/migrations;
+// hub decision 006, issues/001). Fully separate from the catalog tables:
+// candidates stay staged until a separately approved import. Image
+// statuses are preserved exactly as staged and never promoted.
+// Canonical change lives in beer-passport-server; see
+// server/db/migrations/002-discovery-staging.sql.
+model discovery_batches {
+  id                Int      @id @default(autoincrement())
+  slug              String   @unique @db.VarChar(120)
+  title             String?  @db.VarChar(255)
+  source            String   @db.VarChar(120)
+  source_summary    String?  @db.Text
+  manifest          Json
+  bundle_sha256     String   @unique @db.VarChar(64)
+  candidates_sha256 String   @db.VarChar(64)
+  record_count      Int
+  status            String   @default("staged") @db.VarChar(20)
+  ingested_by       String?  @db.VarChar(120)
+  ingested_at       DateTime @default(now()) @db.Timestamp(0)
+  candidates        discovery_candidates[]
+  pairs             discovery_candidate_pairs[]
+  manifests         discovery_import_manifests[]
+}
+
+model discovery_candidates {
+  id                        Int       @id @default(autoincrement())
+  batch_id                  Int
+  candidate_key             String    @db.VarChar(320)
+  payload                   Json
+  name                      String    @db.VarChar(600)
+  brewery_name              String?   @db.VarChar(600)
+  style                     String?   @db.VarChar(255)
+  abv                       Float?
+  ibu                       Float?
+  description               String?   @db.Text
+  barcode                   String?   @db.VarChar(64)
+  source                    String    @db.VarChar(120)
+  source_record_id          String    @db.VarChar(320)
+  source_url                String?   @db.Text
+  retrieved_at              DateTime? @db.Timestamp(0)
+  tier                      String?   @db.VarChar(20)
+  origin_bucket             String?   @db.VarChar(30)
+  origin_evidence           Json?
+  image_url                 String?   @db.Text
+  image_source              String?   @db.VarChar(120)
+  image_tier                String?   @db.VarChar(20)
+  image_status              String?   @db.VarChar(80)
+  image_status_normalized   String?   @db.VarChar(30)
+  image_verified            Boolean?
+  image_flag_reason         String?   @db.Text
+  image_license             String?   @db.VarChar(255)
+  image_page_url            String?   @db.Text
+  image_width               Int?
+  image_height              Int?
+  review_status             String    @default("pending") @db.VarChar(20)
+  hold_reason               String?   @db.VarChar(40)
+  hold_note                 String?   @db.Text
+  dedupe_outcome            String    @default("not_checked") @db.VarChar(30)
+  matched_beer_id           Int?
+  duplicate_of_candidate_id Int?
+  normalized_name           String    @db.VarChar(600)
+  normalized_brewery        String?   @db.VarChar(600)
+  created_at                DateTime  @default(now()) @db.Timestamp(0)
+  updated_at                DateTime  @default(now()) @db.Timestamp(0)
+  batch                     discovery_batches @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_candidates_batch_id")
+  matched_beer              beers?    @relation("discovery_matched_beer", fields: [matched_beer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_candidates_matched_beer_id")
+  duplicate_of              discovery_candidates?  @relation("discovery_duplicate_of", fields: [duplicate_of_candidate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_candidates_duplicate_of")
+  duplicates                discovery_candidates[] @relation("discovery_duplicate_of")
+  image_decision            String?   @db.VarChar(20)
+  image_decision_fetch_id   Int?
+  image_decision_at         DateTime? @db.Timestamp(0)
+  pairs_as_candidate        discovery_candidate_pairs[] @relation("discovery_pairs_candidate")
+  pairs_as_rival            discovery_candidate_pairs[] @relation("discovery_pairs_rival")
+  decisions                 discovery_decisions[] @relation("discovery_decisions_candidate")
+  image_fetches             discovery_image_fetches[] @relation("discovery_image_fetches_candidate")
+  image_decisions           discovery_image_decisions[] @relation("discovery_image_decisions_candidate")
+  image_decision_fetch      discovery_image_fetches? @relation("discovery_candidate_image_decision_fetch", fields: [image_decision_fetch_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_candidates_image_decision_fetch")
+
+  @@unique([batch_id, candidate_key], map: "discovery_candidates_batch_key")
+  @@index([batch_id], map: "discovery_candidates_batch_id_idx")
+  @@index([origin_bucket], map: "discovery_candidates_origin_bucket_idx")
+  @@index([hold_reason], map: "discovery_candidates_hold_reason_idx")
+  @@index([review_status], map: "discovery_candidates_review_status_idx")
+  @@index([barcode], map: "discovery_candidates_barcode_idx")
+  @@index([normalized_name], map: "discovery_candidates_normalized_name_idx")
+  @@index([image_status_normalized], map: "discovery_candidates_image_status_normalized_idx")
+  @@index([source], map: "discovery_candidates_source_idx")
+}
+
+model discovery_candidate_pairs {
+  id             Int       @id @default(autoincrement())
+  batch_id       Int
+  candidate_id   Int
+  candidate_id_b Int?
+  external_ref   String?   @db.VarChar(320)
+  comparison     String?   @db.VarChar(120)
+  method         String?   @db.VarChar(40)
+  score          Float?
+  status         String    @default("pending") @db.VarChar(20)
+  decided_by     Int?
+  decided_at     DateTime? @db.Timestamp(0)
+  created_at     DateTime  @default(now()) @db.Timestamp(0)
+  batch          discovery_batches    @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_pairs_batch_id")
+  candidate      discovery_candidates @relation("discovery_pairs_candidate", fields: [candidate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_pairs_candidate_id")
+  rival          discovery_candidates? @relation("discovery_pairs_rival", fields: [candidate_id_b], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_pairs_candidate_id_b")
+  decider        users?               @relation("discovery_pairs_decided_by", fields: [decided_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_pairs_decided_by")
+  decisions      discovery_decisions[] @relation("discovery_decisions_pair")
+
+  @@index([batch_id], map: "discovery_candidate_pairs_batch_id_idx")
+  @@index([candidate_id], map: "discovery_candidate_pairs_candidate_id_idx")
+  @@index([status], map: "discovery_candidate_pairs_status_idx")
+}
+
+// Append-only audit trail for discovery review decisions (migration
+// 003 in server/db/migrations; hub decision 006, issues/001). One row
+// per decision, written in the same transaction as the status change.
+// decided_by_uid is recorded for audit durability only and is never
+// serialized by the API.
+model discovery_decisions {
+  id             Int       @id @default(autoincrement())
+  candidate_id   Int?
+  pair_id        Int?
+  decision       String    @db.VarChar(40)
+  from_status    String?   @db.VarChar(20)
+  to_status      String?   @db.VarChar(20)
+  reason         String?   @db.VarChar(40)
+  note           String?   @db.Text
+  decided_by     Int?
+  decided_by_uid String?   @db.VarChar(255)
+  created_at     DateTime  @default(now()) @db.Timestamp(0)
+  candidate      discovery_candidates?    @relation("discovery_decisions_candidate", fields: [candidate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_decisions_candidate_id")
+  pair           discovery_candidate_pairs? @relation("discovery_decisions_pair", fields: [pair_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_decisions_pair_id")
+  decider        users?                   @relation("discovery_decisions_decided_by", fields: [decided_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_decisions_decided_by")
+
+  @@index([candidate_id], map: "discovery_decisions_candidate_id_idx")
+  @@index([pair_id], map: "discovery_decisions_pair_id_idx")
+  @@index([created_at], map: "discovery_decisions_created_at_idx")
+}
+
+// One row per server-side image fetch attempt (migration 004 in
+// server/db/migrations; hub decision 006 revision 2, issues/001
+// section 4). Every fetch is audit-logged here and rate-limited per
+// reviewer. sha256 / content_type / byte_size / width / height are
+// set only on outcome = 'success'; content_type is the VERIFIED type
+// from the magic bytes. fetched_by_uid is audit-only, never
+// serialized.
+model discovery_image_fetches {
+  id               Int       @id @default(autoincrement())
+  candidate_id     Int
+  image_ref        String    @db.Text
+  sha256           String?   @db.VarChar(64)
+  content_type     String?   @db.VarChar(120)
+  byte_size        Int?
+  width            Int?
+  height           Int?
+  outcome          String    @db.VarChar(30)
+  outcome_detail   String?   @db.Text
+  fetched_by       Int?
+  fetched_by_uid   String?   @db.VarChar(255)
+  fetched_at       DateTime  @default(now()) @db.Timestamp(0)
+  candidate        discovery_candidates    @relation("discovery_image_fetches_candidate", fields: [candidate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_image_fetches_candidate_id")
+  fetcher          users?                  @relation("discovery_image_fetches_fetched_by", fields: [fetched_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_image_fetches_fetched_by")
+  decision         discovery_image_decisions? @relation("discovery_image_decisions_fetch")
+  decided_candidates discovery_candidates[] @relation("discovery_candidate_image_decision_fetch")
+
+  @@index([candidate_id], map: "discovery_image_fetches_candidate_id_idx")
+  @@index([fetched_by, fetched_at], map: "discovery_image_fetches_fetched_by_idx")
+}
+
+// Append-only audit trail for image decisions (migration 004). One
+// row per decision; fetch_id is UNIQUE (a fetch is decided exactly
+// once). The image_* fields are the binding snapshot copied from the
+// fetch row at decision time; the API re-hashes the stored bytes
+// before writing and refuses on mismatch. decided_by_uid is
+// audit-only, never serialized.
+model discovery_image_decisions {
+  id                 Int       @id @default(autoincrement())
+  candidate_id       Int
+  fetch_id           Int       @unique(map: "discovery_image_decisions_fetch_id_key")
+  image_ref          String    @db.Text
+  image_sha256       String    @db.VarChar(64)
+  image_content_type String?   @db.VarChar(120)
+  image_width        Int?
+  image_height       Int?
+  image_source       String?   @db.VarChar(120)
+  image_license      String?   @db.VarChar(255)
+  decision           String    @db.VarChar(20)
+  note               String?   @db.Text
+  decided_by         Int?
+  decided_by_uid     String?   @db.VarChar(255)
+  decided_at         DateTime  @default(now()) @db.Timestamp(0)
+  candidate          discovery_candidates  @relation("discovery_image_decisions_candidate", fields: [candidate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_image_decisions_candidate_id")
+  fetch              discovery_image_fetches @relation("discovery_image_decisions_fetch", fields: [fetch_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_image_decisions_fetch_id")
+  decider            users?                @relation("discovery_image_decisions_decided_by", fields: [decided_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_image_decisions_decided_by")
+
+  @@index([candidate_id], map: "discovery_image_decisions_candidate_id_idx")
+  @@index([decided_at], map: "discovery_image_decisions_decided_at_idx")
+}
+
+// One row per built import manifest (migration 005 in
+// server/db/migrations; hub decision 006 revisions 1 and 2,
+// issues/001). Manifests are immutable once built: manifest holds
+// the canonical content (header, per-record import payload
+// snapshots with payload hashes and decision ids, and the catalog
+// baseline fingerprint) and sha256 is the SHA-256 of its canonical
+// serialization. status moves draft -> approved -> imported, or
+// draft | approved -> void. approved_sha256 equals sha256 at
+// approval time and is never updated afterward. built_by_uid is
+// audit-only, never serialized.
+model discovery_import_manifests {
+  id                  String    @id @db.VarChar(80)
+  batch_id            Int
+  manifest            Json
+  sha256              String    @unique @db.VarChar(64)
+  record_count        Int
+  catalog_fingerprint Json
+  status              String    @default("draft") @db.VarChar(20)
+  built_by            Int?
+  built_by_uid        String?   @db.VarChar(255)
+  approved_by         Int?
+  approved_at         DateTime? @db.Timestamp(0)
+  approved_sha256     String?   @db.VarChar(64)
+  imported_at         DateTime? @db.Timestamp(0)
+  created_at          DateTime  @default(now()) @db.Timestamp(0)
+  batch               discovery_batches @relation(fields: [batch_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_manifests_batch_id")
+  builder             users?    @relation("discovery_manifests_built_by", fields: [built_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_manifests_built_by")
+  approver            users?    @relation("discovery_manifests_approved_by", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_manifests_approved_by")
+  events              discovery_manifest_events[]
+
+  @@index([batch_id], map: "discovery_import_manifests_batch_id_idx")
+  @@index([status], map: "discovery_import_manifests_status_idx")
+}
+
+// Append-only lifecycle audit for import manifests (migration 005):
+// build / approve / void written by the API on the reviewer client,
+// import written by the operator import executor inside its
+// transaction. actor_uid is audit-only, never serialized.
+model discovery_manifest_events {
+  id          Int       @id @default(autoincrement())
+  manifest_id String    @db.VarChar(80)
+  action      String    @db.VarChar(40)
+  from_status String?   @db.VarChar(20)
+  to_status   String?   @db.VarChar(20)
+  note        String?   @db.Text
+  actor_id    Int?
+  actor_uid   String?   @db.VarChar(255)
+  created_at  DateTime  @default(now()) @db.Timestamp(0)
+  manifest    discovery_import_manifests @relation(fields: [manifest_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_manifest_events_manifest_id")
+  actor       users?    @relation("discovery_manifest_events_actor", fields: [actor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_discovery_manifest_events_actor_id")
+
+  @@index([manifest_id], map: "discovery_manifest_events_manifest_id_idx")
+  @@index([created_at], map: "discovery_manifest_events_created_at_idx")
 }
 
 model breweries {
@@ -176,6 +466,15 @@ model users {
   user_badges                   user_badges[]
   user_beers                    user_beers[]
   notifications                 notifications[]
+  beverage_images_reviewed      beverage_images[]   @relation("beverage_images_reviewed_by")
+  image_review_events           image_review_events[] @relation("image_review_events_admin_user")
+  discovery_pairs_decided       discovery_candidate_pairs[] @relation("discovery_pairs_decided_by")
+  discovery_decisions_decided   discovery_decisions[] @relation("discovery_decisions_decided_by")
+  discovery_image_fetches       discovery_image_fetches[] @relation("discovery_image_fetches_fetched_by")
+  discovery_image_decisions     discovery_image_decisions[] @relation("discovery_image_decisions_decided_by")
+  discovery_manifests_built     discovery_import_manifests[] @relation("discovery_manifests_built_by")
+  discovery_manifests_approved  discovery_import_manifests[] @relation("discovery_manifests_approved_by")
+  discovery_manifest_events     discovery_manifest_events[] @relation("discovery_manifest_events_actor")
 }
 
 model collections {
