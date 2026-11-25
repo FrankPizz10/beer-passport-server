@@ -8,6 +8,13 @@ const adminRoutes: Express = express();
 
 adminRoutes.use('/admin', decodeAdminToken);
 
+// Legacy writes bypass the newer catalog review and owner-approval controls.
+// Keep reads available, but fail closed until equivalent guarded APIs exist.
+adminRoutes.use('/admin', (req: Request, res: Response, next) => {
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  return res.status(403).json({ message: 'Legacy admin writes are disabled.' });
+});
+
 adminRoutes.get('/admin', (req: Request, res: Response) => {
   return res.send('Success!');
 });
