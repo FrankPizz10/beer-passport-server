@@ -64,6 +64,7 @@ model beers {
   // Milestone 2 on, by the import pipeline; not writable through Prisma.
   search_vector    Unsupported("tsvector")?
   discontinued     Boolean            @default(false)
+  archived_at      DateTime?          @db.Timestamptz(6)
   last_mod         DateTime           @default(now()) @db.Timestamp(0)
   brewery          breweries?         @relation(fields: [brewery_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_brewery_id")
   category         categories?        @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_beers_cat_id")
@@ -416,6 +417,7 @@ model breweries {
   website  String   @default("") @db.VarChar(255)
   descript String   @db.Text
   add_user Int?
+  archived_at DateTime? @db.Timestamptz(6)
   last_mod DateTime @default(now()) @db.Timestamp(0)
   beers    beers[]
 
@@ -433,6 +435,7 @@ model breweries_geocode {
 model categories {
   id       Int      @id @default(autoincrement())
   cat_name String   @default("") @db.VarChar(255)
+  archived_at DateTime? @db.Timestamptz(6)
   last_mod DateTime @default(now()) @db.Timestamp(0)
   beers    beers[]
   styles   styles[]
@@ -444,12 +447,43 @@ model styles {
   id         Int         @id @default(autoincrement())
   cat_id     Int?
   style_name String      @default("") @db.VarChar(255)
+  archived_at DateTime?   @db.Timestamptz(6)
   last_mod   DateTime    @default(now()) @db.Timestamp(0)
   category   categories? @relation(fields: [cat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_styles_cat_id")
   beers      beers[]
 
   @@unique([style_name], map: "style_name")
   @@index([cat_id], map: "fk_styles_cat_id_idx")
+}
+
+model catalog_change_requests {
+  id               Int      @id @default(autoincrement())
+  entity_type      String   @db.VarChar(20)
+  entity_id        Int
+  action           String   @db.VarChar(20)
+  status           String   @db.VarChar(20)
+  before_data      Json
+  proposed_data    Json
+  before_hash      String   @db.VarChar(64)
+  after_hash       String?  @db.VarChar(64)
+  requested_by_uid String   @db.VarChar(255)
+  reviewed_by_uid  String?  @db.VarChar(255)
+  reason           String   @db.Text
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  decided_at       DateTime? @db.Timestamptz(6)
+  events           catalog_change_events[]
+  @@index([status, id], map: "catalog_change_requests_status_id_idx")
+  @@index([entity_type, entity_id, id], map: "catalog_change_requests_entity_idx")
+}
+
+model catalog_change_events {
+  id          Int      @id @default(autoincrement())
+  request_id  Int
+  actor_uid   String   @db.VarChar(255)
+  action      String   @db.VarChar(20)
+  occurred_at DateTime @default(now()) @db.Timestamptz(6)
+  request     catalog_change_requests @relation(fields: [request_id], references: [id], onDelete: Restrict)
+  @@index([request_id, id], map: "catalog_change_events_request_id_idx")
 }
 
 model user_beers {
