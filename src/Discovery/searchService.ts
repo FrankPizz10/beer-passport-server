@@ -51,7 +51,8 @@ export const searchBeers = async (
     LEFT JOIN breweries br ON br.id = b.brewery_id
     LEFT JOIN styles s ON s.id = b.style_id
     LEFT JOIN categories c ON c.id = b.cat_id
-    WHERE (${filters.styleId}::int IS NULL OR b.style_id = ${filters.styleId}::int)
+    WHERE b.archived_at IS NULL
+      AND (${filters.styleId}::int IS NULL OR b.style_id = ${filters.styleId}::int)
       AND (${filters.breweryId}::int IS NULL OR b.brewery_id = ${filters.breweryId}::int)
       AND (${filters.categoryId}::int IS NULL OR b.cat_id = ${filters.categoryId}::int)
       AND (${q}::text = ''
@@ -71,7 +72,8 @@ export const searchBeers = async (
     SELECT COUNT(*)::bigint AS count
     FROM beers b
     LEFT JOIN breweries br ON br.id = b.brewery_id
-    WHERE (${filters.styleId}::int IS NULL OR b.style_id = ${filters.styleId}::int)
+    WHERE b.archived_at IS NULL
+      AND (${filters.styleId}::int IS NULL OR b.style_id = ${filters.styleId}::int)
       AND (${filters.breweryId}::int IS NULL OR b.brewery_id = ${filters.breweryId}::int)
       AND (${filters.categoryId}::int IS NULL OR b.cat_id = ${filters.categoryId}::int)
       AND (${q}::text = ''
