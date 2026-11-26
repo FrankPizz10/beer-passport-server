@@ -13,13 +13,14 @@
  * Prisma is mocked through the src/index prismaCtx, as the existing test
  * setup intended. No live database.
  */
-import { addFriend, getFriendsByUserId } from '../../src/DBclient/userclient';
+import { addFriend, ArchivedBeerError, getFriendsByUserId, updateOrCreateUserBeer } from '../../src/DBclient/userclient';
 import { prismaCtx } from '../../src/index';
 
 jest.mock('../../src/index', () => ({
   prismaCtx: {
     prisma: {
       friends: { create: jest.fn(), findMany: jest.fn() },
+    $transaction: jest.fn(),
     },
   },
 }));
@@ -32,10 +33,13 @@ jest.mock('../../src/DBclient/userBadgeClient', () => ({
 
 const prisma = prismaCtx.prisma as unknown as {
   friends: { create: jest.Mock; findMany: jest.Mock };
+  $transaction: jest.Mock;
 };
 
 beforeEach(() => {
   jest.clearAllMocks();
+  const progression = require('../../src/DBclient/userBadgeClient').calcCollectionProgressionForUserBeer;
+  progression.mockResolvedValue([]);
 });
 
 describe('addFriend ordering normalization (F-6)', () => {
@@ -71,5 +75,48 @@ describe('getFriendsByUserId projection (F-3)', () => {
     for (const field of ['email', 'uid', 'age', 'notification_token']) {
       expect(select).not.toHaveProperty(field);
     }
+  });
+});
+
+describe('updateOrCreateUserBeer archive concurrency guard', () => {
+  const run = async (archived: boolean, existing: boolean) => {
+    const tx = {
+      $queryRaw: jest.fn().mockResolvedValue([{ archived_at: archived ? new Date() : null }]),
+      user_beers: {
+        findUnique: jest.fn().mockResolvedValue(existing ? { user_id: 4, beer_id: 9 } : null),
+        upsert: jest.fn().mockResolvedValue({ user_id: 4, beer_id: 9, liked: true }),
+      },
+    };
+    prisma.$transaction.mockImplementation(async (callback: (transaction: typeof tx) => unknown) =>
+      callback(tx),
+    );
+    return { tx, result: await updateOrCreateUserBeer(4, 9, true, { prisma: prisma as any } as any) };
+  };
+
+  it('creates history only while the beer row is active under a share lock', async () => {
+    const { tx } = await run(false, false);
+    expect(tx.$queryRaw).toHaveBeenCalledTimes(1);
+    expect(tx.user_beers.upsert).toHaveBeenCalledWith({
+      where: { user_id_beer_id: { user_id: 4, beer_id: 9 } },
+      update: { liked: true, updated_at: expect.any(Date) },
+      create: { user_id: 4, beer_id: 9, liked: true },
+    });
+  });
+
+  it('does not create new history after an archive wins the row-lock race', async () => {
+    const tx = {
+      $queryRaw: jest.fn().mockResolvedValue([{ archived_at: new Date() }]),
+      user_beers: { findUnique: jest.fn().mockResolvedValue(null), upsert: jest.fn() },
+    };
+    prisma.$transaction.mockImplementation(async (callback: (transaction: typeof tx) => unknown) =>
+      callback(tx),
+    );
+    await expect(updateOrCreateUserBeer(4, 9, true, { prisma: prisma as any } as any)).rejects.toBeInstanceOf(ArchivedBeerError);
+    expect(tx.user_beers.upsert).not.toHaveBeenCalled();
+  });
+
+  it('allows an existing history row to be updated after the beer is archived', async () => {
+    const { tx } = await run(true, true);
+    expect(tx.user_beers.upsert).toHaveBeenCalledTimes(1);
   });
 });
