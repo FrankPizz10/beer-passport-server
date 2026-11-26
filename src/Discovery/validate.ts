@@ -56,22 +56,22 @@ export const parseFilters = async (
   const breweryId = parseFilterId(query.brewery_id, 'brewery_id');
   const categoryId = parseFilterId(query.category_id, 'category_id');
   if (styleId !== null) {
-    const style = await prisma.styles.findUnique({ where: { id: styleId }, select: { id: true } });
-    if (!style) throw invalidParameter(`style_id ${styleId} does not exist.`);
+    const style = await prisma.styles.findUnique({ where: { id: styleId }, select: { id: true, archived_at: true } });
+    if (!style || style.archived_at) throw invalidParameter(`style_id ${styleId} does not exist.`);
   }
   if (breweryId !== null) {
     const brewery = await prisma.breweries.findUnique({
       where: { id: breweryId },
-      select: { id: true },
+      select: { id: true, archived_at: true },
     });
-    if (!brewery) throw invalidParameter(`brewery_id ${breweryId} does not exist.`);
+    if (!brewery || brewery.archived_at) throw invalidParameter(`brewery_id ${breweryId} does not exist.`);
   }
   if (categoryId !== null) {
     const category = await prisma.categories.findUnique({
       where: { id: categoryId },
-      select: { id: true },
+      select: { id: true, archived_at: true },
     });
-    if (!category) throw invalidParameter(`category_id ${categoryId} does not exist.`);
+    if (!category || category.archived_at) throw invalidParameter(`category_id ${categoryId} does not exist.`);
   }
   return { styleId, breweryId, categoryId };
 };
