@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import { prismaCtx } from '../index';
 import {
+  ArchivedBeerError,
   getLikedBeersByUserId,
   getTriedBeersByUserId,
   getUserBeerByUserIdAndBeerId,
@@ -28,13 +29,21 @@ userbeerRoutes.post('/api/userbeers', async (req: Request, res: Response) => {
     res.statusCode = 400;
     return res.json({ Error: 'User not found' });
   }
-  const userBeer = await updateOrCreateUserBeer(
-    res.locals.user.id,
-    parseInt(req.body.beer_id),
-    req.body.liked,
-    prismaCtx,
-  );
-  return res.send(userBeer);
+  try {
+    const userBeer = await updateOrCreateUserBeer(
+      res.locals.user.id,
+      parseInt(req.body.beer_id),
+      req.body.liked,
+      prismaCtx,
+    );
+    return res.send(userBeer);
+  } catch (err) {
+    if (err instanceof ArchivedBeerError) {
+      res.statusCode = 400;
+      return res.json({ Error: err.message });
+    }
+    throw err;
+  }
 });
 
 // Delete user beer / Un try beer
