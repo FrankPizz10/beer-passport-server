@@ -57,28 +57,40 @@ export const updateUserEmail = async (uid: string, email: string) => {
   return user;
 };
 
+export class ArchivedBeerError extends Error {
+  constructor() {
+    super('Beer is archived');
+    this.name = 'ArchivedBeerError';
+  }
+}
+
 export const updateOrCreateUserBeer = async (
   user_id: number,
   beer_id: number,
   liked: boolean,
   ctx: Context,
 ) => {
-  const newUserBeer = await ctx.prisma.user_beers.upsert({
-    where: {
-      user_id_beer_id: {
-        user_id: user_id,
-        beer_id: beer_id,
-      },
-    },
-    update: {
-      liked: liked,
-      updated_at: new Date(),
-    },
-    create: {
-      user_id: user_id,
-      beer_id: beer_id,
-      liked: liked,
-    },
+  const newUserBeer = await ctx.prisma.$transaction(async tx => {
+    // Serialize with catalog archive's FOR UPDATE lock. If an archive commits
+    // first, no new history can be created for that beer; existing history can
+    // still be updated and removed by its owner.
+    const rows = await tx.$queryRaw<Array<{ archived_at: Date | null }>>`
+      SELECT archived_at FROM beers WHERE id = ${beer_id} FOR SHARE
+    `;
+    if (!rows.length) {
+      throw new Error('Beer not found');
+    }
+    const existing = await tx.user_beers.findUnique({
+      where: { user_id_beer_id: { user_id, beer_id } },
+    });
+    if (rows[0].archived_at && !existing) {
+      throw new ArchivedBeerError();
+    }
+    return tx.user_beers.upsert({
+      where: { user_id_beer_id: { user_id, beer_id } },
+      update: { liked, updated_at: new Date() },
+      create: { user_id, beer_id, liked },
+    });
   });
   const sendNotifications = async () => {
     const newCompletedBadges = (
