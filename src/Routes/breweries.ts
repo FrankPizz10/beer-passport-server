@@ -8,6 +8,7 @@ const brewereyRoutes: Express = express();
 brewereyRoutes.get('/api/breweries/basic', async (req, res) => {
   try {
     const breweries = await prismaCtx.prisma.breweries.findMany({
+      where: { archived_at: null },
       select: {
         id: true,
         name: true,
@@ -24,7 +25,7 @@ brewereyRoutes.get('/api/breweries/basic', async (req, res) => {
 // Get all breweries
 brewereyRoutes.get('/api/breweries', async (req, res) => {
   try {
-    const breweries = await prismaCtx.prisma.breweries.findMany();
+    const breweries = await prismaCtx.prisma.breweries.findMany({ where: { archived_at: null } });
     return res.send(breweries);
   } catch (err) {
     res.statusCode = 500;
@@ -48,7 +49,7 @@ brewereyRoutes.get('/api/breweries/popular', async (req, res) => {
           FROM breweries
           LEFT JOIN beers ON breweries.id = beers.brewery_id
           LEFT JOIN user_beers ON beers.id = user_beers.beer_id
-          WHERE user_beers.liked = true
+          WHERE user_beers.liked = true AND breweries.archived_at IS NULL AND beers.archived_at IS NULL
           GROUP BY breweries.id
           ORDER BY liked_beers_count DESC
           LIMIT ${breweryQuantity};
@@ -72,6 +73,7 @@ brewereyRoutes.get('/api/breweries/popular', async (req, res) => {
           name: true,
         },
         where: {
+          archived_at: null,
           NOT: {
             id: {
               in: basicBreweries.map(brewery => brewery.id),
@@ -97,7 +99,7 @@ brewereyRoutes.get('/api/breweries/:id', async (req, res) => {
         id: parseInt(req.params.id),
       },
     });
-    if (!brewery) {
+    if (!brewery || brewery.archived_at) {
       res.statusCode = 404;
       return res.json({ Error: 'Brewery not found' });
     }
