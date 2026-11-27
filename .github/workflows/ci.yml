@@ -1,25 +1,27 @@
 name: Beer-Passport-Server/CI
-on: # Controls when the action will run.
-  # Triggers the workflow on push or pull request events but only for the master branch. If you want to trigger the action on other branches, add here
+on:
   push:
-    branches: [master]
+    branches: [master, release/2.0]
   pull_request:
-    branches: [master]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: [master, release/2.0]
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  build-and-test: #
-    # The type of runner that the job will run on
-    runs-on: ubuntu-20.04
+permissions:
+  contents: read
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+jobs:
+  build-and-test:
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - name: Build and test backend service
-        run: npm install && npm run lint # && npm run build && npm run test
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - name: Lint without modifying the checkout
+        run: npx eslint . --ext .ts
+      - run: npm run build
+      - name: Tests
+        run: npm test -- --runInBand
