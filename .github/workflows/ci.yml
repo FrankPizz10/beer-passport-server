@@ -41,7 +41,7 @@ jobs:
             exit 0
           fi
           mapfile -t files < <(git diff --name-only --diff-filter=ACMR "$base...$SHA" -- '*.ts')
-          if (('${#files[@]}' > 0)); then
+          if (('${#files[@]} > 0)); then
             npx eslint --ext .ts "${files[@]}"
           else
             echo "No changed TypeScript files to lint."
