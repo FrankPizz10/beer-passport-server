@@ -12,13 +12,14 @@ const beerRoutes: Express = express();
 
 // Get all beers
 beerRoutes.get('/api/beers', async (req: Request, res: Response) => {
-  const beers = await prismaCtx.prisma.beers.findMany();
+  const beers = await prismaCtx.prisma.beers.findMany({ where: { archived_at: null } });
   return res.send(beers);
 });
 
 // Get all basic beer info
 beerRoutes.get('/api/beers/basic', async (req: Request, res: Response) => {
   const beers = await prismaCtx.prisma.beers.findMany({
+    where: { archived_at: null },
     select: {
       id: true,
       name: true,
@@ -57,7 +58,7 @@ beerRoutes.get('/api/categories/:id', async (req: Request, res: Response) => {
         id: parseInt(req.params.id),
       },
     });
-    if (!category) {
+    if (!category || category.archived_at) {
       res.statusCode = 404;
       return res.json({ Error: 'Category not found' });
     }
@@ -94,6 +95,7 @@ beerRoutes.get('/api/categories/:id/beers', async (req, res) => {
 beerRoutes.get('/api/beers/newest', async (req: Request, res: Response) => {
   try {
     const beer = await prismaCtx.prisma.beers.findFirst({
+      where: { archived_at: null },
       orderBy: {
         last_mod: 'desc',
       },
@@ -137,6 +139,7 @@ beerRoutes.get('/api/beers/name/:name', async (req: Request, res: Response) => {
     const beer = await prismaCtx.prisma.beers.findFirst({
       where: {
         name: req.params.name,
+        archived_at: null,
       },
     });
     if (!beer) {

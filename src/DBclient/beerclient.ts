@@ -5,14 +5,17 @@ export const getBeerByCategory = async (cat: string) => {
   // Get category that contains cat
   const category = await prismaCtx.prisma.categories.findFirst({
     where: {
+      archived_at: null,
       cat_name: {
         contains: cat,
       },
     },
   });
-  const id = category?.id;
+  if (!category) return [];
+  const id = category.id;
   const beers = await prismaCtx.prisma.beers.findMany({
     where: {
+      archived_at: null,
       cat_id: {
         equals: id,
       },
@@ -57,6 +60,7 @@ export const getBeersByCollectionId = async (collectionId: number) => {
   const beers = await prismaCtx.prisma.collection_beers.findMany({
     where: {
       collection_id: collectionId,
+      beers: { archived_at: null },
     },
   });
   return beers;
@@ -90,6 +94,7 @@ export const getBeersByBrewery = async (breweryId: number) => {
   const beers = await prismaCtx.prisma.beers.findMany({
     where: {
       brewery_id: breweryId,
+      archived_at: null,
     },
   });
   return beers;
@@ -99,6 +104,7 @@ export const getBeersByCategory = async (catId: number, limit?: number) => {
   const beers = await prismaCtx.prisma.beers.findMany({
     where: {
       cat_id: catId,
+      archived_at: null,
     },
     select: {
       id: true,
@@ -113,6 +119,7 @@ export const getBeersByCategory = async (catId: number, limit?: number) => {
 export const getBeerGroupsByBrewery = async () => {
   const beers = await prismaCtx.prisma.beers.groupBy({
     by: ['brewery_id'],
+    where: { archived_at: null },
     _count: {
       id: true,
     },
@@ -125,6 +132,7 @@ export const getTopLikedBeers = async (beerQuantity: number, catId?: number) => 
     by: ['beer_id'],
     where: {
       liked: true,
+      beers: { archived_at: null },
     },
     orderBy: {
       _count: {
@@ -144,6 +152,7 @@ export const getTrendingBeers = async (beerQuantity: number, catId?: number) => 
     by: ['beer_id'],
     where: {
       liked: true,
+      beers: { archived_at: null },
       updated_at: {
         gte: new Date(new Date().getDate() - 7), // Filter updated_at within the last 7 days
       },
@@ -162,6 +171,7 @@ export const getTrendingBeers = async (beerQuantity: number, catId?: number) => 
       by: ['beer_id'],
       where: {
         liked: true,
+        beers: { archived_at: null },
       },
       orderBy: {
         _count: {
@@ -204,10 +214,11 @@ const getTopBeersHelper = async (
         id: true,
         name: true,
         cat_id: true,
+        archived_at: true,
       },
     });
-    if (beerInfo && (!catId || beerInfo.cat_id === catId)) {
-      beers.push(beerInfo);
+    if (beerInfo && !beerInfo.archived_at && (!catId || beerInfo.cat_id === catId)) {
+      beers.push({ id: beerInfo.id, name: beerInfo.name, cat_id: beerInfo.cat_id });
     }
   }
   // If there are not enough top liked beers, get extra beers
@@ -222,6 +233,7 @@ const getTopBeersHelper = async (
           cat_id: true,
         },
         where: {
+          archived_at: null,
           NOT: {
             id: {
               in: beers.map(beer => beer.id),
@@ -244,6 +256,7 @@ const getTopBeersHelper = async (
         },
         where: {
           cat_id: catId,
+          archived_at: null,
           NOT: {
             id: {
               in: beers.map(beer => beer.id),

@@ -1,7 +1,7 @@
 import { prismaCtx } from '..';
 
 export const getCategories = async () => {
-  const categories = await prismaCtx.prisma.categories.findMany();
+  const categories = await prismaCtx.prisma.categories.findMany({ where: { archived_at: null } });
   return categories;
 };
 

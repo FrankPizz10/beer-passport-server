@@ -17,7 +17,7 @@ const router = Router();
 // middleware and reports whether the database answers a trivial query.
 router.get('/health', async (req: Request, res: Response) => {
   try {
-    await getPrisma().$queryRaw`SELECT 1`;
+    await getPrisma().$connect();
     return res.json({ status: 'ok', db: 'ok' });
   } catch (err) {
     return sendError(res, err);
@@ -78,21 +78,22 @@ router.get('/discovery/browse', async (req: Request, res: Response) => {
     const [breweryCounts, styleCounts, categories, categoryCounts, newest] = await Promise.all([
       prisma.beers.groupBy({
         by: ['brewery_id'],
-        where: { brewery_id: { not: null } },
+        where: { brewery_id: { not: null }, archived_at: null },
         _count: { id: true },
         orderBy: { _count: { id: 'desc' } },
         take: 10,
       }),
       prisma.beers.groupBy({
         by: ['style_id'],
-        where: { style_id: { not: null } },
+        where: { style_id: { not: null }, archived_at: null },
         _count: { id: true },
         orderBy: { _count: { id: 'desc' } },
         take: 10,
       }),
-      prisma.categories.findMany({ orderBy: { cat_name: 'asc' } }),
-      prisma.beers.groupBy({ by: ['cat_id'], _count: { id: true } }),
+      prisma.categories.findMany({ where: { archived_at: null }, orderBy: { cat_name: 'asc' } }),
+      prisma.beers.groupBy({ by: ['cat_id'], where: { archived_at: null }, _count: { id: true } }),
       prisma.beers.findMany({
+        where: { archived_at: null },
         orderBy: [{ last_mod: 'desc' }, { id: 'desc' }],
         take: 10,
         include: { brewery: true, style: true, category: true },
@@ -103,14 +104,12 @@ router.get('/discovery/browse', async (req: Request, res: Response) => {
       .filter((id): id is number => id !== null);
     const styleIds = styleCounts.map(c => c.style_id).filter((id): id is number => id !== null);
     const [breweryRows, styleRows] = await Promise.all([
-      prisma.breweries.findMany({ where: { id: { in: breweryIds } } }),
-      prisma.styles.findMany({ where: { id: { in: styleIds } } }),
+      prisma.breweries.findMany({ where: { id: { in: breweryIds }, archived_at: null } }),
+      prisma.styles.findMany({ where: { id: { in: styleIds }, archived_at: null } }),
     ]);
     const breweryNames = new Map(breweryRows.map(b => [b.id, b.name]));
     const styleNames = new Map(styleRows.map(s => [s.id, s.style_name]));
-    const categoryCountMap = new Map(
-      categoryCounts.map(c => [c.cat_id, c._count.id] as const),
-    );
+    const categoryCountMap = new Map(categoryCounts.map(c => [c.cat_id, c._count.id] as const));
     const newestImages = await resolveImages(
       prisma,
       newest.map(b => ({ id: b.id, cat_id: b.cat_id })),
@@ -196,6 +195,7 @@ router.get('/beverages/:id', async (req: Request, res: Response) => {
       srm: unknownNumber(beer.srm),
       description: emptyToNull(beer.descript),
       discontinued: beer.discontinued,
+      archived: Boolean(beer.archived_at),
       image_url: image.image_url,
       image_kind: image.image_kind,
       image_provenance: image.image_provenance,
