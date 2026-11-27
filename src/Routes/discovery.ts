@@ -17,7 +17,7 @@ const router = Router();
 // middleware and reports whether the database answers a trivial query.
 router.get('/health', async (req: Request, res: Response) => {
   try {
-    await getPrisma().$queryRaw`SELECT 1`;
+    await getPrisma().$connect();
     return res.json({ status: 'ok', db: 'ok' });
   } catch (err) {
     return sendError(res, err);
