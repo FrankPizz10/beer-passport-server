@@ -109,9 +109,7 @@ router.get('/discovery/browse', async (req: Request, res: Response) => {
     ]);
     const breweryNames = new Map(breweryRows.map(b => [b.id, b.name]));
     const styleNames = new Map(styleRows.map(s => [s.id, s.style_name]));
-    const categoryCountMap = new Map(
-      categoryCounts.map(c => [c.cat_id, c._count.id] as const),
-    );
+    const categoryCountMap = new Map(categoryCounts.map(c => [c.cat_id, c._count.id] as const));
     const newestImages = await resolveImages(
       prisma,
       newest.map(b => ({ id: b.id, cat_id: b.cat_id })),
