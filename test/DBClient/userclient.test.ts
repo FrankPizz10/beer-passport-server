@@ -13,14 +13,21 @@
  * Prisma is mocked through the src/index prismaCtx, as the existing test
  * setup intended. No live database.
  */
-import { addFriend, ArchivedBeerError, getFriendsByUserId, updateOrCreateUserBeer } from '../../src/DBclient/userclient';
+import {
+  addFriend,
+  ArchivedBeerError,
+  getFriendsByUserId,
+  updateOrCreateUserBeer,
+} from '../../src/DBclient/userclient';
+import { calcCollectionProgressionForUserBeer } from '../../src/DBclient/userBadgeClient';
+import { Context } from '../../context';
 import { prismaCtx } from '../../src/index';
 
 jest.mock('../../src/index', () => ({
   prismaCtx: {
     prisma: {
       friends: { create: jest.fn(), findMany: jest.fn() },
-    $transaction: jest.fn(),
+      $transaction: jest.fn(),
     },
   },
 }));
@@ -35,10 +42,14 @@ const prisma = prismaCtx.prisma as unknown as {
   friends: { create: jest.Mock; findMany: jest.Mock };
   $transaction: jest.Mock;
 };
+const progression = calcCollectionProgressionForUserBeer as jest.Mock;
+const context = (): Context =>
+  ({
+    prisma: prisma as unknown as Context['prisma'],
+  } as Context);
 
 beforeEach(() => {
   jest.clearAllMocks();
-  const progression = require('../../src/DBclient/userBadgeClient').calcCollectionProgressionForUserBeer;
   progression.mockResolvedValue([]);
 });
 
@@ -90,7 +101,10 @@ describe('updateOrCreateUserBeer archive concurrency guard', () => {
     prisma.$transaction.mockImplementation(async (callback: (transaction: typeof tx) => unknown) =>
       callback(tx),
     );
-    return { tx, result: await updateOrCreateUserBeer(4, 9, true, { prisma: prisma as any } as any) };
+    return {
+      tx,
+      result: await updateOrCreateUserBeer(4, 9, true, context()),
+    };
   };
 
   it('creates history only while the beer row is active under a share lock', async () => {
@@ -111,7 +125,9 @@ describe('updateOrCreateUserBeer archive concurrency guard', () => {
     prisma.$transaction.mockImplementation(async (callback: (transaction: typeof tx) => unknown) =>
       callback(tx),
     );
-    await expect(updateOrCreateUserBeer(4, 9, true, { prisma: prisma as any } as any)).rejects.toBeInstanceOf(ArchivedBeerError);
+    await expect(updateOrCreateUserBeer(4, 9, true, context())).rejects.toBeInstanceOf(
+      ArchivedBeerError,
+    );
     expect(tx.user_beers.upsert).not.toHaveBeenCalled();
   });
 
