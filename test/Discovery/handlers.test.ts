@@ -290,6 +290,7 @@ describe('GET /api/v1/beverages/:id', () => {
       srm: null,
       description: 'Esquire Magazine calls our 90 Minute IPA "perhaps the best I.P.A. in America."',
       discontinued: false,
+      archived: false,
       image_url: null,
       image_kind: 'initials',
       image_provenance: null,
