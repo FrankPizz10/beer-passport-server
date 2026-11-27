@@ -1,4 +1,5 @@
 import { Context } from '../../context';
+import { Prisma } from '@prisma/client';
 import { prismaCtx } from '..';
 import { getCollectionSize } from './gettableinfo';
 import { calcCollectionProgressionForUserBeer } from './userBadgeClient';
@@ -70,7 +71,7 @@ export const updateOrCreateUserBeer = async (
   liked: boolean,
   ctx: Context,
 ) => {
-  const newUserBeer = await ctx.prisma.$transaction(async tx => {
+  const newUserBeer = await ctx.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     // Serialize with catalog archive's FOR UPDATE lock. If an archive commits
     // first, no new history can be created for that beer; existing history can
     // still be updated and removed by its owner.
@@ -272,7 +273,7 @@ const getCollectionProgress = async (user_id: number, collection_id: number) => 
   let progress = 0;
   for (let i = 0; i < collectionBeers.length; i++) {
     const collectionBeer = collectionBeers[i];
-    const userBeer = userBeers.find(beer => beer.beer_id === collectionBeer.beer_id);
+    const userBeer = userBeers.find((beer: { beer_id: number }) => beer.beer_id === collectionBeer.beer_id);
     if (userBeer) {
       progress++;
     }
