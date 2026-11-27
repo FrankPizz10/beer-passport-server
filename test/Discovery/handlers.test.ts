@@ -67,9 +67,9 @@ const beer3951 = {
 };
 
 const fakePrisma = {
+  $connect: jest.fn(async () => undefined),
   $queryRaw: jest.fn(async (strings: TemplateStringsArray) => {
     const sql = strings.join(' ');
-    if (sql.includes('SELECT 1')) return [{ '?column?': 1 }];
     if (sql.includes('COUNT')) return [{ count: BigInt(1) }];
     return [
       {
